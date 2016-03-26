@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <script src="/edit/node_modules/mathjs/dist/math.js"></script>
+    <script src="/edit/node_modules/json-editor/dist/jsoneditor.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script>
+    </script>
+  </head>
+  <body ng-app>
+    <div id="schema" >
+        <ng-include src="'/edit/templates/object.html'"></ng-include>
+    </div>
+        <input type="text" ng-model="sometext" />
+ 
+    <h1>Hello {{ sometext }}</h1>
+    <script>
+      $(document).ready(function () {
+
+      });
+        
+    </script>
+  </body>
+</html>
