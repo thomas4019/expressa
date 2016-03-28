@@ -14,8 +14,8 @@ Object.keys(queries).forEach(function(name) {
 			if (err) {
 				console.error(err);
 			}
-			console.log(query.query);
-			console.log(req.query);
+			//console.log(query.query);
+			//console.log(req.query);
 			var params = [];
 			for (var i = 1; true; i++) {
 				if (typeof req.query['p'+i] != 'undefined')
@@ -28,7 +28,7 @@ Object.keys(queries).forEach(function(name) {
 				if (err) {
 					return res.status(500).send(err);
 				}
-				console.log(result);
+				//console.log(result);
 		        res.send(result.rows)
 	      	})
 		})

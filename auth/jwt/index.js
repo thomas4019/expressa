@@ -8,7 +8,8 @@ exports.doLogin = function(uid, req, res) {
 		expiresIn: 7 * 24 * 60 * 60 // number is in seconds
 	});
 	res.send({
-		token: token
+		token: token,
+		uid: uid
 	});
 }
 

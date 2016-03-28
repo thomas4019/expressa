@@ -37,6 +37,7 @@ exports.registerRoute = function(req, res) {
 
 		// check if user exists
 		client.query("SELECT * FROM users WHERE data->>'email' = $1", [email], function(err, result) {
+			done();
 			if (err) {
 				console.error(err);
 				return res.status(500).send('Server error')
@@ -68,6 +69,7 @@ exports.loginRoute = function(req, res) {
 
 		// check if user exists
 		client.query("SELECT * FROM users WHERE data->>'email' = $1", [email], function(err, result) {
+			done();
 			if (err) {
 				console.error(err);
 				return res.status(500).send('Server error')
@@ -78,6 +80,8 @@ exports.loginRoute = function(req, res) {
 			var user = result.rows[0];
 			if (isValidPassword(password, user.data.password)) {
 				handler.doLogin(user.id, req, res)
+			} else {
+				res.status(500).send('Incorrect password')
 			}
 		})
 	});

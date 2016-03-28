@@ -1,0 +1,8 @@
+Items Type: <select ng-init="d = data; d.items={'type': 'text'};" ng-model="d.items.type" ng-options="v for v in types"></select>
+minItems:  <input type="minItems" ng-model="d.minItems"/>
+Max:  <input type="checkbox" ng-model="d.uniqueItems"/>
+<div ng-init="data = d.items;" style="padding-left: 15px">
+	<ng-include src="'/edit/templates/'+d.items.type+'.html'">
+	
+	 </ng-include>
+</div>
