@@ -15,11 +15,11 @@ exports.middleware = function(req, res, next) {
 	handler.isLoggedIn(req, function(uid) {
 		if (uid) {
 			req.uid = uid;
-			next();
 		} else {
-			console.log('access denied ' + req.url)
-			res.status(403).send('Forbidden')
+			//console.log('access denied ' + req.url)
+			//res.status(403).send('Forbidden')
 		}
+		next();
 	})
 }
 
