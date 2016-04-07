@@ -6,27 +6,54 @@
     <meta name="keywords" content="">
     <meta name="author" content="">
     <title></title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> -->
 
     <link href="style.css" rel="stylesheet" type="text/css">
-    <script src="/edit/node_modules/mathjs/dist/math.js"></script>
-    <script src="/edit/node_modules/json-editor/dist/jsoneditor.js"></script>
+<script src="https://fb.me/react-0.14.8.js"></script>
+<script src="https://fb.me/react-dom-0.14.8.js"></script>
+
+<script src="/edit/node_modules/json-schema-editor/dist/jsonschemaeditor.js"></script>
+
+<!-- <script src="/edit/node_modules/react/dist/react.js"></script>
+<script src="/edit/node_modules/react-dom/dist/react-dom.js"></script> -->
+
     <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>-->
     <script>
     </script>
   </head>
-  <body ng-app>
-    <div id="schema" ng-init="types = ['text', 'number', 'array', 'object']" >
-        <ng-include ng-init="data = {properties: [{name: 'first', type: 'text'}, {name: 'last',  type: 'array'}] }" src="'/edit/templates/object.html'"></ng-include>
+  <body>
+    <div id="editor">
     </div>
-    {{data}}
-
+    <button onclick="save()">Save</button>
     <script>
-      $(document).ready(function () {
+    function save() {
+      var schema = window.editor.getValue();
+      $.ajax({
+        url : '/api/schemas/' + schemaName,
+        type: 'PUT',
+        data: JSON.stringify(schema),
+        contentType: 'application/json'
+      })
+        .then(function(result) {
+          console.log(result);
+        });
+    }
 
+      var tokens = window.location.pathname.split('/');
+      var schemaName = tokens.pop();
+      
+      $(function() {
+      $.get('/api/schemas/' + schemaName)
+        .then(function(schema) {
+          var element = document.getElementById('editor');
+
+          var editor = new JSONSchemaEditor(element, {});
+          editor.setValue(schema);
+          window.editor = editor;
+        });
       });
-        
+
     </script>
   </body>
 </html>
