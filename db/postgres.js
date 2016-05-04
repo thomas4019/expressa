@@ -1,5 +1,7 @@
 var pg = require('pg')
-var conString = require('../config.js').getConnectionURL()
+var conString = require('../config').settings.postgres;
+var uuid = require('node-uuid');
+var mongoToPostgres = require('../../mongo-query-to-postgres-jsonb')
 
 module.exports = (function(collection) {
 	return {
@@ -7,9 +9,10 @@ module.exports = (function(collection) {
 			return new Promise(function(resolve, reject) {
 				pg.connect(conString, function(err, client, done) {
 					if (err) {
-						reject(err, 500);
+						return reject(err, 500);
 					}
-					client.query('CREATE TABLE ' + collection + ' (id serial primary key, data jsonb)', function(err, result) {
+					client.query('CREATE TABLE IF NOT EXISTS ' + collection + ' (id text primary key, data jsonb)', function(err, result) {
+						done();
 						if (err) {
 							return reject(err, 500);
 						}
@@ -22,17 +25,44 @@ module.exports = (function(collection) {
 			return new Promise(function(resolve, reject) {
 				pg.connect(conString, function(err, client, done) {
 					if (err) {
-						reject(err, 500);
+						return reject(err, 500);
 					}
 					client.query('SELECT * FROM ' + collection, function(err, result) {
+						done();
 						if (err) {
 							return reject(err, 500);
 						}
-						var out = {};
-						result.rows.forEach(function(row) {
-							out[row.id] = row.data;
-						});
-						resolve(out)
+						resolve(result.rows.map(function(row) {
+							return row.data
+						}))
+					})
+				});
+			});
+		},
+		find: function(query, offset, limit) {
+			console.log(query)
+			var pgQuery = mongoToPostgres('data', query)
+			console.log(pgQuery)
+			return new Promise(function(resolve, reject) {
+				pg.connect(conString, function(err, client, done) {
+					if (err) {
+						return reject(err, 500);
+					}
+					var query = 'SELECT * FROM ' + collection + (pgQuery ? ' WHERE ' + pgQuery : '');
+					if (typeof offset != 'undefined') {
+						query += ' OFFSET ' + offset;
+					}
+					if (typeof limit != 'undefined') {
+						query += ' LIMIT ' + limit;
+					}
+					client.query(query, function(err, result) {
+						done();
+						if (err) {
+							return reject(err, 500);
+						}
+						resolve(result.rows.map(function(row) {
+							return row.data
+						}))
 					})
 				});
 			});
@@ -41,9 +71,10 @@ module.exports = (function(collection) {
 			return new Promise(function(resolve, reject) {
 				pg.connect(conString, function(err, client, done) {
 					if (err) {
-						reject(err, 500);
+						return reject(err, 500);
 					}
 					client.query('SELECT * FROM ' + collection + ' WHERE id = $1', [id], function(err, result) {
+						done();
 						if (err) {
 							return reject(err, 500);
 						}
@@ -59,14 +90,17 @@ module.exports = (function(collection) {
 			return new Promise(function(resolve, reject) {
 				pg.connect(conString, function(err, client, done) {
 					if (err) {
-						reject(err, 500);
+						return reject(err, 500);
 					}
-					client.query('INSERT INTO '+collection+' (data) VALUES ($1) RETURNING id;', [data], function(err, result) {
+					if (typeof data._id == 'undefined') {
+						data._id = uuid.v4();
+					}
+					client.query('INSERT INTO '+collection+' (id, data) VALUES ($1, $2)', [data._id, data], function(err, result) {
+						done();
 						if (err) {
 							reject(err);
 						}
-						var id = result.rows[0].id;
-						resolve(id);
+						resolve(data);
 					})
 				});
 			});
@@ -75,9 +109,14 @@ module.exports = (function(collection) {
 			return new Promise(function(resolve, reject) {
 				pg.connect(conString, function(err, client, done) {
 					if (err) {
-						reject(err, 500);
+						return reject(err, 500);
 					}
-					client.query('UPDATE '+collection+' SET data=$2 WHERE id=$1', [id, data], function(err, result) {
+					var idChange = '';
+					if (typeof data._id == 'undefined') {
+						data._id = id;
+					}
+					client.query('UPDATE '+collection+' SET data=$2,id=$3 WHERE id=$1', [id, data, data._id], function(err, result) {
+						done();
 						if (err) {
 							return reject(err, 500);
 						}
@@ -93,9 +132,10 @@ module.exports = (function(collection) {
 			return new Promise(function(resolve, reject) {
 				pg.connect(conString, function(err, client, done) {
 					if (err) {
-						reject(err, 500);
+						return reject(err, 500);
 					}
-					client.query('DELETE FROM '+req.params.schema+' WHERE id=$1', [req.params.id], function(err, result) {
+					client.query('DELETE FROM '+collection+' WHERE id=$1', [id], function(err, result) {
+						done();
 						if (err) {
 							return reject(err, 500);
 						}

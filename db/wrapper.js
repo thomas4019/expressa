@@ -18,6 +18,9 @@ exports.wrap = function(db, collection) {
 		all: function(id) {
 			return db.all(id);
 		},
+		find: function(query, skip, limit) {
+			return db.find(query, skip, limit);
+		},
 		findOne: function(id) {
 			notify('findOne', collection, id);
 			return db.findOne(id);
