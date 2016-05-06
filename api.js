@@ -3,7 +3,9 @@ var router = express.Router()
 var bodyParser  = require('body-parser')
 var auth = require('./auth')
 var mongoQuery = require('mongo-query');
-var MongoQS = require('mongo-querystring');
+var MongoQS = require('mongo-querystring')
+var queryStringParser = new MongoQS({});
+router.queryStringParser = queryStringParser;
 
 var rolePermissions = require('./role_permissions')(router);
 
@@ -47,6 +49,9 @@ db.settings.findOne('production')
 		require('./listeners')(router)
 
 		require('./validation_listeners')(router)
+	}, function(err) {
+		console.error('error during startup')
+		console.error(err.stack);
 	})
 
 var eventListeners = {};
@@ -98,7 +103,12 @@ function notify(event, req, collection, data) {
 	console.log('notifying '+ eventListeners[event].length +  ' of ' + event)
 	var promises = eventListeners[event].map(function(listener) {
 		//console.log('calling ' + listener.name)
-		return listener(req, collection, data)
+		try {
+			return listener(req, collection, data)
+		} catch (e) {
+			console.error('error in listener')
+			console.error(e.stack)
+		}
 	})
 	return Promise.all(promises)
 		.then(function(results) {
@@ -110,7 +120,7 @@ function notify(event, req, collection, data) {
 			return result || result === undefined
 		}, function(err) {
 			console.error('ERROR during listeners')
-			console.error(err);
+			console.error(err.stack);
 			return err;
 		});	
 }
@@ -147,7 +157,7 @@ router.get('/:collection', function (req, res, next) {
 			delete params['skip']
 			delete params['offset']
 			delete params['limit']
-			query = MongoQS.parse(params)
+			query = queryStringParser.parse(params)
 		}
 		if (req.query.skip) {
 			req.query.skip = parseInt(req.query.skip)
@@ -286,6 +296,7 @@ router.delete('/:collection/:id', function (req, res, next) {
 			if (allow) {
 				db[req.params.collection].destroy(req.params.id)
 					.then(function(data) {
+						notify('deleted', req, req.params.collection, {_id: req.params.id})
 						res.send('OK');
 					}, function(err, code) {
 						res.errCode = code;

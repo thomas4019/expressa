@@ -30,7 +30,9 @@ module.exports = function(api) {
 	function ensureCollectionPermission(permission) {
 		return function collectionPermissionCheck(req, collection, data) {
 			var user = req.user;
-			var editingOwn = (data.meta && data.meta.owner == req.uid && 
+			var editingOwnUser = collection == 'users' && data._id == req.uid
+			var editingOwnDoc = data.meta && data.meta.owner == req.uid
+			var editingOwn = ((editingOwnUser || editingOwnDoc) && 
 				req.hasPermission(collection + ': ' + permission + ' own'));
 			if (!editingOwn && !req.hasPermission(collection + ': ' + permission)) {
 				console.log('cancelling, missing ' + collection + ': ' + permission);

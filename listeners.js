@@ -50,12 +50,20 @@ module.exports = function(api) {
 		}
 	});
 
-	// update roles in user schema
-	/*addListener(['post', 'put', 'delete'], function(req, collection, data) {
-		if (collection == 'role') {
-			console.log(data)
+	// TODO how to add back in the password on PUT?
+	api.addListener('get', -100, function hidePasswordHashes(req, collection, data) {
+		if (collection == 'users' && !req.hasPermission('users: view hashed passwords')) {
+			delete data.password;
 		}
-	});*/
+	});
+
+	api.addListener('get', -5, function allowViewOwnUser(req, collection, data) {
+		if (collection == 'users' && req.hasPermission('users: view own')) {
+			if (req.uid == data._id) {
+				return true;
+			}
+		}
+	});
 
 	api.addListener('post', function userUniquenessCheck(req, collection, data) {
 		if (collection == 'users') {
@@ -74,4 +82,28 @@ module.exports = function(api) {
 		}
 	});
 
+	api.addListener('changed', function viewRelevantCollections(req, collection, data) {
+		if (collection == 'role') {
+			return api.db.collection.findOne('users')
+				.then(function(doc) {
+					if (doc.schema.properties.roles.items.enum.indexOf(data._id) == -1) {
+						doc.schema.properties.roles.items.enum.push(data._id);
+						api.db.collection.update('users', doc)
+					}
+				})
+		}
+	});
+
+	api.addListener('deleted', function viewRelevantCollections(req, collection, data) {
+		if (collection == 'role') {
+			return api.db.collection.findOne('users')
+				.then(function(doc) {
+					var roles = doc.schema.properties.roles.items.enum;
+					if (roles.indexOf(data._id) != -1) {
+						roles.splice(roles.indexOf(data._id), 1)
+						api.db.collection.update('users', doc)
+					}
+				})
+		}
+	});
 };
