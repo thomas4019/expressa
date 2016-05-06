@@ -3,7 +3,7 @@ var randomstring = require("randomstring");
 var mongoQuery = require("mongo-query")
 var filtr = require("filtr")
 
-module.exports = (function(collection) {
+module.exports = (function(settings, collection) {
 	var store = new Store('data/' + collection, {pretty: true, saveId: '_id'})
 
 	return {

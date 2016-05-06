@@ -14,7 +14,7 @@ module.exports = function(api) {
 			api.db.users.findOne(req.uid)
 				.then(function(user) {
 					req.user = user;
-					addRolePermissions(user, user.roles.concat(['Authenticated']), next);
+					addRolePermissions(user, (user.roles||[]).concat(['Authenticated']), next);
 				}, function(err) {
 					next(err);
 				});
@@ -55,6 +55,5 @@ module.exports = function(api) {
 
 	return {
 		middleware: addRolePermissionsMiddleware,
-		addRolePermissions: addRolePermissions
 	}
 }

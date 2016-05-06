@@ -3,9 +3,10 @@ var auth = require('./auth')
 module.exports = function(api) {
 
 	// Add db interface for new collections immediately
-	api.addListener('post', function setupCollections(req, collection, data) {
+	api.addListener('changed', function setupCollections(req, collection, data) {
 		if (collection == 'collection') {
-			api.db[data._id] = api.dbTypes[data.storage](data._id)
+			api.db[data._id] = api.dbTypes[data.storage](req.settings, data._id)
+			console.log('updated ' + data._id + ' collection storage')
 		}
 	})
 

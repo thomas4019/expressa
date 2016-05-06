@@ -1,17 +1,19 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
-var url = require('../config').settings.mongo;
 
-module.exports = (function(collection) {
+module.exports = (function(settings, collection) {
 	return {
 		init: function() {
 
 		},
 		all: function() {
 			return new Promise(function(resolve, reject) {
-				MongoClient.connect(url, function(err, db) {
+				MongoClient.connect(settings.mongo, function(err, db) {
 					db.collection(collection).find({})
 					.toArray(function(err, docs) {
+						docs.forEach(function(doc) {
+							doc._id = doc._id.toString()
+						})
 						if (err) {
 							reject(err);
 						} else {
@@ -23,7 +25,7 @@ module.exports = (function(collection) {
 		},
 		find: function(query, skip, limit) {
 			return new Promise(function(resolve, reject) {
-				MongoClient.connect(url, function(err, db) {
+				MongoClient.connect(settings.mongo, function(err, db) {
 					var cursor = db.collection(collection).find(query)
 					if (typeof skip != 'undefined') {
 						cursor.skip(skip)
@@ -32,6 +34,9 @@ module.exports = (function(collection) {
 						cursor.limit(limit)
 					}
 					cursor.toArray(function(err, docs) {
+						docs.forEach(function(doc) {
+							doc._id = doc._id.toString()
+						})
 						if (err) {
 							reject(err);
 						} else {
@@ -43,8 +48,10 @@ module.exports = (function(collection) {
 		},
 		findOne: function(id) {
 			return new Promise(function(resolve, reject) {
-				MongoClient.connect(url, function(err, db) {
+				MongoClient.connect(settings.mongo, function(err, db) {
 					db.collection(collection).findOne(new ObjectId(id), function(err, doc) {
+						if (doc)
+							doc._id = doc._id.toString()
 						if (err) {
 							reject(err);
 						} else {
@@ -56,8 +63,10 @@ module.exports = (function(collection) {
 		},
 		create: function(data) {
 			return new Promise(function(resolve, reject) {
-				MongoClient.connect(url, function(err, db) {
-					db.collection(collection).create(data, function(err, doc) {
+				MongoClient.connect(settings.mongo, function(err, db) {
+					db.collection(collection).insert(data, function(err, doc) {
+						if (typeof doc._id != 'undefined')
+							doc._id = doc._id.toString()
 						if (err) {
 							reject(err);
 						} else {
@@ -69,8 +78,11 @@ module.exports = (function(collection) {
 		},
 		update: function(id, data) {
 			return new Promise(function(resolve, reject) {
-				MongoClient.connect(url, function(err, db) {
+				MongoClient.connect(settings.mongo, function(err, db) {
+					data._id = ObjectId(id)
 					db.collection(collection).update({_id: ObjectId(id)}, data, function(err, doc) {
+						console.log(doc)
+						//doc._id = doc._id.toString()
 						if (err) {
 							reject(err);
 						} else {
@@ -82,8 +94,10 @@ module.exports = (function(collection) {
 		},
 		destroy: function(id) {
 			return new Promise(function(resolve, reject) {
-				MongoClient.connect(url, function(err, db) {
+				MongoClient.connect(settings.mongo, function(err, db) {
 					db.collection(collection).remove({_id: ObjectId(id)}, function(err, doc) {
+						if (typeof doc._id != 'undefined')
+							doc._id = doc._id.toString()
 						if (err) {
 							reject(err);
 						} else {

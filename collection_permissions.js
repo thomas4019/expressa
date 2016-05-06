@@ -17,16 +17,25 @@ module.exports = function(api) {
 		]
 	}
 
+	api.addListener('get', function viewRelevantCollections(req, collection, data) {
+		if (collection == 'collection') {
+			if (req.hasPermission('collection: view relevant')) {
+				if (req.hasPermission(data._id + ': view') || req.hasPermission(data._id + ': view own')) {
+					return true;
+				}
+			}
+		}
+	});
+
 	function ensureCollectionPermission(permission) {
 		return function collectionPermissionCheck(req, collection, data) {
 			var user = req.user;
-			var editingOwn = (data.meta && data.meta.owner && 
+			var editingOwn = (data.meta && data.meta.owner == req.uid && 
 				req.hasPermission(collection + ': ' + permission + ' own'));
 			if (!editingOwn && !req.hasPermission(collection + ': ' + permission)) {
 				console.log('cancelling, missing ' + collection + ': ' + permission);
 				return false;
 			}
-			//return true
 		}
 	}
 
@@ -56,7 +65,6 @@ module.exports = function(api) {
 				});
 		}
 	}
-
 	api.addListener(['put', 'post'], addCollectionPermissions);
 
 	function removeCollectionPermissions(req, collection, data) {

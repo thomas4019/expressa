@@ -1,7 +1,7 @@
 {
-  "name": "nbackend",
-  "version": "1.0.0",
-  "description": "",
+  "name": "expressa",
+  "version": "0.1.0",
+  "description": "API framework using JSON schemas",
   "main": "index.js",
   "dependencies": {
     "ajv": "^3.8.1",
@@ -22,10 +22,10 @@
     "randomstring": "^1.1.4"
   },
   "devDependencies": {},
+  "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf node_modules;"
   },
-  "author": "",
-  "license": "ISC"
+  "license": "MIT"
 }

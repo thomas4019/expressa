@@ -1,13 +1,12 @@
 var pg = require('pg')
-var conString = require('../config').settings.postgres;
 var uuid = require('node-uuid');
-var mongoToPostgres = require('../../mongo-query-to-postgres-jsonb')
+var mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 
-module.exports = (function(collection) {
+module.exports = (function(settings, collection) {
 	return {
 		init: function() {
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
@@ -23,7 +22,7 @@ module.exports = (function(collection) {
 		},
 		all: function(id) {
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
@@ -44,7 +43,7 @@ module.exports = (function(collection) {
 			var pgQuery = mongoToPostgres('data', query)
 			console.log(pgQuery)
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
@@ -69,7 +68,7 @@ module.exports = (function(collection) {
 		},
 		findOne: function(id) {
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
@@ -88,7 +87,7 @@ module.exports = (function(collection) {
 		},
 		create: function(data) {
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
@@ -107,7 +106,7 @@ module.exports = (function(collection) {
 		},
 		update: function(id, data) {
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
@@ -130,7 +129,7 @@ module.exports = (function(collection) {
 		},
 		destroy: function(id) {
 			return new Promise(function(resolve, reject) {
-				pg.connect(conString, function(err, client, done) {
+				pg.connect(settings.postgres, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}

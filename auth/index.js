@@ -1,9 +1,6 @@
 var pg = require('pg')
-var config = require('../config.js')
-var conString = config.settings.postgres;
-
-var handler = require('./jwt')
 var bCrypt = require('bcrypt-nodejs')
+var handler = require('./jwt')
 
 var createHash = function(password){
     return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null)
@@ -19,9 +16,6 @@ module.exports = {
 		handler.isLoggedIn(req, function(uid) {
 			if (uid) {
 				req.uid = uid;
-			} else {
-				//console.log('access denied ' + req.url)
-				//res.status(403).send('Forbidden')
 			}
 			next();
 		})
@@ -46,9 +40,7 @@ module.exports = {
 							next(err2)
 						})
 
-				}, function(err) {
-					next(err)
-				})
+				}, next)
 		};
 	},
 	getLoginRoute: function(api) {
@@ -68,9 +60,7 @@ module.exports = {
 					} else {
 						res.status(500).send('Incorrect password')
 					}
-				}, function(err) {
-					next(err)
-				})
+				}, next)
 		}
 	}
 }
