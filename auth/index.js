@@ -20,29 +20,6 @@ module.exports = {
 			next();
 		})
 	},
-	getRegisterRoute: function(api) {
-		return function(req, res, next) {
-			var user = req.body
-			var email = user.email
-			user.password = createHash(user.password)
-
-			// check if user exists
-			api.db.users.find({'email': email})
-				.then(function(result) {
-					if (result.length > 0) {
-						return res.status(409).send('User with this email already registered.')
-					}
-					api.db.users.create(req.body)
-						.then(function(result2) {
-							var uid = result2[0]._id;
-							handler.doLogin(uid, req, res)
-						}, function(err2) {
-							next(err2)
-						})
-
-				}, next)
-		};
-	},
 	getLoginRoute: function(api) {
 		return function(req, res, next) {
 			var email = req.body.email

@@ -83,7 +83,10 @@ router.use(function(req, res, next) {
 	next()
 })
 
-router.post('/user/register', auth.getRegisterRoute(router))
+router.post('/user/register', function(req, res, next) {
+	req.url = '/users';
+	next('route')
+})
 router.post('/user/login', auth.getLoginRoute(router))
 
 router.use(auth.middleware) // Add user id to request, if logged in
