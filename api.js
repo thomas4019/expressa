@@ -21,7 +21,7 @@ db.settings = dbTypes['file']({}, 'settings')
 router.db = db
 
 router.settings = {}
-db.settings.findOne('production')
+db.settings.get('production')
 	.then(function(data) {
 		router.settings = data;
 
@@ -129,7 +129,7 @@ function notify(event, req, collection, data) {
 }
 
 router.get('/:collection/schema', function (req, res, next) {
-	db.collection.findOne(req.params.collection)
+	db.collection.get(req.params.collection)
 		.then(function(collection) {
 			notify('get', req, 'schemas', collection.schema)
 				.then(function(allow) {
@@ -236,7 +236,7 @@ router.post('/:collection', function (req, res, next) {
 function getById(req, res, next) {
 	if (req.params.id == 'schema')
 		return next();
-	db[req.params.collection].findOne(req.params.id)
+	db[req.params.collection].get(req.params.id)
 		.then(function(data) {
 			notify('get', req, req.params.collection, data)
 				.then(function(allowed) {
@@ -277,7 +277,7 @@ router.put('/:collection/:id', function(req, res, next) {
 router.post('/:collection/:id/update', function (req, res, next) {
 	var modifier = req.body
 
-	db[req.params.collection].findOne(req.params.id)
+	db[req.params.collection].get(req.params.id)
 		.then(function(doc) {
 			var changes = mongoQuery(doc, {}, modifier);
 			req.body = doc;
@@ -296,7 +296,7 @@ router.delete('/:collection/:id', function (req, res, next) {
 	notify('delete', req, req.params.collection, {_id: req.params.id})
 		.then(function(allow) {
 			if (allow) {
-				db[req.params.collection].destroy(req.params.id)
+				db[req.params.collection].delete(req.params.id)
 					.then(function(data) {
 						notify('deleted', req, req.params.collection, {_id: req.params.id})
 						res.send('OK');

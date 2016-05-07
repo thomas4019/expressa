@@ -48,7 +48,7 @@ module.exports = function(api) {
 
 	function addCollectionPermissions(req, collection, data) {
 		if (collection == 'collection' && api.db.role) {
-			return api.db.role.findOne('Admin')
+			return api.db.role.get('Admin')
 				.then(function(admin) {
 					console.log('adding collection permissions for ' + data._id)
 					collectionPermissions(data._id).forEach(function(permission) {
@@ -72,7 +72,7 @@ module.exports = function(api) {
 	function removeCollectionPermissions(req, collection, data) {
 		console.log('delete')
 		if (collection == 'collection') {
-			api.db.role.findOne('Admin')
+			api.db.role.get('Admin')
 				.then(function(admin) {
 					console.log('deleting collection permissions for ' + id)
 					collectionPermissions(id).forEach(function(permission) {

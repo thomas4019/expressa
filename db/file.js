@@ -49,7 +49,7 @@ module.exports = (function(settings, collection) {
 				});
 			});
 		},
-		findOne: function(id) {
+		get: function(id) {
 			return new Promise(function(resolve, reject) {
 				store.get(id, function(err, data) {
 					if (err) {
@@ -90,7 +90,7 @@ module.exports = (function(settings, collection) {
 				}
 			});
 		},
-		destroy: function(id) {
+		delete: function(id) {
 			return new Promise(function(resolve, reject) {
 				store.delete(id, function(err, data) {
 					if (err) {

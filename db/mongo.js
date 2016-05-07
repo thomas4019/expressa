@@ -46,10 +46,10 @@ module.exports = (function(settings, collection) {
 				})
 			});
 		},
-		findOne: function(id) {
+		get: function(id) {
 			return new Promise(function(resolve, reject) {
 				MongoClient.connect(settings.mongo, function(err, db) {
-					db.collection(collection).findOne(new ObjectId(id), function(err, doc) {
+					db.collection(collection).get(new ObjectId(id), function(err, doc) {
 						if (doc)
 							doc._id = doc._id.toString()
 						if (err) {
@@ -92,7 +92,7 @@ module.exports = (function(settings, collection) {
 				})
 			});
 		},
-		destroy: function(id) {
+		delete: function(id) {
 			return new Promise(function(resolve, reject) {
 				MongoClient.connect(settings.mongo, function(err, db) {
 					db.collection(collection).remove({_id: ObjectId(id)}, function(err, doc) {

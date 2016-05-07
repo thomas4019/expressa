@@ -11,7 +11,7 @@ module.exports = function(api) {
 			return req.user.permissions[permission];
 		}
 		if (typeof req.uid != 'undefined') {
-			api.db.users.findOne(req.uid)
+			api.db.users.get(req.uid)
 				.then(function(user) {
 					req.user = user;
 					addRolePermissions(user, (user.roles||[]).concat(['Authenticated']), next);
@@ -29,7 +29,7 @@ module.exports = function(api) {
 
 	function addRolePermissions(user, roles, next) {
 		var promises = roles.map(function(name) {
-			return api.db.role.findOne(name)
+			return api.db.role.get(name)
 				.then(function(result) {
 					return result;
 				}, function(err) {

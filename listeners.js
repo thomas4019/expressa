@@ -36,7 +36,7 @@ module.exports = function(api) {
 				if (req.hasPermission('modify user roles')) {
 					resolve(undefined)
 				} else {
-					api.db.users.findOne(data._id)
+					api.db.users.get(data._id)
 						.then(function(oldData) {
 							data.roles = oldData.roles;
 							resolve(undefined);
@@ -84,7 +84,7 @@ module.exports = function(api) {
 
 	api.addListener('changed', function viewRelevantCollections(req, collection, data) {
 		if (collection == 'role') {
-			return api.db.collection.findOne('users')
+			return api.db.collection.get('users')
 				.then(function(doc) {
 					if (doc.schema.properties.roles.items.enum.indexOf(data._id) == -1) {
 						doc.schema.properties.roles.items.enum.push(data._id);
@@ -96,7 +96,7 @@ module.exports = function(api) {
 
 	api.addListener('deleted', function viewRelevantCollections(req, collection, data) {
 		if (collection == 'role') {
-			return api.db.collection.findOne('users')
+			return api.db.collection.get('users')
 				.then(function(doc) {
 					var roles = doc.schema.properties.roles.items.enum;
 					if (roles.indexOf(data._id) != -1) {
