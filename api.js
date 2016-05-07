@@ -4,8 +4,8 @@ var bodyParser  = require('body-parser')
 var auth = require('./auth')
 var mongoQuery = require('mongo-query');
 var MongoQS = require('mongo-querystring')
-var queryStringParser = new MongoQS({});
-router.queryStringParser = queryStringParser;
+
+router.queryStringParser = new MongoQS({});
 
 var rolePermissions = require('./role_permissions')(router);
 
@@ -160,7 +160,7 @@ router.get('/:collection', function (req, res, next) {
 			delete params['skip']
 			delete params['offset']
 			delete params['limit']
-			query = queryStringParser.parse(params)
+			query = router.queryStringParser.parse(params)
 		}
 		if (req.query.skip) {
 			req.query.skip = parseInt(req.query.skip)
@@ -247,8 +247,7 @@ function getById(req, res, next) {
 					}
 				});
 		}, function(err, code) {
-			res.errCode = code;
-			next(err);
+			res.status(404).send('document not found')
 		});
 }
 router.get('/:collection/:id', getById)

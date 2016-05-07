@@ -55,7 +55,10 @@ module.exports = (function(settings, collection) {
 						if (err) {
 							reject(err);
 						} else {
-							resolve(doc);
+							if (doc)
+								resolve(doc);
+							else
+								reject('document not found', 404)
 						}
 					})
 				})
@@ -65,12 +68,10 @@ module.exports = (function(settings, collection) {
 			return new Promise(function(resolve, reject) {
 				MongoClient.connect(settings.mongo, function(err, db) {
 					db.collection(collection).insert(data, function(err, doc) {
-						if (typeof doc._id != 'undefined')
-							doc._id = doc._id.toString()
 						if (err) {
 							reject(err);
 						} else {
-							resolve(doc);
+							resolve(doc.insertedIds[0]);
 						}
 					})
 				})
@@ -81,7 +82,6 @@ module.exports = (function(settings, collection) {
 				MongoClient.connect(settings.mongo, function(err, db) {
 					data._id = ObjectId(id)
 					db.collection(collection).update({_id: ObjectId(id)}, data, function(err, doc) {
-						console.log(doc)
 						//doc._id = doc._id.toString()
 						if (err) {
 							reject(err);
