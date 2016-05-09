@@ -50,7 +50,7 @@ module.exports = function(api) {
 	})
 
 	api.addListener(['put', 'post'], function checkValid(req, collection, data) {
-		if (req.hasPermission('bypass schema validation')) {
+		if (!req.settings.enforce_permissions) {
 			return;
 		}
 		var valid = schemaValidators[collection](data);

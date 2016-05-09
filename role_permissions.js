@@ -1,7 +1,7 @@
 module.exports = function(api) {
 	
 	function addRolePermissionsMiddleware(req, res, next) {
-		if (typeof api.db.role == 'undefined') {
+		if (!req.settings || !req.settings.enforce_permissions) {
 			req.hasPermission = function(permission) {
 				return true;
 			}

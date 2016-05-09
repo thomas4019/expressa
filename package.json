@@ -9,6 +9,7 @@
     "body-parser": "^1.15.0",
     "cors": "^2.7.1",
     "express": "^4.13.4",
+    "expressa-admin": "^0.1.3",
     "filtr": "^0.3.0",
     "handlebars": "^4.0.5",
     "jfs": "^0.2.6",

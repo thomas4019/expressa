@@ -1,14 +1,14 @@
 ## Summary
 
-expressa is an api framework for express apps. Collections are described via [JSON schema](http://json-schema.org). Documents can be stored in text files (for small collections), MongoDB, or PostgreSQL (using the [jsonb field](http://www.postgresql.org/docs/9.4/static/datatype-json.html)).
+Expressa is an extensable API framework/CMS for express. Collections are described using [JSON schema](http://json-schema.org). Documents are stored in MongoDB, PostgreSQL (using [jsonb](http://www.postgresql.org/docs/9.4/static/datatype-json.html)), or text files (for small collections)
 
-Provides a django-like admin interface for creating and editing documents (using [JSON Editor](https://github.com/jdorn/json-editor)), editing collection schemas, and managing permisions.
+It includes a django-like admin interface for creating and editing documents, editing collection schemas, and managing permisions.
 
 ## Getting Started
 
 Install via npm
 
-    npm install expressa express
+    npm install expressa expressa-admin express
 
 Create a file `app.js` with the following code (or integrate the middle 4 lines into your existing express app)
 
@@ -23,6 +23,16 @@ Create a file `app.js` with the following code (or integrate the middle 4 lines 
     app.listen(3000, function () {
       console.log('Example app listening on port 3000!');
     });
+
+Note: you can run the api server on a different host or prefix and then pass the url of the api server into expressa.admin()
+
+### Start the server
+
+`node app.js`
+
+### Install via the admin app
+
+Navigate to [http://localhost:3000/admin/](http://localhost:3000/admin/) or whatever address the admin site is being served from.
 
 ## Collections
 
@@ -44,7 +54,7 @@ Only standard JSON (strings, numbers, booleans, null). Dates can be stored as st
 ### Special endpoints
 
 * `POST /user/login`
-* `GET /user/me` - return the logged in user's object
+* `GET /user/me` - returns the logged in user's object
 
 
 ## Authentication using [JSON Web Tokens](https://jwt.io/)
@@ -64,22 +74,28 @@ Use one of the two functions to add a listener
 
 `eventTypes` is a string or array of the event types listed below  
 `priority` determines the order of callback execution. Listeners with lower priority are executed first.  
-`callback` is a function like the following: `function(req, collection, doc)` 
+`callback` is a function like the following: 
 
-    `req` is the request
-    `collection` is a string of the name of the collection acted upon
-    `doc` is generally the relevant . Sometimes only doc._id is available.
+`function(req, collection, doc)`  where
 
-Before Event Types
+> `req` is the request  
+> `collection` is a string of the name of the collection acted upon  
+> `doc` is generally the relevant . Sometimes only doc._id is available.  
+
+### Before Event Types
+
+The value returned controls whether the user will be allowed to perform the action. Return `true` to allow the action. Return `false` to deny the action. Don't return anything or `undefined` to let other listeners decide. If all listeners return undefined the action is allowed. Order is significant because it's the first defined return value that controls whether the action is allowed.
 
 * get
 * post
 * put
 * delete
 
-After Event Types
+### After Event Types
 
-* changed
+For these, the returned value is ignored.
+
+* changed (called after a put or post has succeeded)
 * deleted
 
 ## Todo - contributions welcome!

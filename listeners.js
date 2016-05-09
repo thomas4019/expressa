@@ -33,7 +33,7 @@ module.exports = function(api) {
 	api.addListener('put', function roleChangeCheck(req, collection, data) {
 		if (collection == 'users') {
 			return new Promise(function(resolve, reject) {
-				if (req.hasPermission('modify user roles')) {
+				if (req.hasPermission('users: modify roles')) {
 					resolve(undefined)
 				} else {
 					api.db.users.get(data._id)
@@ -104,6 +104,15 @@ module.exports = function(api) {
 						api.db.collection.update('users', doc)
 					}
 				})
+		}
+	});
+
+	api.addListener('changed', function updateSettings(req, collection, data) {
+		if (collection == 'settings') {
+			// Copy and replace each attribute
+			for (var attrname in data) {
+				req.settings[attrname] = data[attrname];
+			}
 		}
 	});
 };

@@ -22,18 +22,17 @@ module.exports = {
 	},
 	getLoginRoute: function(api) {
 		return function(req, res, next) {
-			var email = req.body.email
 			var password = req.body.password
 
 			// check if user exists
-			api.db.users.find({'email': email})
+			api.db.users.find({'email': req.body.email})
 				.then(function(result) {
 					if (result.length == 0) {
 						return res.status(404).send('No user found with this email.')
 					}
 					var user = result[0];
 					if (isValidPassword(password, user.password)) {
-						handler.doLogin(user._id, req, res)
+						handler.doLogin(user._id, req, res, next)
 					} else {
 						res.status(500).send('Incorrect password')
 					}

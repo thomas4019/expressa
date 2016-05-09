@@ -41,6 +41,7 @@ db.settings.get('production')
 	}, function(err) {
 		console.error('error reading settings')
 		console.error(err.stack)
+		db.collection = dbTypes[router.settings.collection_db_type||'file'](router.settings, 'collection')
 	})
 	.then(function(data) {
 		// Add standard collection based permissions
@@ -81,6 +82,12 @@ router.use(bodyParser.json({ type: "*/*" }))
 router.use(function(req, res, next) {
 	req.settings = router.settings;
 	next()
+})
+
+router.get('/status', function(req, res, next) {
+	res.send({
+		installed: req.settings.installed || false
+	})
 })
 
 router.post('/user/register', function(req, res, next) {
@@ -243,7 +250,7 @@ function getById(req, res, next) {
 					if (allowed == true) {
 						res.send(data);
 					} else {
-						res.status(allowed.code||500).send(allowed.message || 'forbidden');
+						res.status(allowed.code||403).send(allowed.message || 'forbidden');
 					}
 				});
 		}, function(err, code) {
@@ -318,7 +325,7 @@ router.use(function(err, req, res, next) {
 	console.log('my err handler')
 	console.error(err.stack);
 	res.status(res.errCode || 500)
-	if (req.hasPermission('view: errors')) {
+	if (req.hasPermission('view errors')) {
 		res.send(err);
 	} else {
 		res.send('something wrong happened')

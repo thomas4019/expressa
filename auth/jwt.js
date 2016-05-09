@@ -2,7 +2,10 @@ var jwt = require('jsonwebtoken');
 
 // User document already validated, created, and saved to database
 // The id of that document is given.
-exports.doLogin = function(uid, req, res) {
+exports.doLogin = function(uid, req, res, next) {
+	if (!req.settings.jwt_secret) {
+		return next('missing jwt_secret in settings')
+	}
 	var token = jwt.sign(uid, req.settings.jwt_secret, {});
 	res.send({
 		token: token,
