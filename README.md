@@ -38,9 +38,10 @@ Navigate to [http://localhost:3000/admin/](http://localhost:3000/admin/) or what
 
 ### API endpoints
 
-* `GET /:collection>/` - get an array of all objects in a collection
-* `GET /:collection>/:id` - get a specific object
-* `GET /:collection>/?query={}` - get an array of objects matching the mongo style query
+* `GET /:collection>/` - get an array of all documents in a collection
+* `GET /:collection>/:id` - get a specific document
+* `GET /:collection>/?query={}` - get an array of documents matching the mongo query
+* `GET /:collection>/?fieldname=value` - get an array of documents matching with the specified values. See [node-mongo-querystring](https://github.com/Turistforeningen/node-mongo-querystring) for details.
 * `GET /:collection>/schema` - get the collection schema
 * `POST /:collection/` - create a new document
 * `POST /:collection/:id/update` - modify the document with `id` using a [mongo update query](https://docs.mongodb.com/manual/reference/method/db.collection.update/#update-parameter)
@@ -69,34 +70,47 @@ Obtain a token by sending a POST to `/user/login`. This returns:
 This token can then be passed as a queryparam (e.g. ?token=) or using the `x-access-token` header.
 
 ## Modifying behavior using listeners
-Use one of the two functions to add a listener
-`api.addListener(eventTypes, priority, callback)`
+Use `api.addListener(eventTypes, priority, callback)`
 
-`eventTypes` is a string or array of the event types listed below  
-`priority` determines the order of callback execution. Listeners with lower priority are executed first.  
+`eventTypes` is a string or array of the event types listed below e.g. 'get' or ['put', 'post']
+`priority` is a number which determines the order of callback execution. Listeners with lower priority are executed first. e.g. 0
 `callback` is a function like the following: 
 
 `function(req, collection, doc)`  where
 
 > `req` is the request  
 > `collection` is a string of the name of the collection acted upon  
-> `doc` is generally the relevant . Sometimes only doc._id is available.  
+> `doc` is the relevant document.
 
 ### Before Event Types
 
 The value returned controls whether the user will be allowed to perform the action. Return `true` to allow the action. Return `false` to deny the action. Don't return anything or `undefined` to let other listeners decide. If all listeners return undefined the action is allowed. Order is significant because it's the first defined return value that controls whether the action is allowed.
 
-* get
-* post
-* put
-* delete
+A promise may also be returned so that asynchronus logic can be perfomed. In this case, it will wait for the promise to fulfill and use the resolved value.
+
+* get - called once for each document being retrieved. A listener returning false in a GET returning multiple documents (e.g. all or find) will simply remove that document from the list.
+* post - called before creating a new document
+* put - called before changing a document
+* delete - called before deleting a document. Note: only the _id of the document is available in the callback. If the full document is needed you will need to load it yourself.
 
 ### After Event Types
 
 For these, the returned value is ignored.
 
-* changed (called after a put or post has succeeded)
-* deleted
+* changed - called after a put or post has succeeded
+* deleted - called after a successful deletion
+
+### Generic JSON Database API
+
+Each of the database implementations provides the following methods. You can access a collection's database using `api.db[collectionName]
+
+* all - returns all documents
+* find - returns array of documents matching the mongo query
+* get - retrieve a document by id
+* create - create a new document
+* update - modify an existing document
+* delete - delete a document by id
+* init - called once during startup, useful to create/ensure collection exists
 
 ## Todo - contributions welcome!
 * JWT token expiration
