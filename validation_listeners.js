@@ -42,7 +42,7 @@ module.exports = function(api) {
 			console.error(err);
 		});
 
-	api.addListener(['put', 'post'], function updateValidators(req, collection, data) {
+	api.addListener('changed', function updateValidators(req, collection, data) {
 		if (collection == 'collection') {
 			var schema = augmentSchema(data.schema)
 			schemaValidators[data._id] = ajv.compile(schema)

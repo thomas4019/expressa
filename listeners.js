@@ -89,6 +89,7 @@ module.exports = function(api) {
 					if (doc.schema.properties.roles.items.enum.indexOf(data._id) == -1) {
 						doc.schema.properties.roles.items.enum.push(data._id);
 						api.db.collection.update('users', doc)
+						api.notify('changed', req, 'users', doc)
 					}
 				})
 		}
@@ -102,6 +103,7 @@ module.exports = function(api) {
 					if (roles.indexOf(data._id) != -1) {
 						roles.splice(roles.indexOf(data._id), 1)
 						api.db.collection.update('users', doc)
+						api.notify('changed', req, 'users', doc)
 					}
 				})
 		}
