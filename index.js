@@ -140,11 +140,11 @@ router.get('/:collection/schema', function (req, res, next) {
 	db.collection.get(req.params.collection)
 		.then(function(collection) {
 			notify('get', req, 'schemas', collection.schema)
-				.then(function(allow) {
-					if (allow)
+				.then(function(allowed) {
+					if (allowed === true)
 						res.send(collection.schema);
 					else 
-						res.status(403).send('forbidden')
+						res.status(allowed.code||500).send(allowed.message || 'forbidden');
 				}, function(err) {
 					next(err)
 				})
@@ -187,7 +187,7 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						res.send(data.filter(function(doc, i) {
-							return allowed[i];
+							return allowed[i] === true;
 						}))
 					}, function(err) {
 						next(err);
@@ -205,7 +205,7 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						res.send(data.filter(function(doc, i) {
-							return allowed[i];
+							return allowed[i] === true;
 						}))
 					}, function(err) {
 						next(err);
@@ -221,7 +221,7 @@ router.post('/:collection', function (req, res, next) {
 	var data = req.body
 	notify('post', req, req.params.collection, data)
 		.then(function(allowed) {
-			if (allowed == true) {
+			if (allowed === true) {
 				db[req.params.collection].create(data)
 					.then(function(id) {
 						notify('changed', req, req.params.collection, data)
@@ -248,7 +248,7 @@ function getById(req, res, next) {
 		.then(function(data) {
 			notify('get', req, req.params.collection, data)
 				.then(function(allowed) {
-					if (allowed == true) {
+					if (allowed === true) {
 						res.send(data);
 					} else {
 						res.status(allowed.code||403).send(allowed.message || 'forbidden');
@@ -265,7 +265,7 @@ router.put('/:collection/:id', function(req, res, next) {
 	data._id = req.params.id
 	notify('put', req, req.params.collection, data)
 		.then(function(allowed) {
-			if (allowed == true) {
+			if (allowed === true) {
 				db[req.params.collection].update(req.params.id, req.body)
 					.then(function(data) {
 						notify('changed', req, req.params.collection, req.body)
@@ -302,8 +302,8 @@ router.post('/:collection/:id/update', function (req, res, next) {
 
 router.delete('/:collection/:id', function (req, res, next) {
 	notify('delete', req, req.params.collection, {_id: req.params.id})
-		.then(function(allow) {
-			if (allow) {
+		.then(function(allowed) {
+			if (allowed) {
 				db[req.params.collection].delete(req.params.id)
 					.then(function(data) {
 						notify('deleted', req, req.params.collection, {_id: req.params.id})
@@ -314,7 +314,7 @@ router.delete('/:collection/:id', function (req, res, next) {
 					});
 			}
 			else {
-				res.status(403).send('forbidden')
+				res.status(allowed.code||500).send(allowed.message || 'forbidden');
 			}
 		}, function(err) {
 			next(err)
