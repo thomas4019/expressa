@@ -13,6 +13,7 @@ var dbTypes = {
 	file: require('./db/file'),
 	postgres: require('./db/postgres'),
 	mongo: require('./db/mongo'),
+	mongodb: require('./db/mongo'),
 }
 router.dbTypes = dbTypes
 
@@ -110,7 +111,7 @@ function notify(event, req, collection, data) {
 	if (typeof eventListeners[event] == 'undefined' || eventListeners[event].length == 0) {
 		return Promise.resolve(true);
 	}
-	console.log('notifying '+ eventListeners[event].length +  ' of ' + event)
+	//console.log('notifying '+ eventListeners[event].length +  ' of ' + event)
 	var promises = eventListeners[event].map(function(listener) {
 		//console.log('calling ' + listener.name)
 		try {
@@ -122,14 +123,15 @@ function notify(event, req, collection, data) {
 	})
 	return Promise.all(promises)
 		.then(function(results) {
-			console.log('notifying done')
+			//console.log('notifying done')
 			// Result is the first defined value
 			var result = results.reduce(function(prev, current) {
 				return (prev == undefined) ? current : prev;
 			})
 			return result || result === undefined
 		}, function(err) {
-			console.error('ERROR during listeners')
+			console.error('ERROR during listeners ' + event + ' ' + collection)
+			console.error(data)
 			console.error(err.stack);
 			return err;
 		});	
