@@ -1,7 +1,7 @@
 # Expressa
 ## a data-driven extendable API framework for Node.js
 
-Expressa makes it easy to create basic APIs without custom code. It's easily extendable so you can add complex features as well. It includes a django-like admin interface for creating documents and managing permissions without doing any code. Furthermore, the collection schema's themselves can be edited through the admin interface which makes adding new collections simple.
+Expressa makes it easy to create basic APIs without custom code. It's easily extendable so you can add complex features as well. It includes a django-like admin interface for creating documents and managing permissions. Furthermore, the collection schema's themselves can be edited through the admin interface which makes adding new collections simple.
 
 Those with experience in node and express can mix expressa with their own endpoints, since expressa is just a middleware. It allows adding event listeners which can stop requests and/or modify the results, so advanced functionality can be cleanly added.
 
