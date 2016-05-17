@@ -88,7 +88,7 @@ Returns the following
   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NmNkNWM5NmY4MjA4N2I1MDQ0OTM3YjEiLCJ1bml2ZXJzaXR5IjoiQllVIiwiZnVsbE5hbWUiOiJUaG9tYXMgSGFuc2VuIiwicGFzc3dvcmQiOiIkMmEkMTAkb0prdlBnTTlkR2FJRTIzaWFabGEvT0tjZC9PL3phSGFJOHFRUDBuZ2pPUVV1Ums3Vng2QkciLCJlbWFpbCI6InRoNDAxOUBnbWFpbC5jb20iLCJfX3YiOjAsImxpc3RpbmdzIjpbXSwiaWF0IjoxNDU2NDMwMjE5LCJleHAiOjE0NTY1MTY2MTl9._ijngdgwLU9AJnAjbySUgEFsR8hJCSw8PhH1AnyBHuM"
 }
 ```
-Or it will respond with a status code of 401 and a message explaing why they can't login.
+Or it will respond with a status code of 401 and a message explaining why they can't login.
 
 ```javascript
 {
