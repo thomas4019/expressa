@@ -1,10 +1,28 @@
-## Summary
+# Expressa
+## a data-driven extendable API framework for Node.js
 
-Expressa is a data-driven extensable API framework which makes it easy to create a basic API without custom code. It includes a django-like admin interface for creating documents and managing permissions without doing any code. Furthermore, the collection schema's themselves can be edited through the admin interface which makes adding new endpoints simple.
+Expressa makes it easy to create basic APIs without custom code. It's easily extendable so you can add complex features as well. It includes a django-like admin interface for creating documents and managing permissions without doing any code. Furthermore, the collection schema's themselves can be edited through the admin interface which makes adding new collections simple.
 
-Those with experience in node and express can mix expressa with their own endpoints, since expressa is just a middleware. It includes a system for adding event listeners which can stop requests and/or modify the results, so advanced functionality can be cleanly added.
+Those with experience in node and express can mix expressa with their own endpoints, since expressa is just a middleware. It allows adding event listeners which can stop requests and/or modify the results, so advanced functionality can be cleanly added.
 
-The [JSON schema](http://json-schema.org) standard format is used for describing the documents in a collection. Documents can be stored in MongoDB, PostgreSQL, or just text files.
+The [JSON schema](http://json-schema.org) standard format is used for describing the documents in a collection. This makes your schemas portable, so you can easily use them for another app and with other libraries.
+
+Expressa lets you store different collections in different databases (thus taking advantage of each one's unique benefits). Documents can be stored in MongoDB, PostgreSQL, or just text files (useful for version control). Support for other JSON capable databases can be easily added.
+
+--------------------------------
+
+### The main page of the admin app
+![home](https://cloud.githubusercontent.com/assets/406149/15307573/a43b1508-1b91-11e6-8ff3-c8a24dd4efa1.png)
+
+--------------------------------
+
+### Creating the "post" collection and its schema
+![post schema 3](https://cloud.githubusercontent.com/assets/406149/15308189/c3612ade-1b97-11e6-8f87-faeee4aba8bd.png)
+
+--------------------------------
+
+### Creating a post
+![create post 3](https://cloud.githubusercontent.com/assets/406149/15308188/c361368c-1b97-11e6-869a-ac40ba838dde.png)
 
 ## Getting Started
 
@@ -94,6 +112,14 @@ Obtain a token by sending a POST to `/user/login`. This returns:
 ```
 This token can then be passed as a queryparam (e.g. ?token=) or using the `x-access-token` header.
 
+## Permissions
+
+Expressa lets you manage CRUD permissions for collections easily through the admin interface. Collections that are marked as having documents with owners have additional permissions for users interacting with their own documents.
+
+![post permissions](https://cloud.githubusercontent.com/assets/406149/15307975/8c609530-1b95-11e6-9888-36a76a9a8248.png)
+
+Note: additional roles can be added through the interface
+
 ## Automatic Metadata
 
 A meta property is added to objects which looks like the following.
@@ -176,6 +202,6 @@ Other JSON capable databases can be added easily.
 
 ## Inspired by
 
-* deployd (API design)
-* Django (admin UI)
-* Drupal (roles/permissions)
+* [deployd](http://deployd.com/) (API design)
+* [Django](https://www.djangoproject.com/) (admin UI)
+* [Drupal](https://www.drupal.org/) (roles/permissions)

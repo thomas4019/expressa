@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "dependencies": {
@@ -9,7 +9,7 @@
     "body-parser": "^1.15.0",
     "cors": "^2.7.1",
     "express": "^4.13.4",
-    "expressa-admin": "^0.1.3",
+    "expressa-admin": "^0.1.5",
     "filtr": "^0.3.0",
     "handlebars": "^4.0.5",
     "jfs": "^0.2.6",
