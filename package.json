@@ -3,6 +3,7 @@
   "version": "0.2.3",
   "description": "API framework using JSON schemas",
   "main": "index.js",
+  "repository":"https://github.com/thomas4019/expressa",
   "dependencies": {
     "ajv": "^3.8.1",
     "bcrypt-nodejs": "0.0.3",
