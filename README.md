@@ -1,10 +1,11 @@
-# Expressa
+![](expressa.png)
+
 ## data-driven extendable API framework for Node.js
 
 Expressa makes it easy to create basic APIs by using [JSON schema](http://json-schema.org):
 
-* django-like admin interface for creating collection-endpoints and managing permissions 
-* collection schema's can be edited *and* added through the admin interface 
+* django-like __admin interface__ for creating collection-__REST__ endpoints and managing permissions 
+* collection schema's can be edited *and* added __through the admin interface__ 
 * re-use collection schema's in your frontend to generate forms
 * easily extendable so you can add complex features as well
 * define collection as [JSON schema](http://json-schema.org) instead of custom code
@@ -41,23 +42,6 @@ Create a file `app.js` with the following code (or just copy the middle 3 lines 
 
 Now start the server by running `node app.js` and navigate your browser to [http://localhost:3000/admin/](http://localhost:3000/admin/)
 
-### The main page of the admin app
-![home](https://cloud.githubusercontent.com/assets/406149/15307573/a43b1508-1b91-11e6-8ff3-c8a24dd4efa1.png)
-
---------------------------------
-
-### Creating the "post" collection and its schema
-![post schema 3](https://cloud.githubusercontent.com/assets/406149/15308189/c3612ade-1b97-11e6-8f87-faeee4aba8bd.png)
-
---------------------------------
-
-### Creating a post
-![create post 3](https://cloud.githubusercontent.com/assets/406149/15308188/c361368c-1b97-11e6-869a-ac40ba838dde.png)
-
-### Start the server
-
-`node app.js`
-
 ## Collections
 
 ### API endpoints
@@ -91,6 +75,7 @@ Each object will contain this meta property:
 
 ## Documentation 
 
+* [Usecase: creating a blog collection and post](doc/blogexample.md)
 * [Authentication](doc/permissions.md)
 * [Authentication using JSON Web Tokens](doc/permissions.md)
 * [Managing CRUD permissions using the admin interface](doc/permissions.md)
