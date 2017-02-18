@@ -24,16 +24,16 @@ A promise can be returned so that asynchronous logic can be perfomed. In this ca
 
 For example to prevent modifying old posts you could add the following listener:
 
-expressa.addListener('put', 10, function(req, collection, doc) {
-  if (collection == 'listing') {
-    if (Date.now() - new Date(doc.meta.created) > (1000*60*60*24)) { //older than a day
-      return {
-        code: 403,
-        message: 'You cannot modify posts older than a day'
+    expressa.addListener('put', 10, function(req, collection, doc) {
+      if (collection == 'listing') {
+        if (Date.now() - new Date(doc.meta.created) > (1000*60*60*24)) { //older than a day
+          return {
+            code: 403,
+            message: 'You cannot modify posts older than a day'
+          }
+        }
       }
-    }
-  }
-})
+    })
 
 ### After Event Types
 
