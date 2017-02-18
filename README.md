@@ -8,12 +8,12 @@ Expressa makes it easy to create basic APIs by using [JSON schema](http://json-s
 * collection schema's can be edited *and* added __through the admin interface__ 
 * re-use collection schema's in your frontend to generate forms
 * easily extendable so you can add complex features as well
-* define collection as [JSON schema](http://json-schema.org) instead of custom code
-* per-collection database storage: *MongoDB*, *PostgreSQL*, or *JSON-files* (userful for version control)
+* define collections as [JSON schema](http://json-schema.org) instead of custom code
+* per-collection database storage: *MongoDB*, *PostgreSQL*, or *JSON-files* (useful for version control)
 
 > Best of all: it's just middleware, not a framework 
 
-* mix-and-mash: easily thrown in other express middleware and endpoints 
+* mix-and-mash: easily throw in other express middleware and endpoints 
 * decorate expressa-endpoints: add event listeners which stop/modify requests (responses)
 
 --------------------------------
@@ -76,7 +76,7 @@ Each object will contain this meta property:
 ## Documentation 
 
 * [Usecase: creating a blog collection and post](doc/blogexample.md)
-* [Authentication](doc/permissions.md)
+* [Permissions](doc/permissions.md)
 * [Authentication using JSON Web Tokens](doc/permissions.md)
 * [Managing CRUD permissions using the admin interface](doc/permissions.md)
 * [Modifying behavior using listeners](doc/listeners.md)
