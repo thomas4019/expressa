@@ -77,10 +77,11 @@ Each object will contain this meta property:
 
 * [Usecase: creating a blog collection and post](doc/blogexample.md)
 * [Permissions](doc/permissions.md)
-* [Authentication using JSON Web Tokens](doc/permissions.md)
+* [Authentication using JSON Web Tokens](doc/authentication.md)
 * [Managing CRUD permissions using the admin interface](doc/permissions.md)
 * [Modifying behavior using listeners](doc/listeners.md)
 * [Accessing the database](md/database.md)
+* [Online generated documentation + browser REST client](https://www.npmjs.com/package/expressa-swagger)
 
 ## Todo - contributions welcome!
 * JWT token expiration
