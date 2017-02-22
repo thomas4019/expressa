@@ -82,6 +82,7 @@ Each object will contain this meta property:
 * [Modifying behavior using listeners](doc/listeners.md)
 * [Accessing the database](doc/database.md)
 * [Online generated documentation + browser REST client](https://www.npmjs.com/package/expressa-swagger)
+* [Testing / CI integrating your expressa app](doc/testing.md)
 
 ## Todo - contributions welcome!
 * JWT token expiration
