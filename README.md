@@ -80,7 +80,7 @@ Each object will contain this meta property:
 * [Authentication using JSON Web Tokens](doc/authentication.md)
 * [Managing CRUD permissions using the admin interface](doc/permissions.md)
 * [Modifying behavior using listeners](doc/listeners.md)
-* [Accessing the database](md/database.md)
+* [Accessing the database](doc/database.md)
 * [Online generated documentation + browser REST client](https://www.npmjs.com/package/expressa-swagger)
 
 ## Todo - contributions welcome!
