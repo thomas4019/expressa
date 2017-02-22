@@ -5,13 +5,15 @@ Here's just an easy testframework-agnostic, linux way to test your app.
 
 ## package.json
 
-Add this line:
+Add the 'test' command in the `script`-section of your package.json:
 
-    "test": "for i in test/*; do [ -x $i  ] && [ ! -d $i  ] && { printf '\nn<▶ '$i'\n\n' && ./$i || exit 1;  }; done;"
+    "scripts":{
+      "test": "for i in test/*; do [ -x $i  ] && [ ! -d $i  ] && { printf '\nn<▶ '$i'\n\n' && ./$i || exit 1;  }; done;"
+    }
 
 ## app.js 
 
-Modify the `listen()`-part in your express(a) app like this:
+In your expressa main-file (`app.js` e.g.), search for `app.listen()`, and modify it like this:
 
     module.exports = { 
       expressa:expressa, 
@@ -19,7 +21,7 @@ Modify the `listen()`-part in your express(a) app like this:
       app:app, 
       server: app.listen(port, >(){
         console.log("listening on "+host)
-        if( module.exports.onServerReady ) setTimeout(module.exports.onServerReady, 500 )                              
+        if( module.exports.onServerReady ) setTimeout(module.exports.onServerReady, 500 )  // fire tests if any
       })
     }
 
