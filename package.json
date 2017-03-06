@@ -9,6 +9,7 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.0",
     "cors": "^2.7.1",
+    "debug": "^2.6.1",
     "express": "^4.13.4",
     "expressa-admin": "^0.1.5",
     "filtr": "^0.3.0",
@@ -24,11 +25,10 @@
     "randomstring": "^1.1.4"
   },
   "devDependencies": {
-    "superagent": "^3.3.1"
   },
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
-    "test": "test/test", 
+    "test": "test/test",
     "clean": "rm -rf node_modules;"
   },
   "license": "MIT"
