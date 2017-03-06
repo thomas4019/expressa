@@ -3,7 +3,6 @@ var util     = require('./../lib/util.js')
 var app      = require('./../example/app.js')
 var expressa = app.expressa
 var testuser = { email: "foo@gmail.com" }
-var request = require('superagent')
 
 util.test("create user", function(next, error){
   expressa.db.users.create(testuser)
