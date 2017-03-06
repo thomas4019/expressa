@@ -4,6 +4,7 @@ var bodyParser  = require('body-parser')
 var auth = require('./auth')
 var mongoQuery = require('mongo-query');
 var MongoQS = require('mongo-querystring')
+var debug = require('debug')('expressa')
 
 router.queryStringParser = new MongoQS({});
 
@@ -34,7 +35,7 @@ db.settings.get('production')
 					db[collection._id] = dbTypes[collection.storage](router.settings, collection._id);
 					db[collection._id].init();
 				});
-				console.log('collections loaded.')
+				debug('collections loaded.')
 			}, function(err) {
 				console.error('failed to load collections');
 				console.error(err);
@@ -111,9 +112,9 @@ function notify(event, req, collection, data) {
 	if (typeof eventListeners[event] == 'undefined' || eventListeners[event].length == 0) {
 		return Promise.resolve(true);
 	}
-	//console.log('notifying '+ eventListeners[event].length +  ' of ' + event)
+	debug('notifying '+ eventListeners[event].length +  ' of ' + event)
 	var promises = eventListeners[event].map(function(listener) {
-		//console.log('calling ' + listener.name)
+		debug('calling ' + listener.name)
 		try {
 			return listener(req, collection, data)
 		} catch (e) {

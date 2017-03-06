@@ -1,4 +1,5 @@
 var ajv = require('ajv')({allErrors: true});
+var debug = require('debug')('expressa')
 
 module.exports = function(api) {
 
@@ -36,7 +37,7 @@ module.exports = function(api) {
 				var schema = augmentSchema(collection.schema)
 				schemaValidators[collection._id] = ajv.compile(schema)
 			});
-			console.log('validators loaded.')
+			debug('validators loaded.')
 		}, function(err) {
 			console.error('failed to load collections');
 			console.error(err);

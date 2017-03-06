@@ -1,0 +1,68 @@
+{
+  "_id": "users",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "meta": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {}
+      },
+      "email": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "fullName": {
+        "type": "string"
+      },
+      "roles": {
+        "items": {
+          "type": "string",
+          "enum": [
+            "Admin",
+            "Anonymous",
+            "Authenticated",
+            "Test",
+            "TierLow",
+            "TierMedium",
+            "TierPremium"
+          ]
+        },
+        "uniqueItems": true,
+        "format": "checkbox",
+        "type": "array"
+      },
+      "passport": {
+        "type": "object",
+        "properties": {
+          "schema": {
+            "type": "string",
+            "enum": [
+              "github"
+            ]
+          },
+          "data": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      },
+      "id_remote": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "email",
+      "password"
+    ]
+  },
+  "storage": "file",
+  "documentsHaveOwners": true,
+  "meta": {
+    "updated": "2017-02-22T15:44:05.098Z",
+    "created": "2017-02-16T16:49:27.133Z"
+  }
+}

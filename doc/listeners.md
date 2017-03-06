@@ -42,3 +42,6 @@ With these, the value returned from the listener is ignored.
 * `changed` - called after a put or post has succeeded
 * `deleted` - called after a successful deletion
 
+## Debugging 
+
+Run `NODE_DEBUG=expressa node app.js` or `NODE_DEBUG=* app.js` to see what's going on in your app

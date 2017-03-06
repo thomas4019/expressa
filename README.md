@@ -1,4 +1,5 @@
 ![](expressa.png)
+[![CircleCI](https://circleci.com/gh/coderofsalvation/expressa.svg?style=svg)](https://circleci.com/gh/coderofsalvation/expressa)
 
 ## data-driven extendable API framework for Node.js
 
