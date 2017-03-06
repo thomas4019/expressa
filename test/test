@@ -4,7 +4,7 @@
 
 for i in test/tests/*; do 
   [ -x $i   ] && [ ! -d $i   ] && { 
-    printf '\n<▶ '$i'\n\n' 
+    printf '\n◀▶ '$i'\n\n' 
     { ./$i || exit 1; } | awk '{ print "   "$0 }' 
   }; 
 done
