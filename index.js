@@ -5,6 +5,7 @@ var auth = require('./auth')
 var mongoQuery = require('mongo-query');
 var MongoQS = require('mongo-querystring')
 var debug = require('debug')('expressa')
+var sequential = require('promise-sequential')
 
 router.queryStringParser = new MongoQS({});
 
@@ -116,13 +117,13 @@ function notify(event, req, collection, data) {
 	var promises = eventListeners[event].map(function(listener) {
 		debug('calling ' + listener.name)
 		try {
-			return listener(req, collection, data)
+			return () => listener(req, collection, data)
 		} catch (e) {
 			console.error('error in listener')
 			console.error(e.stack)
 		}
 	})
-	return Promise.all(promises)
+	return sequential(promises)
 		.then(function(results) {
 			//console.log('notifying done')
 			// Result is the first defined value

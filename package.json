@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
@@ -22,10 +22,10 @@
     "mongodb": "^2.1.16",
     "node-uuid": "^1.4.7",
     "pg": "^4.5.1",
+    "promise-sequential": "^1.1.1",
     "randomstring": "^1.1.4"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "test/test",
