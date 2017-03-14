@@ -340,6 +340,7 @@ router.use(function(err, req, res, next) {
 router.admin = function(settings) {
 	var router = express.Router()
 	router.get('/settings.js', function(req, res) {
+		res.set('Content-Type', 'text/javascript');
 		res.send('window.settings = ' + JSON.stringify(settings||{}) + ';')
 	})
 	router.use(express.static('node_modules/expressa-admin'))

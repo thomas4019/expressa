@@ -1,12 +1,12 @@
 {
   "name": "expressa",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
   "dependencies": {
     "ajv": "^3.8.1",
-    "bcrypt-nodejs": "0.0.3",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.15.0",
     "cors": "^2.7.1",
     "debug": "^2.6.1",

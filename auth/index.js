@@ -1,13 +1,14 @@
 var pg = require('pg')
-var bCrypt = require('bcrypt-nodejs')
+var bcrypt = require('bcryptjs');
 var handler = require('./jwt')
 
 var createHash = function(password){
-    return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null)
+	var salt = bcrypt.genSaltSync(10);
+	return bcrypt.hashSync(password, salt);
 }
 
 var isValidPassword = function(password, hashedPassword){
-    return bCrypt.compareSync(password, hashedPassword)
+    return bcrypt.compareSync(password, hashedPassword)
 }
 
 module.exports = {
