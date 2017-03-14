@@ -84,6 +84,7 @@ Each object will contain this meta property:
 * [Accessing the database](doc/database.md)
 * [Online generated documentation + browser REST client](https://www.npmjs.com/package/expressa-swagger)
 * [Testing / CI integrating your expressa app](doc/testing.md)
+* [Uploading files](doc/uploading-files.md)
 
 ## Todo - contributions welcome!
 * JWT token expiration
