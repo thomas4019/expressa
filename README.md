@@ -41,7 +41,7 @@ Create a file `app.js` with the following code (or just copy the middle 3 lines 
       console.log('Example app listening on port 3000!');
     });
 
-Now start the server by running `node app.js` and navigate your browser to [http://localhost:3000/admin/](http://localhost:3000/admin/)
+Now start the server by running `node --use-strict app.js` and navigate your browser to [http://localhost:3000/admin/](http://localhost:3000/admin/)
 
 ## Collections
 
