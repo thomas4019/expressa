@@ -19,7 +19,7 @@ module.exports = function(api) {
 					next(err);
 				});
 		} else {
-			roles = ['Anonymous'];
+			var roles = ['Anonymous'];
 			req.user = {
 				permissions: {}
 			}
