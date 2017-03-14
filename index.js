@@ -173,6 +173,7 @@ router.get('/:collection', function (req, res, next) {
 			delete params['limit']
 			query = router.queryStringParser.parse(params)
 		}
+		req.query.exclude = req.query.exclude ? req.query.exclude.split(',') : []
 		if (req.query.skip) {
 			req.query.skip = parseInt(req.query.skip)
 		}
@@ -190,7 +191,8 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						res.send(data.filter(function(doc, i) {
-							return allowed[i] === true;
+              req.query.exclude.map( function(k){ if( doc[k] ) delete doc[k] })
+							return allowed[i] === true
 						}))
 					}, function(err) {
 						next(err);
