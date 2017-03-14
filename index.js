@@ -24,6 +24,12 @@ db.settings = dbTypes['file']({}, 'settings')
 router.db = db
 
 router.settings = {}
+
+var excludeFields = function(req,data){
+  req.query.exclude = req.query.exclude ? req.query.exclude.split(',') : []
+  req.query.exclude.map( function(k){ if( data[k] ) delete data[k] })
+}
+
 db.settings.get('production')
 	.then(function(data) {
 		router.settings = data;
@@ -191,6 +197,7 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						res.send(data.filter(function(doc, i) {
+              excludeFields(req,doc)
 							return allowed[i] === true;
 						}))
 					}, function(err) {
@@ -253,6 +260,7 @@ function getById(req, res, next) {
 			notify('get', req, req.params.collection, data)
 				.then(function(allowed) {
 					if (allowed === true) {
+            excludeFields(req,data)
 						res.send(data);
 					} else {
 						res.status(allowed.code||403).send(allowed.message || 'forbidden');
