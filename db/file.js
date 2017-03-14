@@ -30,7 +30,7 @@ module.exports = (function(settings, collection) {
 					if (err) {
 						reject(err);
 					} else {
-						var filter = filtr(query);
+						var filter = new filtr(query);
 						var arr = Object.keys(data).map(function(id) {
 							return data[id];
 						});
@@ -61,7 +61,7 @@ module.exports = (function(settings, collection) {
 			});
 		},
 		create: function(data) {
-			id = typeof data._id == 'undefined' ? randomstring.generate(8) : data._id;
+			var id = typeof data._id == 'undefined' ? randomstring.generate(8) : data._id;
 			return new Promise(function(resolve, reject) {
 				store.save(id, data, function(err, data) {
 					if (err) {

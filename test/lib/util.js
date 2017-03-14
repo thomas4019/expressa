@@ -93,7 +93,7 @@ t.test = function(description, cb) {
 t.run = function(cb) {
   var i, next;
   i = 0;
-  output = function (msg,i){
+  var output = function (msg,i){
     if( msg ) console.log('\x1b[33m',"\n"+i+") " + msg, '\x1b[0m' );
   }
   next = function() {
