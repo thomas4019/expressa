@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
@@ -19,9 +19,9 @@
     "mongo-query": "0.5.7",
     "mongo-query-to-postgres-jsonb": "0.1.1",
     "mongo-querystring": "3.0.0",
-    "mongodb": "2.1.19",
+    "mongodb": "2.2.19",
     "node-uuid": "1.4.7",
-    "pg": "4.5.1",
+    "pg": "6.1.4",
     "promise-sequential": "1.1.1",
     "randomstring": "1.1.4"
   },
