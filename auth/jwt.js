@@ -9,7 +9,7 @@ exports.doLogin = function(user, req, res, next) {
 	var token = jwt.sign(user, req.settings.jwt_secret, {});
 	res.send({
 		token: token,
-		uid: user.uid
+		uid: user._id
 	});
 }
 
