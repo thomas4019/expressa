@@ -25,8 +25,8 @@ router.db = db
 
 router.settings = {}
 
-var excludeFields = function(req,data){
-  req.query.exclude = req.query.exclude ? req.query.exclude.split(',') : []
+var excludeFields = function(req,data) {
+  req.query.exclude = typeof(req.query.exclude) == 'string' ? req.query.exclude.split(',') : []
   req.query.exclude.map( function(k){ if( data[k] ) delete data[k] })
 }
 
@@ -40,7 +40,12 @@ db.settings.get('production')
 			.then(function(result) {
 				result.forEach(function(collection) {
 					db[collection._id] = dbTypes[collection.storage](router.settings, collection._id);
-					db[collection._id].init();
+					Promise.resolve(db[collection._id].init())
+						.then(function(sucess) {
+							debug('initialized ' + collection._id + ' using '+ collection.storage);
+						}, function(err) {
+							console.error('failed to initialize ' + collection._id + ' using '+ collection.storage);
+						})
 				});
 				debug('collections loaded.')
 			}, function(err) {
@@ -197,7 +202,7 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						res.send(data.filter(function(doc, i) {
-              excludeFields(req,doc)
+							excludeFields(req, doc);
 							return allowed[i] === true;
 						}))
 					}, function(err) {
@@ -260,7 +265,7 @@ function getById(req, res, next) {
 			notify('get', req, req.params.collection, data)
 				.then(function(allowed) {
 					if (allowed === true) {
-            excludeFields(req,data)
+						excludeFields(req, data);
 						res.send(data);
 					} else {
 						res.status(allowed.code||403).send(allowed.message || 'forbidden');
