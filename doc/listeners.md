@@ -1,3 +1,10 @@
+## When to use 
+
+* decorate endpoint responses with relational data
+* fine grained role-permissions: hide certain properties based on role
+* save bandwidth: hide certain properties like file/image-data 
+* include optional properties: support extra query-parameters for inclusion of file/image-data
+
 ## Modifying behavior using listeners
 Use `expressa.addListener(eventTypes, priority, callback)`
 
