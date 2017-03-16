@@ -11,7 +11,7 @@ module.exports = function(api) {
 	})
 
 	api.addListener(['post', 'put'], function updatePassword(req, collection, data) {
-		if (collection == 'users' && data.password.length != 60 && data.password[0] != "$") {
+		if (collection == 'users' && data.password && data.password.length != 60 && data.password[0] != "$") {
 			data.password = auth.createHash(data.password);
 		}
 	});
