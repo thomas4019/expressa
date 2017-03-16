@@ -297,16 +297,27 @@ router.post('/:collection/:id/update', function (req, res, next) {
 
 	db[req.params.collection].get(req.params.id)
 		.then(function(doc) {
-			var changes = mongoQuery(doc, {}, modifier);
-			req.body = doc;
-			db[req.params.collection].update(req.params.id, req.body)
-				.then(function(data) {
-					notify('changed', req, req.params.collection, req.body)
-					res.send(doc);
-				}, function(err, code) {
-					res.errCode = code;
+			notify('put', req, req.params.collection, doc)
+				.then(function(allowed) {
+					if (allowed === true) {
+						var changes = mongoQuery(doc, {}, modifier);
+						req.body = doc;
+						db[req.params.collection].update(req.params.id, req.body)
+							.then(function(data) {
+								notify('changed', req, req.params.collection, req.body)
+								res.send(doc);
+							}, function(err, code) {
+								res.errCode = code;
+								next(err);
+							});
+					} else {
+						res.status(allowed.code||500).send(allowed.message || 'forbidden');
+					}
+				}, function(err) {
 					next(err);
-				});
+				})
+		}, function(err) {
+			next(err);
 		});
 })
 
