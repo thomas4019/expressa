@@ -86,6 +86,11 @@ Each object will contain this meta property:
 * [Testing / CI integrating your expressa app](doc/testing.md)
 * [Uploading files](doc/uploading-files.md)
 
+## Expressa ecosystem
+* [expressa-swagger](https://npmjs.org/package/expressa-swagger) middleware to generate online api documentation
+* [expressa-client](https://npmjs.org/package/expressa-client) middleware to generate browser REST-client (+nodejs client)
+* [expressa-cli](https://npmjs.org/package/expressa-cli) commandline interface for expressa 
+
 ## Todo - contributions welcome!
 * JWT token expiration
 * Support cookie based authentication as well
