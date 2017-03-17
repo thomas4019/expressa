@@ -297,11 +297,11 @@ router.post('/:collection/:id/update', function (req, res, next) {
 
 	db[req.params.collection].get(req.params.id)
 		.then(function(doc) {
+			var changes = mongoQuery(doc, {}, modifier);
+			req.body = doc;
 			notify('put', req, req.params.collection, doc)
 				.then(function(allowed) {
 					if (allowed === true) {
-						var changes = mongoQuery(doc, {}, modifier);
-						req.body = doc;
 						db[req.params.collection].update(req.params.id, req.body)
 							.then(function(data) {
 								notify('changed', req, req.params.collection, req.body)
