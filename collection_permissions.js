@@ -35,7 +35,7 @@ module.exports = function(api) {
 			var editingOwn = ((editingOwnUser || editingOwnDoc) && 
 				req.hasPermission(collection + ': ' + permission + ' own'));
 			if (!editingOwn && !req.hasPermission(collection + ': ' + permission)) {
-				console.log('cancelling, missing ' + collection + ': ' + permission);
+				console.log('cancelling, missing permission for "' + collection + '"-collection: ' + permission);
 				return false;
 			}
 		}
