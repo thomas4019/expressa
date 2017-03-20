@@ -5,7 +5,7 @@
 * save bandwidth: hide certain properties like file/image-data 
 * include optional properties: support extra query-parameters for inclusion of file/image-data
 
-## Modifying behavior using listeners
+## Synchronoulsy modifying behavior using listeners
 Use `expressa.addListener(eventTypes, priority, callback)`
 
 `eventTypes` is a string or array of the event types listed below e.g. 'get' or ['put', 'post']
@@ -53,33 +53,25 @@ With these, the value returned from the listener is ignored.
 
 Run `NODE_DEBUG=expressa node app.js` or `NODE_DEBUG=* app.js` to see what's going on in your app
 
-## Middleware monkeypatching
+## Async wrappers 
 
-Sometimes certain events aren't listenable (like recovering from expressa errors, or other middleware).
+The listeners above are synchronous, but sometimes you need async listeners (like recovering from expressa errors, or other middleware).
 In those cases we can wrap an expressa-point like so:
 
-    var patches = {
-      "/:collection":{
-        method:"get"
-        cb: function(req,res,next){
-          // do stuff (before)
-          handle(req, res, function(){
-            // do stuff (after)
-            next()
-          }) 
-        }
-      }
-    }
+    app.post('/api/myendpoint', require('./lib/listener/myendpoint/post.js')(expressa) ) 
+    app.use('/api', expressa )
 
-    expressa.stack.map( (r) => {
-      if( r.route ){
-        for( var path in patches ){
-          if( path == r.route.path && patches[path].method == r.route.stack[0].method ){
-            var handle = r.route.stack[0].handle
-            r.route.stack[0].handle = patches[path].cb 
-          }
-        }
-      }
-    })
+> NOTE: put it above the expressa init
 
-> NOTE: replace `expressa.stack` with `app._router.stack` if you want to monkeypatch non-expressa middleware
+And `lib/listener/myendpoint/post.js` like so:
+
+		module.exports = >(expressa){
+			return >(req, res, next){
+				          // do stuff before expressa handler 
+        next()    // run expressa handler
+									// do stuff after expressa handler
+     }
+   }
+
+
+
