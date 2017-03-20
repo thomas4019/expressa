@@ -5,7 +5,7 @@
 * save bandwidth: hide certain properties like file/image-data 
 * include optional properties: support extra query-parameters for inclusion of file/image-data
 
-## Synchronoulsy modifying behavior using listeners
+## Modifying behavior using listeners
 Use `expressa.addListener(eventTypes, priority, callback)`
 
 `eventTypes` is a string or array of the event types listed below e.g. 'get' or ['put', 'post']
