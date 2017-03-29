@@ -31,18 +31,6 @@ module.exports = function(api) {
 		}
 	});
 
-	collections = api.db.collection.all()
-		.then(function(result) {
-			result.forEach(function(collection) {
-				var schema = augmentSchema(collection.schema)
-				schemaValidators[collection._id] = ajv.compile(schema)
-			});
-			debug('validators loaded.')
-		}, function(err) {
-			console.error('failed to load collections');
-			console.error(err);
-		});
-
 	api.addListener('changed', function updateValidators(req, collection, data) {
 		if (collection == 'collection') {
 			var schema = augmentSchema(data.schema)
@@ -60,4 +48,16 @@ module.exports = function(api) {
 			return {code: 500, message: schemaValidators[collection].errors};
 		}
 	})
+
+	return api.db.collection.all()
+		.then(function(result) {
+			result.forEach(function(collection) {
+				var schema = augmentSchema(collection.schema)
+				schemaValidators[collection._id] = ajv.compile(schema)
+			});
+			debug('validators loaded.')
+		}, function(err) {
+			console.error('failed to load collections');
+			console.error(err);
+		});
 }
