@@ -1,6 +1,6 @@
 ### Generic JSON Database API
 
-Each of the database implementations provides the following methods. You can access a collection's database using `api.db[collectionName]
+You can access a collection's database using `expressa.db[collectionName].action where action is one of the following:
 
 * all - returns all documents
 * find - returns array of documents matching the mongo query
@@ -12,8 +12,7 @@ Each of the database implementations provides the following methods. You can acc
 
 ### Implemented JSON databases
 * MongoDB
-* PostgreSQL (using [jsonb](http://www.postgresql.org/docs/9.4/static/datatype-json.html))
+* PostgreSQL (using [jsonb](http://www.postgresql.org/docs/9.4/static/datatype-json.html) and [mongo-query-to-postgres-jsonb](https://github.com/thomas4019/mongo-query-to-postgres-jsonb))
 * Text files (using [json-file-store](https://github.com/flosse/json-file-store) and [mongo-query](https://github.com/Automattic/mongo-query))
 
-Other JSON capable databases can be added easily.
-
+Other JSON capable databases can be added easily (pull requests welcome!) by writing a wrapper that supports each of the above methods.

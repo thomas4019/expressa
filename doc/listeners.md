@@ -1,15 +1,19 @@
-## When to use 
+## When to use listeners
 
 * decorate endpoint responses with relational data
 * fine grained role-permissions: hide certain properties based on role
 * save bandwidth: hide certain properties like file/image-data 
-* include optional properties: support extra query-parameters for inclusion of file/image-data
+* do additional actions like sending emails when content is created or changed
+* add fields whose values are computed from others
+* custom validation like ensuring a user doesn't create too many documents of a collection type.
 
 ## Modifying behavior using listeners
 Use `expressa.addListener(eventTypes, priority, callback)`
 
 `eventTypes` is a string or array of the event types listed below e.g. 'get' or ['put', 'post']
+
 `priority` is a number which determines the order of callback execution. Listeners with lower priority are executed first. If you don't care about order just use 0.
+
 `callback` is a function like the following: 
 
 `function(req, collection, doc)`  where
@@ -53,10 +57,33 @@ With these, the value returned from the listener is ignored.
 
 Run `NODE_DEBUG=expressa node app.js` or `NODE_DEBUG=* app.js` to see what's going on in your app
 
-## Async wrappers 
+## Async wrapper example 
 
-The listeners above are synchronous, but sometimes you need async listeners (like recovering from expressa errors, or other middleware).
-In those cases we can wrap an expressa-point like so:
+    var request = require('request');
+    expressa.addListener('put', -10, function(req, collection, doc) {
+      if (collection == 'users') {
+        var key = your google maps api key;
+        var loc = doc.address;
+        return new Promise(function(resolve, reject) {
+          request('https://maps.googleapis.com/maps/api/geocode/json?address=' + loc + '&key=' + key, function(err, response, body) {
+            if (err) {
+              console.error('failed to geolocate address');
+              return reject();
+            }
+            var data = JSON.parse(body);
+            if (!data.results[0]) {
+              console.error('Geolocation of user address had empty response.');
+              return reject();
+            }
+            doc.coordinates = data.results[0].geometry.location;
+            resolve();
+          });
+        });
+      }
+
+## Manual wrappers
+
+Sometimes you may need to wrap an expressa endpoint so you have full control before and after (like recovering from expressa errors, or other middleware). In those cases we can wrap an expressa-point like so:
 
     app.post('/api/myendpoint', require('./lib/listener/myendpoint/post.js')(expressa) ) 
     app.use('/api', expressa )
@@ -65,13 +92,10 @@ In those cases we can wrap an expressa-point like so:
 
 And `lib/listener/myendpoint/post.js` like so:
 
-		module.exports = >(expressa){
-			return >(req, res, next){
+		module.exports = function(expressa) {
+			return function(req, res, next) {
 				          // do stuff before expressa handler 
         next()    // run expressa handler
 									// do stuff after expressa handler
      }
    }
-
-
-
