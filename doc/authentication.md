@@ -1,4 +1,5 @@
 ## Authentication
+Uses [JSON Web Tokens](https://jwt.io/)
 
 | method | endpoint                      | description  |
 |--------|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -7,7 +8,7 @@
 Returns the following
 ```javascript
 {
-  "success": true,
+  "uid": "a52ee085-ff47-4ee1-bac3-a8a319f674ed",
   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NmNkNWM5NmY4MjA4N2I1MDQ0OTM3YjEiLCJ1bml2ZXJzaXR5IjoiQllVIiwiZnVsbE5hbWUiOiJUaG9tYXMgSGFuc2VuIiwicGFzc3dvcmQiOiIkMmEkMTAkb0prdlBnTTlkR2FJRTIzaWFabGEvT0tjZC9PL3phSGFJOHFRUDBuZ2pPUVV1Ums3Vng2QkciLCJlbWFpbCI6InRoNDAxOUBnbWFpbC5jb20iLCJfX3YiOjAsImxpc3RpbmdzIjpbXSwiaWF0IjoxNDU2NDMwMjE5LCJleHAiOjE0NTY1MTY2MTl9._ijngdgwLU9AJnAjbySUgEFsR8hJCSw8PhH1AnyBHuM"
 }
 ```
@@ -24,14 +25,14 @@ The returned token must then be passed in as a header on future requests using t
 
 * `GET /user/me` - returns the logged in user's object
 
-## Authentication using [JSON Web Tokens](https://jwt.io/)
+## Making authenticated requests
 
-Obtain a token by sending a POST to `/user/login`. This returns:
-```
-{
-  "id": "572d93513688657feede5877",
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NmNkNWM5NmY4MjA4N2I1MDQ0OTM3YjEiLCJ1bml2ZXJzaXR5IjoiQllVIiwiZnV._ijngdgwLU9AJnAjbySUgEFsR8hJCSw8PhH1AnyBHuM"
-}
-```
-This token can then be passed as a queryparam (e.g. ?token=) or using the `x-access-token` header.
+After obtaining a token as described above you need to pass it with your request in one of these ways
 
+1. Using the `x-access-token`
+
+	`curl --header "x-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NmNkNWM5NmY4MjA4N2I1MDQ0OTM3YjEiLCJ1bml2ZXJzaXR5IjoiQllVIiwiZnVsbE5hbWUiOiJUaG9tYXMgSGFuc2VuIiwicGFzc3dvcmQiOiIkMmEkMTAkb0prdlBnTTlkR2FJRTIzaWFabGEvT0tjZC9PL3phSGFJOHFRUDBuZ2pPUVV1Ums3Vng2QkciLCJlbWFpbCI6InRoNDAxOUBnbWFpbC5jb20iLCJfX3YiOjAsImxpc3RpbmdzIjpbXSwiaWF0IjoxNDU2NDMwMjE5LCJleHAiOjE0NTY1MTY2MTl9._ijngdgwLU9AJnAjbySUgEFsR8hJCSw8PhH1AnyBHuM" api.example.com/user/me`
+
+2. Pass the token as a query parameter.
+
+	`curl api.example.com/user/me?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NmNkNWM5NmY4MjA4N2I1MDQ0OTM3YjEiLCJ1bml2ZXJzaXR5IjoiQllVIiwiZnVsbE5hbWUiOiJUaG9tYXMgSGFuc2VuIiwicGFzc3dvcmQiOiIkMmEkMTAkb0prdlBnTTlkR2FJRTIzaWFabGEvT0tjZC9PL3phSGFJOHFRUDBuZ2pPUVV1Ums3Vng2QkciLCJlbWFpbCI6InRoNDAxOUBnbWFpbC5jb20iLCJfX3YiOjAsImxpc3RpbmdzIjpbXSwiaWF0IjoxNDU2NDMwMjE5LCJleHAiOjE0NTY1MTY2MTl9._ijngdgwLU9AJnAjbySUgEFsR8hJCSw8PhH1AnyBHuM`
