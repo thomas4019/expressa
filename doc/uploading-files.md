@@ -16,7 +16,7 @@ Here's how you add an image file-upload in `data/collection/post.json`:
           }
       }
 
-> NOTE: you probably want to create an expressa listener which does hides the 'picture'-property to save bandwidth. On top of that, you probably want automatic thumbnails using [this expressa middleware](https://gist.github.com/coderofsalvation/d3c67fbdf4639dfae4d292a37434097c)
+> NOTE: you probably want to create an expressa listener which hides the 'picture'-property to save bandwidth. On top of that, you probably want automatic thumbnails using something like [this expressa middleware](https://gist.github.com/coderofsalvation/d3c67fbdf4639dfae4d292a37434097c)
 
 ![](https://gist.githubusercontent.com/coderofsalvation/f9af1791560bdcde2e536ba6ee85fd66/raw/86bfd8821d4c426a8404ff10ea1164b4f171ea8c/file-upload.png)
 
