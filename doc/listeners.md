@@ -55,7 +55,7 @@ With these, the value returned from the listener is ignored.
 
 ## Debugging 
 
-Run `NODE_DEBUG=expressa node app.js` or `NODE_DEBUG=* app.js` to see what's going on in your app
+Run `DEBUG=expressa node --use-strict app.js` or `DEBUG=* --use-strict node app.js` to see what's going on in your app
 
 ## Async wrapper example 
 

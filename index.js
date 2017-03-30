@@ -33,16 +33,16 @@ db.settings.get('production')
 
 		return db.collection.all()
 			.then(function(result) {
-				result.forEach(function(collection) {
+				var promises = result.map(function(collection) {
 					db[collection._id] = dbTypes[collection.storage](router.settings, collection._id);
-					Promise.resolve(db[collection._id].init())
+					return Promise.resolve(db[collection._id].init())
 						.then(function(sucess) {
 							debug('initialized ' + collection._id + ' using '+ collection.storage);
 						}, function(err) {
 							console.error('failed to initialize ' + collection._id + ' using '+ collection.storage);
 						})
 				});
-				debug('collections loaded.')
+				return Promise.all(promises);
 			}, function(err) {
 				console.error('failed to load collections');
 				console.error(err);
@@ -53,12 +53,21 @@ db.settings.get('production')
 		db.collection = dbTypes[router.settings.collection_db_type||'file'](router.settings, 'collection')
 	})
 	.then(function(data) {
-		// Add standard collection based permissions
-		require('./collection_permissions')(router)
+		debug('collections loaded.');
 
-		require('./listeners')(router)
+		var promises = [
+			require('./collection_permissions')(router), // Add standard collection based permissions
+			require('./listeners')(router),
+			require('./validation_listeners')(router)
+		];
+		Promise.all(promises)
+			.then(function() {
+				notify('ready')
+			}, function(err) {
+				console.error(err);
+				console.error('Expressa error setting up validators');
+			})
 
-		require('./validation_listeners')(router)
 	}, function(err) {
 		console.error('error during startup')
 		console.error(err.stack);
