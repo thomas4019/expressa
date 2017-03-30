@@ -42,7 +42,7 @@ module.exports = function(api) {
 		if (!req.settings.enforce_permissions) {
 			return;
 		}
-		var valid = schemaValidators[collection](data);
+		var valid = schemaValidators[collection] ? schemaValidators[collection](data) : true
 		if (!valid) {
 			console.log({code: 500, message: JSON.stringify(schemaValidators[collection].errors)})
 			return {code: 500, message: schemaValidators[collection].errors};
