@@ -117,4 +117,34 @@ module.exports = function(api) {
 			}
 		}
 	});
+
+	api.addListener(['get'], function addMetaToSchema(req, collection, data) {
+		if (collection == 'schemas') {
+			var schema = data.schema;
+			schema.properties.meta = {
+				"type" : "object",
+				"propertyOrder": 2000,
+				"properties": {
+					"created": {
+						"type": "string"
+					},
+					"updated": {
+						"type": "string"
+					}
+				}
+			}
+			if (data.documentsHaveOwners) {
+				schema.properties.meta.properties.owner = {
+					"type": "string",
+					"links": [
+						{
+							"rel": "» view owner user",
+							"href": "/admin/#/edit/users/{{self}}",
+							"class": "comment-link open-in-modal primary-text"
+						}
+					]
+				}
+			}
+		}
+	});
 };

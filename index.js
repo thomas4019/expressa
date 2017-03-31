@@ -158,7 +158,7 @@ router.notify = notify
 router.get('/:collection/schema', function (req, res, next) {
 	db.collection.get(req.params.collection)
 		.then(function(collection) {
-			notify('get', req, 'schemas', collection.schema)
+			notify('get', req, 'schemas', collection)
 				.then(function(allowed) {
 					if (allowed === true)
 						res.send(collection.schema);

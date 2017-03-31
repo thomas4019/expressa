@@ -25,7 +25,9 @@
     "promise-sequential": "1.1.1",
     "randomstring": "1.1.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "supertest": "^3.0.0"
+  },
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "test/test",
