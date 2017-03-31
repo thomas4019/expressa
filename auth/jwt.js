@@ -15,6 +15,7 @@ exports.doLogin = function(user, req, res, next) {
 
 // Returns the user id, or false if not logged in.
 exports.isLoggedIn = function(req, callback) {
+	req.query = req.query || {}
 	var token = req.query.token || req.headers['x-access-token']
 	delete req.query.token
 	if (token) {
