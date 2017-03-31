@@ -1,6 +1,6 @@
 ## Relationships & References 
 
-Lets say we want to extend our `/data/collection/users.json`-collection a bit, by specifying which user belongs to another user:
+Let's suppose we want to extend our `/data/collection/users.json`-collection, by specifying which user belongs to another user:
 
     { 
       "properties":{
@@ -28,30 +28,32 @@ Done, now expressa-admin will show a textfield in which we can write the userid:
 
 ## Dynamically generated Relationships
 
-To turn the textfield above, into a dropdown of all users, lets write this listener:
+To make things extra convenient, lets generate a dropdown of all users:
 
-			expressa.addListener('get', -101, function(req,collection,doc){
-				// add user reference      
-				var schema = {             
-					"enumSource": [{         
-							// A watched field source       
-							source: [],          
-							title: "{{item.title}}",        
-							value: "{{item.id}}" 
-					}]
-				}
-				return new Promise( function(resolve, reject ){
-					expressa.db.users.find() 
-					.then( function(users){  
-						users.map( function(u){·
-							schema.enumSource[0].source.push({title: u.firstname+" "+u.lastname+", "+u.email,id:u._id})·
-						})
-						doc.properties.id_parent.enumSource = schema.enumSource
-						return resolve({"code":200, "message":doc})
-					})
-					.catch(reject)                                                                                                                                                                                                                                                                                                           
-				})  
-			}  
+      expressa.addListener('get', -101, function(req,collection,doc){
+        if( req.url.match(/\/users\/schema$/) != null ) {
+          // add user reference to schema      
+          var schema = {             
+            "enumSource": [{         
+                // A watched field source       
+                source: [],          
+                title: "{{item.title}}",        
+                value: "{{item.id}}" 
+            }]
+          }
+          return new Promise( function(resolve, reject ){
+            expressa.db.users.find() 
+            .then( function(users){  
+              users.map( function(u){·
+                schema.enumSource[0].source.push({title: u.firstname+" "+u.lastname+", "+u.email,id:u._id})·
+              })
+              doc.properties.id_parent.enumSource = schema.enumSource
+              return resolve({"code":200, "message":doc})
+            })
+            .catch(reject)                                                                                                                                                                                                                                                                                                           
+          })  
+        }  
+      }
 
 Done, now we'll have a nice dropdown to select our relationship:
 
