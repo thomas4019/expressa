@@ -8,7 +8,7 @@ Here's just an easy testframework-agnostic, linux way to test your app.
 Add the 'test' command in the `script`-section of your package.json:
 
     "scripts":{
-      "test": "for i in test/*; do [ -x $i  ] && [ ! -d $i  ] && { printf '\nn<▶ '$i'\n\n' && ./$i || exit 1;  }; done;"
+      "test": "for i in test/*; do [ -x $i  ] && [ ! -d $i  ] && { printf '\n<▶ '$i'\n\n' && ./$i || exit 1;  }; done;"
     }
 
 ## app.js 
@@ -19,7 +19,7 @@ In your expressa main-file (`app.js` e.g.), search for `app.listen()`, and modif
       expressa:expressa, 
       express:express, 
       app:app, 
-      server: app.listen(port, >(){
+      server: app.listen(port, function(){
         console.log("listening on "+host)
         if( module.exports.onServerReady ) setTimeout(module.exports.onServerReady, 500 )  // fire tests if any
       })
@@ -35,7 +35,7 @@ In your expressa main-file (`app.js` e.g.), search for `app.listen()`, and modif
       // do mocha stuff here etc and call done()  
     }
 
-    app.onServerReady = run.bind(@, >(){
+    app.onServerReady = run.bind(this, function(){
       app.server.close()
       process.exit(0)
     }) 
