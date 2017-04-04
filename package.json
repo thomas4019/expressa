@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
@@ -11,7 +11,7 @@
     "cors": "2.7.1",
     "debug": "2.6.1",
     "express": "4.13.4",
-    "expressa-admin": "0.1.7",
+    "expressa-admin": "0.1.8",
     "filtr": "0.3.0",
     "handlebars": "4.0.5",
     "jfs": "0.2.6",
