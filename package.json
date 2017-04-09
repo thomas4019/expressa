@@ -10,6 +10,7 @@
     "body-parser": "1.15.0",
     "cors": "2.7.1",
     "debug": "2.6.1",
+    "dotty": "0.0.2",
     "express": "4.13.4",
     "expressa-admin": "0.1.8",
     "filtr": "0.3.0",
@@ -21,6 +22,7 @@
     "mongo-querystring": "3.0.0",
     "mongodb": "2.2.19",
     "node-uuid": "1.4.7",
+    "on-finished": "^2.3.0",
     "pg": "6.1.4",
     "promise-sequential": "1.1.1",
     "randomstring": "1.1.4"

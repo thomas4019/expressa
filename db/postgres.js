@@ -38,16 +38,21 @@ module.exports = (function(settings, collection) {
 				});
 			});
 		},
-		find: function(query, offset, limit) {
-			console.log(query)
+		find: function(query, offset, limit, orderby) {
 			var pgQuery = mongoToPostgres('data', query)
-			console.log(pgQuery)
 			return new Promise(function(resolve, reject) {
 				pg.connect(settings.postgresql_uri, function(err, client, done) {
 					if (err) {
 						return reject(err, 500);
 					}
 					var query = 'SELECT * FROM ' + collection + (pgQuery ? ' WHERE ' + pgQuery : '');
+					if (typeof orderby != undefined) {
+						query += ' ORDER BY '
+						for (var key in orderby) {
+							query += ' ' + mongoToPostgres.convertDotNotation('data', key) + (orderby[key] > 0 ? ' ASC' : ' DESC')
+						}
+					}
+					console.log(query)
 					if (typeof offset != 'undefined') {
 						query += ' OFFSET ' + offset;
 					}

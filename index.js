@@ -6,6 +6,7 @@ var mongoQuery = require('mongo-query');
 var MongoQS = require('mongo-querystring')
 var debug = require('debug')('expressa')
 var sequential = require('promise-sequential')
+var onFinished = require('on-finished')
 
 router.queryStringParser = new MongoQS({});
 
@@ -94,6 +95,47 @@ router.addListener = function addListener(events, priority, listener) {
 	})
 }
 
+function getSeverity(status) {
+	var severity = status >= 500 ? 'error'
+		: status >= 400 ? 'warning'
+		: status >= 300 ? 'notice'
+		: status >= 200 ? 'info'
+		: 'debug'
+	return severity;
+}
+
+router.use(function logger(req, res, next)  {
+	if (db.log) {
+		onFinished(res, function (err) {
+			entry = {
+				severity: getSeverity(res.statusCode),
+				user: req.user ? req.user._id : undefined,
+				url: req.originalUrl || req.url,
+				method: req.method,
+				referer: req.headers['referer'],
+				req: {
+					ip: req.ip,
+					headers: req.headers,
+				},
+				res: {
+					statusCode: res.statusCode,
+				},
+				meta: {
+					created: new Date().toISOString(),
+					updated: new Date().toISOString(),
+				}	
+			}
+		db.log.create(entry, function(res) {
+
+			}, function(err) {
+				console.error(err);
+				console.error('failed to write log entry.')
+			});
+		})
+	}
+	next()
+})
+
 // The wildcard type ensures it works without the application/json header
 router.use(bodyParser.json({ type: "*/*" }))
 
@@ -179,7 +221,7 @@ router.get('/:collection', function (req, res, next) {
 		return res.status(404).send('page not found')
 	}
 	if (Object.keys(req.query).length > 0) {
-		var query;
+		var query, orderby;
 		if (typeof req.query.query != 'undefined') {
 			query = JSON.parse(req.query.query)
 		} else {
@@ -187,6 +229,7 @@ router.get('/:collection', function (req, res, next) {
 			delete params['skip']
 			delete params['offset']
 			delete params['limit']
+			delete params['orderby']
 			query = router.queryStringParser.parse(params)
 		}
 		if (req.query.skip) {
@@ -198,7 +241,12 @@ router.get('/:collection', function (req, res, next) {
 		if (req.query.limit) {
 			req.query.limit = parseInt(req.query.limit)
 		}
-		db[req.params.collection].find(query, req.query.skip || req.query.offset, req.query.limit)
+		if (typeof req.query.orderby != 'undefined') {
+			orderby = JSON.parse(req.query.orderby)
+		} else {
+			orderby = undefined
+		}
+		db[req.params.collection].find(query, req.query.skip || req.query.offset, req.query.limit, orderby)
 			.then(function(data) {
 				var promises = data.map(function(doc) {
 					return notify('get', req, req.params.collection, doc);

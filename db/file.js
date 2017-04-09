@@ -1,7 +1,21 @@
 var Store = require("jfs")
 var randomstring = require("randomstring");
-var mongoQuery = require("mongo-query")
+var dotty = require('dotty')
 var filtr = require("filtr")
+
+function orderBy(data, orderby) {
+	data.sort(function compare(a, b) {
+		for (var key in orderby) {
+			if (dotty.get(a, key) > dotty.get(b, key)) {
+				return orderby[key]
+			} else if (dotty.get(a, key) < dotty.get(b, key)) {
+				return -orderby[key]
+			}
+		}
+		return 0
+	});
+	return data
+}
 
 module.exports = (function(settings, collection) {
 	var store = new Store('data/' + collection, {pretty: true, saveId: '_id'})
@@ -24,7 +38,7 @@ module.exports = (function(settings, collection) {
 				});
 			});
 		},
-		find: function(query, offset, limit) {
+		find: function(query, offset, limit, orderby) {
 			return new Promise(function(resolve, reject) {
 				store.all(function(err, data) {
 					if (err) {
@@ -43,6 +57,9 @@ module.exports = (function(settings, collection) {
 						}
 						else if (typeof limit != 'undefined') {
 							matches = matches.slice(0, limit)
+						}
+						if (orderby) {
+							matches = orderBy(matches, orderby)
 						}
 						resolve(matches);
 					}

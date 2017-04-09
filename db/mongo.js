@@ -23,10 +23,10 @@ module.exports = (function(settings, collection) {
 				})
 			});
 		},
-		find: function(query, skip, limit) {
+		find: function(query, skip, limit, orderby) {
 			return new Promise(function(resolve, reject) {
 				MongoClient.connect(settings.mongodb_uri, function(err, db) {
-					var cursor = db.collection(collection).find(query)
+					var cursor = db.collection(collection).find(query).sort(orderby)
 					if (typeof skip != 'undefined') {
 						cursor.skip(skip)
 					}
