@@ -6,7 +6,7 @@ function orderBy(data, orderby) {
 	data.sort(function compare(a, b) {
 		for (var i = 0; i < orderby.length; i++) {
 			var ordering = orderby[i]
-			key = ordering[0]
+			var key = ordering[0]
 			if (dotty.get(a, key) > dotty.get(b, key)) {
 				return ordering[1]
 			} else if (dotty.get(a, key) < dotty.get(b, key)) {
