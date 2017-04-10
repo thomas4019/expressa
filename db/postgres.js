@@ -46,13 +46,12 @@ module.exports = (function(settings, collection) {
 						return reject(err, 500);
 					}
 					var query = 'SELECT * FROM ' + collection + (pgQuery ? ' WHERE ' + pgQuery : '');
-					if (typeof orderby != undefined) {
+					if (typeof orderby != 'undefined') {
 						query += ' ORDER BY '
-						for (var key in orderby) {
-							query += ' ' + mongoToPostgres.convertDotNotation('data', key) + (orderby[key] > 0 ? ' ASC' : ' DESC')
-						}
+						orderby.forEach(function(ordering) {
+							query += ' ' + mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
+						});
 					}
-					console.log(query)
 					if (typeof offset != 'undefined') {
 						query += ' OFFSET ' + offset;
 					}

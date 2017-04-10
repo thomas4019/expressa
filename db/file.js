@@ -5,15 +5,17 @@ var filtr = require("filtr")
 
 function orderBy(data, orderby) {
 	data.sort(function compare(a, b) {
-		for (var key in orderby) {
+		for (var i = 0; i < orderby.length; i++) {
+			var ordering = orderby[i]
+			key = ordering[0]
 			if (dotty.get(a, key) > dotty.get(b, key)) {
-				return orderby[key]
+				return ordering[1]
 			} else if (dotty.get(a, key) < dotty.get(b, key)) {
-				return -orderby[key]
+				return -ordering[1]
 			}
 		}
 		return 0
-	});
+	})
 	return data
 }
 

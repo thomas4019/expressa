@@ -14,6 +14,7 @@ var rolePermissions = require('./role_permissions')(router);
 
 var dbTypes = {
 	file: require('./db/file'),
+	memory: require('./db/memory'),
 	postgres: require('./db/postgres'),
 	mongo: require('./db/mongo'),
 	mongodb: require('./db/mongo'),
@@ -95,6 +96,7 @@ router.addListener = function addListener(events, priority, listener) {
 	})
 }
 
+var severities = ["critical", "error", "warning", "notice", "info", "debug"]
 function getSeverity(status) {
 	var severity = status >= 500 ? 'error'
 		: status >= 400 ? 'warning'
@@ -107,30 +109,36 @@ function getSeverity(status) {
 router.use(function logger(req, res, next)  {
 	if (db.log) {
 		onFinished(res, function (err) {
-			entry = {
-				severity: getSeverity(res.statusCode),
-				user: req.user ? req.user._id : undefined,
-				url: req.originalUrl || req.url,
-				method: req.method,
-				referer: req.headers['referer'],
-				req: {
-					ip: req.ip,
-					headers: req.headers,
-				},
-				res: {
-					statusCode: res.statusCode,
-				},
-				meta: {
-					created: new Date().toISOString(),
-					updated: new Date().toISOString(),
-				}	
-			}
-		db.log.create(entry, function(res) {
+			var severity = getSeverity(res.statusCode)
+			var severityLoggingIndex = severities.indexOf(req.settings.logging_level || 'warning');
+			var severityIndex = severities.indexOf(severity)
+			if (severityIndex <= severityLoggingIndex) {
+				var entry = {
+					severity: severity,
+					user: req.user ? req.user._id : undefined,
+					url: decodeURI(req.originalUrl || req.url),
+					method: req.method,
+					referer: req.headers['referer'],
+					req: {
+						ip: req.ip,
+						headers: req.headers,
+					},
+					res: {
+						statusCode: res.statusCode,
+						headers: res._headers
+					},
+					meta: {
+						created: new Date().toISOString(),
+						updated: new Date().toISOString(),
+					}
+				}
+				db.log.create(entry, function(res) {
 
-			}, function(err) {
-				console.error(err);
-				console.error('failed to write log entry.')
-			});
+					}, function(err) {
+						console.error(err);
+						console.error('failed to write log entry.')
+					});
+			}
 		})
 	}
 	next()
@@ -243,6 +251,25 @@ router.get('/:collection', function (req, res, next) {
 		}
 		if (typeof req.query.orderby != 'undefined') {
 			orderby = JSON.parse(req.query.orderby)
+
+			if (Array.isArray(orderby)) {
+				orderby = orderby.map(function(ordering) {
+					if (typeof ordering == 'string') {
+						return [ordering, 1]
+					} else if (Array.isArray(ordering)) {
+						if (ordering.length == 1) {
+							return [ordering[0], 1] // add 1 (default to ascending sort)
+						}
+					}
+					return ordering
+				})
+			} else {
+				var arr = []
+				for (var key in orderby) {
+					arr.push([key, orderby[key]])
+				}
+				orderby = arr
+			}
 		} else {
 			orderby = undefined
 		}
