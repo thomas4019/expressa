@@ -7,6 +7,8 @@
 * add fields whose values are computed from others
 * custom validation like ensuring a user doesn't create too many documents of a collection type.
 
+> TIP: to prevent having listenercode all over the place, use [expressa-folder](https://npmjs.org/package/expressa-folder) to automatically map listeners to files.
+
 ## Modifying behavior using listeners
 Use `expressa.addListener(eventTypes, priority, callback)`
 

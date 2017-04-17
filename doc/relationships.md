@@ -57,6 +57,9 @@ To make things extra convenient, lets generate a dropdown of all users:
 
 Done, now we'll have a nice dropdown to select our relationship:
 
+
 ![](https://gist.githubusercontent.com/coderofsalvation/1ea3f6fad8a880b45b1a23917f9975b5/raw/d828acb18ff1cb5c6e3b9319b813e996cfbfda8f/reference_1.png)
 
 > For more info on enumSource see the [json-editor docs](https://github.com/jdorn/json-editor)
+
+> TIP: use [expressa-folder](https://npmjs.org/package/expressa-folder) to automatically map listeners to files.

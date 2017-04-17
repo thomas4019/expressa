@@ -16,3 +16,7 @@ You can access a collection's database using `expressa.db[collectionName].action
 * Text files (using [json-file-store](https://github.com/flosse/json-file-store) and [mongo-query](https://github.com/Automattic/mongo-query))
 
 Other JSON capable databases can be added easily (pull requests welcome!) by writing a wrapper that supports each of the above methods.
+
+### Smart database objects
+
+[expressa-folder](https://npmjs.org/package/expressa-folder) will automatically add functions to objects returned by `all`,`find` and `get`
