@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
