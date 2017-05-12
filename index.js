@@ -1,3 +1,4 @@
+var fs = require('fs')
 var express = require('express')
 var router = express.Router()
 var bodyParser  = require('body-parser')
@@ -36,6 +37,10 @@ db.settings.get('production')
 		return db.collection.all()
 			.then(function(result) {
 				var promises = result.map(function(collection) {
+					if (typeof dbTypes[collection.storage] != 'function') {
+						console.error('missing ' + collection.storage + ' dbtype which is used by ' + collection._id);
+						console.error('try updating to the latest version of expressa')
+					}
 					db[collection._id] = dbTypes[collection.storage](router.settings, collection._id);
 					return Promise.resolve(db[collection._id].init())
 						.then(function(sucess) {
@@ -50,8 +55,14 @@ db.settings.get('production')
 				console.error(err);
 			});
 	}, function(err) {
-		console.error('error reading settings')
-		console.error(err.stack)
+		if (!fs.existsSync('data/settings/production.json')) {
+		    console.error('Settings file does not exist.')
+		    console.error('Please visit the expressa admin page to run the installation process.')
+		    console.error('This is likely at http://localhost:3000/admin but may be different if you changed ports, etc.')
+		} else {
+			console.error('error reading settings')
+			console.error(err.stack)
+		}
 		db.collection = dbTypes[router.settings.collection_db_type||'file'](router.settings, 'collection')
 	})
 	.then(function(data) {
