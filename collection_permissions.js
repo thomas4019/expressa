@@ -31,7 +31,7 @@ module.exports = function(api) {
 		return function collectionPermissionCheck(req, collection, data) {
 			var user = req.user;
 			var editingOwnUser = collection == 'users' && data._id == req.uid
-			var editingOwnDoc = data.meta && data.meta.owner == req.uid
+			var editingOwnDoc = data.meta && data.meta.owner && data.meta.owner == req.uid
 			var editingOwn = ((editingOwnUser || editingOwnDoc) && 
 				req.hasPermission(collection + ': ' + permission + ' own'));
 			if (!editingOwn && !req.hasPermission(collection + ': ' + permission)) {
