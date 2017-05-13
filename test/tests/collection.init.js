@@ -29,9 +29,9 @@ util.test("create settings collection", function(next, error){
   })
 })
 
-util.test("create settings 'production'", function(next, error){
+util.test("create settings '"+process.env.NODE_ENV+"'", function(next, error){
   expressa.db.settings.create({
-    "_id": "production",
+    "_id": process.env.NODE_ENV,
     "postgresql_uri": "postgres://<username>:<password>@localhost/<database name>",
     "mongodb_uri": "mongodb://localhost:27017/test",
     "jwt_secret": "123123",
