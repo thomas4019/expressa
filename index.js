@@ -58,7 +58,7 @@ db.settings.get( process.env.NODE_ENV )
 			});
 	}, function(err) {
 		if (!fs.existsSync('data/settings/'+process.env.NODE_ENV+'.json')) {
-		    console.error('Settings file does not exist.')
+		    console.error(process.env.NODE_ENV + ' settings file does not exist.')
 		    console.error('Please visit the expressa admin page to run the installation process.')
 		    console.error('This is likely at http://localhost:3000/admin but may be different if you changed ports, etc.')
 		} else {
