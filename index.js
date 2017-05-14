@@ -349,7 +349,7 @@ router.post('/:collection', function (req, res, next) {
 })
 
 function getById(req, res, next) {
-	if (req.params.id == 'schema')
+	if (req.params.id == 'schema' || !db[req.params.collection])
 		return next();
 	db[req.params.collection].get(req.params.id)
 		.then(function(data) {
