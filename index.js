@@ -443,10 +443,10 @@ router.use(function(err, req, res, next) {
 	console.error(err.stack);
 	res.status(res.errCode || 500)
 	if( process.env.DEBUG || (req.hasPermission && req.hasPermission('view errors')) ){      
-      res.send(err);           
-    } else {
-      res.send('something wrong happened')
-    } 
+		res.send(err);           
+	} else {
+		res.send('something wrong happened')
+	} 
 })
 
 router.admin = function(settings) {
