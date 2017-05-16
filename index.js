@@ -442,11 +442,11 @@ router.use(function(err, req, res, next) {
 	console.log('my err handler')
 	console.error(err.stack);
 	res.status(res.errCode || 500)
-	if (req.hasPermission('view errors')) {
-		res.send(err);
+	if( process.env.DEBUG || (req.hasPermission && req.hasPermission('view errors')) ){      
+		res.send(err);           
 	} else {
 		res.send('something wrong happened')
-	}
+	} 
 })
 
 router.admin = function(settings) {
