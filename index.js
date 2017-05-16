@@ -28,7 +28,9 @@ router.db = db
 
 router.settings = {}
 
-db.settings.get('production')
+process.env.NODE_ENV = process.env.NODE_ENV || "development"
+
+db.settings.get( process.env.NODE_ENV )
 	.then(function(data) {
 		router.settings = data;
 
@@ -55,8 +57,8 @@ db.settings.get('production')
 				console.error(err);
 			});
 	}, function(err) {
-		if (!fs.existsSync('data/settings/production.json')) {
-		    console.error('Settings file does not exist.')
+		if (!fs.existsSync('data/settings/'+process.env.NODE_ENV+'.json')) {
+		    console.error(process.env.NODE_ENV + ' settings file does not exist.')
 		    console.error('Please visit the expressa admin page to run the installation process.')
 		    console.error('This is likely at http://localhost:3000/admin but may be different if you changed ports, etc.')
 		} else {
@@ -347,7 +349,7 @@ router.post('/:collection', function (req, res, next) {
 })
 
 function getById(req, res, next) {
-	if (req.params.id == 'schema')
+	if (req.params.id == 'schema' || !db[req.params.collection])
 		return next();
 	db[req.params.collection].get(req.params.id)
 		.then(function(data) {
