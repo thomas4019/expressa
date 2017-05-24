@@ -218,6 +218,20 @@ function notify(event, req, collection, data) {
 }
 router.notify = notify
 
+function createPagination(data, req, limit){
+	var pagination = {
+		page: parseInt(req.query.page),
+		itemsTotal: data.length, 
+		itemsPerPage: limit, 
+		pages: Math.ceil( data.length / limit ), 
+	}
+	pagination.page = pagination.page > pagination.pages ? pagination.pages : pagination.page 
+	if( pagination.page + 1 <= pagination.pages   ) pagination.pageNext = pagination.page + 1 
+	if( pagination.page - 1 > -1                  ) pagination.pagePrev = pagination.page - 1 
+	data = data.splice( pagination.page * limit, limit )
+  return pagination
+}
+
 router.get('/:collection/schema', function (req, res, next) {
 	db.collection.get(req.params.collection)
 		.then(function(collection) {
@@ -238,6 +252,7 @@ router.get('/:collection/schema', function (req, res, next) {
 })
 
 router.get('/:collection', function (req, res, next) {
+	var total = 0
 	if (typeof db[req.params.collection] == 'undefined') {
 		return res.status(404).send('page not found')
 	}
@@ -261,6 +276,10 @@ router.get('/:collection', function (req, res, next) {
 		}
 		if (req.query.limit) {
 			req.query.limit = parseInt(req.query.limit)
+			if( req.query.page ){
+				req.query.pageitems = req.query.limit
+				delete req.query.limit
+			} 
 		}
 		if (typeof req.query.orderby != 'undefined') {
 			orderby = JSON.parse(req.query.orderby)
@@ -288,14 +307,18 @@ router.get('/:collection', function (req, res, next) {
 		}
 		db[req.params.collection].find(query, req.query.skip || req.query.offset, req.query.limit, orderby)
 			.then(function(data) {
+				total = data.length
+				var limit = req.query.pageitems || (total > 10 ? 10 : total ) 
+				// calculate pagination in case `page`-queryarg was passed
+				var pagination = {}
+				if( req.query.page ) pagination = createPagination(data, req, limit)
 				var promises = data.map(function(doc) {
 					return notify('get', req, req.params.collection, doc);
 				});
 				Promise.all(promises)
 					.then(function(allowed) {
-						res.send(data.filter(function(doc, i) {
-							return allowed[i] === true;
-						}))
+						data = data.filter( (doc, i) => allowed[i] === true )
+						res.send( req.query.page ? Object.assign(pagination, {items:data}) : data )
 					}, function(err) {
 						next(err);
 					})
