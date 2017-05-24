@@ -49,18 +49,20 @@ Now start the server by running `node --use-strict app.js` and navigate your bro
 
 You can easily add collections in the admin interface, every collection will be exposing several RESTful endpoints:
 
-| method | endpoint                      | description  |
-|--------|-------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| POST   | /user/login                   | expects JSON in the message body. e.g. `{"email": "email@example.com", password: "<the password>"}                                                                                             |
-| GET    | /:collection                  | get an array of all documents in a collection                                                                                                                                                  |
-| GET    | /:collection/:id              | get a specific document                                                                                                                                                                        |
-| GET    | /:collection/?query={}        | get an array of documents matching the [mongo query](https://www.npmjs.com/package/mongo-query). For pagination append `&skip=0&offset=0&limit=6`                                              |
-| GET    | /:collection/?fieldname=value | get an array of documents matching with the specified values. See [node-mongo-querystring](https://github.com/Turistforeningen/node-mongo-querystring) for details.                            |
-| GET    | /:collection/schema           | get the collection schema                                                                                                                                                                      |
-| POST   | /:collection/                 | create a new document, the message body should be the JSON document                                                                                                                            |
-| PUT    | /:collection/:id              | replace the document with id. The message body should be the JSON document. If the _id in document is different (the old document _id is deleted and a new one with id is created.)            |
-| POST   | /:collection/:id/update       | modify the document with id using a [mongo update query](https://docs.mongodb.com/manual/reference/method/db.collection.update/#update-parameter). The message body should be the update query |
-| DELETE | /:collection/:id              | delete the document                                                                                                                                                                            |
+| method | endpoint                                     | description  |
+|--------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| POST   | /user/login                                  | expects JSON in the message body. e.g. `{"email": "email@example.com", password: "<the password>"}                                                                                             |
+| GET    | /:collection                                 | get an array of all documents in a collection                                                                                                                                                  |
+| GET    | /:collection/:id                             | get a specific document                                                                                                                                                                        |
+| GET    | /:collection/?query={..}                     | get an array of documents matching the [mongo query](https://www.npmjs.com/package/mongo-query). For pagination append `&skip=0&offset=0&limit=6`                                              |
+| GET    | /:collection/?query={..}&limit=100&page=1    | same as previous, but with pagination support (adds X-Result-* headers,  supported by expressa-client) |
+| GET    | /:collection/?query={..}&limit=100&offset=10 | same as previous, but with finergrained output control |
+| GET    | /:collection/?fieldname=value                | get an array of documents matching with the specified values. See [node-mongo-querystring](https://github.com/Turistforeningen/node-mongo-querystring) for details.                            |
+| GET    | /:collection/schema                          | get the collection schema                                                                                                                                                                      |
+| POST   | /:collection/                                | create a new document, the message body should be the JSON document                                                                                                                            |
+| PUT    | /:collection/:id                             | replace the document with id. The message body should be the JSON document. If the _id in document is different (the old document _id is deleted and a new one with id is created.)            |
+| POST   | /:collection/:id/update                      | modify the document with id using a [mongo update query](https://docs.mongodb.com/manual/reference/method/db.collection.update/#update-parameter). The message body should be the update query |
+| DELETE | /:collection/:id                             | delete the document                                                                                                                                                                            |
 
 > Supported Data: Only standard JSON (strings, numbers, booleans, null) is supported. Dates can be stored as strings using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
 
