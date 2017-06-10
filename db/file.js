@@ -42,7 +42,6 @@ module.exports = (function(settings, collection) {
 		},
 		find: function(query, offset, limit, orderby) {
 			return new Promise(function(resolve, reject) {
-				var matches = []
 				store.all(function(err, data) {
 					if (err) {
 						reject(err);
@@ -51,7 +50,7 @@ module.exports = (function(settings, collection) {
 						var arr = Object.keys(data).map(function(id) {
 							return data[id];
 						});
-						matches = filter.test(arr)
+						var matches = filter.test(arr)
 						if (typeof offset != 'undefined' && typeof limit != 'undefined') {
 							matches = matches.slice(offset, offset + limit)
 						}
@@ -64,9 +63,9 @@ module.exports = (function(settings, collection) {
 						if (orderby) {
 							matches = orderBy(matches, orderby)
 						}
+						resolve(matches);
 					}
 				});
-				resolve(matches);
 			});
 		},
 		get: function(id) {
