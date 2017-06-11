@@ -226,10 +226,10 @@ function createPagination(data, req, limit){
 		pages: Math.ceil( data.length / limit ), 
 	}
 	pagination.page = pagination.page > pagination.pages ? pagination.pages : pagination.page 
-	if( pagination.page + 1 <= pagination.pages   ) pagination.pageNext = pagination.page + 1 
-	if( pagination.page - 1 > -1                  ) pagination.pagePrev = pagination.page - 1 
-	data = data.splice( pagination.page * limit, limit )
-  return pagination
+	if ( pagination.page + 1 <= pagination.pages   ) pagination.pageNext = pagination.page + 1 
+	if ( pagination.page - 1 > -1                  ) pagination.pagePrev = pagination.page - 1 
+	pagination.data = data.splice( pagination.page * limit, limit )
+	return pagination
 }
 
 router.get('/:collection/schema', function (req, res, next) {
@@ -276,7 +276,7 @@ router.get('/:collection', function (req, res, next) {
 		}
 		if (req.query.limit) {
 			req.query.limit = parseInt(req.query.limit)
-			if( req.query.page ){
+			if( req.query.page ) {
 				req.query.pageitems = req.query.limit
 				delete req.query.limit
 			} 
@@ -318,7 +318,7 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						data = data.filter( (doc, i) => allowed[i] === true )
-						res.send( req.query.page ? Object.assign(pagination, {items:data}) : data )
+						res.send( req.query.page ? pagination : data )
 					}, function(err) {
 						next(err);
 					})
