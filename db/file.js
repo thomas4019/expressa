@@ -19,6 +19,11 @@ function orderBy(data, orderby) {
 	return data
 }
 
+function clone(obj){
+	if( !obj ) return obj
+	return JSON.parse( JSON.stringify(obj) )
+}
+
 module.exports = (function(settings, collection) {
 	var store = new Store('data/' + collection, {pretty: true, saveId: '_id'})
 
@@ -35,6 +40,8 @@ module.exports = (function(settings, collection) {
 						var arr = Object.keys(data).map(function(id) {
 							return data[id];
 						});
+						if( arr ) // prevent store from being modified
+							arr = arr.map( function(m){ return clone(m) } ) 
 						resolve(arr);	
 					}
 				});
@@ -63,6 +70,8 @@ module.exports = (function(settings, collection) {
 						if (orderby) {
 							matches = orderBy(matches, orderby)
 						}
+						if( matches ) // prevent store from being modified
+							matches = matches.map( function(m){ return clone(m) } ) // prevent store from being modified
 						resolve(matches);
 					}
 				});
@@ -74,7 +83,8 @@ module.exports = (function(settings, collection) {
 					if (err) {
 						reject(err);
 					} else {
-						resolve(data);	
+						if( data ) data = clone(data) // prevent store from getting modified
+						resolve( data );	
 					}
 				});
 			});
