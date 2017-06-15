@@ -48,9 +48,9 @@ module.exports = (function(settings, collection) {
 					var query = 'SELECT * FROM ' + collection + (pgQuery ? ' WHERE ' + pgQuery : '');
 					if (typeof orderby != 'undefined') {
 						query += ' ORDER BY '
-						orderby.forEach(function(ordering) {
-							query += ' ' + mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
-						});
+						query += orderby.map(function(ordering) {
+							return mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
+						}).join(', ');
 					}
 					if (typeof offset != 'undefined') {
 						query += ' OFFSET ' + offset;
