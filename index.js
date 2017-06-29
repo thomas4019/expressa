@@ -318,7 +318,11 @@ router.get('/:collection', function (req, res, next) {
 				Promise.all(promises)
 					.then(function(allowed) {
 						data = data.filter( (doc, i) => allowed[i] === true )
-						res.send( req.query.page ? pagination : data )
+						var result = req.query.page ? pagination : data;
+						notify('getpresend', req, req.params.collection, result)
+							.then(function() {
+								res.send(result)
+							}, next);
 					}, function(err) {
 						next(err);
 					})
@@ -334,9 +338,13 @@ router.get('/:collection', function (req, res, next) {
 				});
 				Promise.all(promises)
 					.then(function(allowed) {
-						res.send(data.filter(function(doc, i) {
+						var result = data.filter(function(doc, i) {
 							return allowed[i] === true;
-						}))
+						});
+						notify('getpresend', req, req.params.collection, result)
+							.then(function() {
+								res.send(result)
+							}, next);
 					}, function(err) {
 						next(err);
 					})
@@ -379,7 +387,10 @@ function getById(req, res, next) {
 			notify('get', req, req.params.collection, data)
 				.then(function(allowed) {
 					if (allowed === true) {
-						res.send(data);
+						notify('getpresend', req, req.params.collection, data)
+							.then(function() {
+								res.send(data)
+							}, next);
 					} else {
 						res.status(allowed.code||403).send(allowed.message || 'forbidden');
 					}
