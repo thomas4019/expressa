@@ -310,15 +310,15 @@ router.get('/:collection', function (req, res, next) {
 				total = data.length
 				var limit = req.query.pageitems || (total > 10 ? 10 : total ) 
 				// calculate pagination in case `page`-queryarg was passed
-				var pagination = {}
-				if( req.query.page ) pagination = createPagination(data, req, limit)
 				var promises = data.map(function(doc) {
 					return notify('get', req, req.params.collection, doc);
 				});
 				Promise.all(promises)
 					.then(function(allowed) {
-						data = data.filter( (doc, i) => allowed[i] === true )
-						var result = req.query.page ? pagination : data;
+						var result = data.filter( (doc, i) => allowed[i] === true )
+						if (req.query.page) {
+							result = createPagination(data, req, limit);
+						}
 						notify('getpresend', req, req.params.collection, result)
 							.then(function() {
 								res.send(result)
