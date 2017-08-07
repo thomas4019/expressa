@@ -13,7 +13,7 @@ module.exports = function(api) {
 
 	api.addListener(['post', 'put'], function updatePassword(req, collection, data) {
 		if (collection == 'users' && data.password && data.password.length != 60 && data.password[0] != "$") {
-			debug('setting new password')
+			debug('hashing and replacing password in the user document.')
 			data.password = auth.createHash(data.password);
 		}
 	});
