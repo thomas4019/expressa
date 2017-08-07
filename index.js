@@ -428,11 +428,18 @@ router.post('/:collection/:id/update', function (req, res, next) {
 
 	db[req.params.collection].get(req.params.id)
 		.then(function(doc) {
+			var owner = doc.meta.owner;
 			var changes = mongoQuery(doc, {}, modifier);
+			var newOwner = doc.meta.owner;
+			if (owner != newOwner) {
+				debug('attempting to change document owner.')
+				doc.meta.owner = owner;
+			}
 			req.body = doc;
 			notify('put', req, req.params.collection, doc)
 				.then(function(allowed) {
 					if (allowed === true) {
+						req.body.meta.owner = newOwner;
 						db[req.params.collection].update(req.params.id, req.body)
 							.then(function(data) {
 								notify('changed', req, req.params.collection, req.body)
