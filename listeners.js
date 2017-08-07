@@ -1,4 +1,5 @@
 var auth = require('./auth')
+var debug = require('debug')('expressa/'+ String(__filename).replace(/.*\//, '') )
 
 module.exports = function(api) {
 
@@ -6,12 +7,13 @@ module.exports = function(api) {
 	api.addListener('changed', function setupCollections(req, collection, data) {
 		if (collection == 'collection') {
 			api.db[data._id] = api.dbTypes[data.storage](req.settings, data._id)
-			console.log('updated ' + data._id + ' collection storage')
+			debug('updated ' + data._id + ' collection storage')
 		}
 	})
 
 	api.addListener(['post', 'put'], function updatePassword(req, collection, data) {
 		if (collection == 'users' && data.password && data.password.length != 60 && data.password[0] != "$") {
+			debug('hashing and replacing password in the user document.')
 			data.password = auth.createHash(data.password);
 		}
 	});
@@ -53,6 +55,7 @@ module.exports = function(api) {
 	// TODO how to add back in the password on PUT?
 	api.addListener('get', -100, function hidePasswordHashes(req, collection, data) {
 		if (collection == 'users' && !req.hasPermission('users: view hashed passwords')) {
+			debug("deleting password because 'users: view hashed passwords'-role is not set")
 			delete data.password;
 		}
 	});

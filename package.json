@@ -9,7 +9,7 @@
     "bcryptjs": "2.4.3",
     "body-parser": "1.15.0",
     "cors": "2.7.1",
-    "debug": "2.6.1",
+    "debug": "^2.6.1",
     "dotty": "0.0.2",
     "express": "4.13.4",
     "expressa-admin": "0.1.10",
