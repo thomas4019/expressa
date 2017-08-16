@@ -228,7 +228,7 @@ function createPagination(data, req, limit){
 	pagination.page = pagination.page > pagination.pages ? pagination.pages : pagination.page 
 	if ( pagination.page + 1 <= pagination.pages   ) pagination.pageNext = pagination.page + 1 
 	if ( pagination.page - 1 > -1                  ) pagination.pagePrev = pagination.page - 1 
-	pagination.data = data.splice( pagination.page * limit, limit )
+	pagination.data = data.splice( (pagination.page-1) * limit, limit )
 	return pagination
 }
 
