@@ -6,7 +6,7 @@ exports.doLogin = function(user, req, res, next) {
 	if (!req.settings.jwt_secret) {
 		return next('missing jwt_secret in settings')
 	}
-	var token = jwt.sign(user, req.settings.jwt_secret, {});
+	var token = jwt.sign({_id:user._id, email:user.email}, req.settings.jwt_secret, {});
 	res.send({
 		token: token,
 		uid: user._id
