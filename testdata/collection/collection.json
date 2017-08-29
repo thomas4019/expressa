@@ -1,0 +1,40 @@
+{
+  "_id": "collection",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "schema": {
+        "type": "object",
+        "format": "schema",
+        "properties": {}
+      },
+      "storage": {
+        "type": "string",
+        "enum": [
+          "file",
+          "postgres",
+          "mongo"
+        ]
+      },
+      "documentsHaveOwners": {
+        "type": "boolean",
+        "format": "checkbox"
+      }
+    },
+    "required": [
+      "storage",
+      "documentsHaveOwners"
+    ]
+  },
+  "storage": "file",
+  "cached": true,
+  "documentsHaveOwners": false,
+  "meta": {
+    "updated": "2017-08-24T04:39:29.670Z",
+    "created": "2017-08-24T04:39:29.670Z"
+  }
+}

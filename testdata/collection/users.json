@@ -25,33 +25,12 @@
             "Admin",
             "Anonymous",
             "Authenticated",
-            "Test",
-            "TierLow",
-            "TierMedium",
-            "TierPremium"
+            "Test"
           ]
         },
         "uniqueItems": true,
-        "format": "checkbox",
-        "type": "array"
-      },
-      "passport": {
-        "type": "object",
-        "properties": {
-          "schema": {
-            "type": "string",
-            "enum": [
-              "github"
-            ]
-          },
-          "data": {
-            "type": "object",
-            "properties": {}
-          }
-        }
-      },
-      "id_remote": {
-        "type": "string"
+        "type": "array",
+        "format": "checkbox"
       }
     },
     "required": [
@@ -60,9 +39,10 @@
     ]
   },
   "storage": "file",
+  "cached": true,
   "documentsHaveOwners": true,
   "meta": {
-    "updated": "2017-02-22T15:44:05.098Z",
-    "created": "2017-02-16T16:49:27.133Z"
+    "updated": "2017-08-24T04:39:30.056Z",
+    "created": "2017-08-24T04:39:30.056Z"
   }
 }

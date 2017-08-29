@@ -1,0 +1,8 @@
+{
+	"whiteSpace": {
+		"after": {
+			"FunctionName": 1,
+			"FunctionReservedWord": 1
+		}
+	}
+}

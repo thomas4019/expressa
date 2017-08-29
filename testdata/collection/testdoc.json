@@ -1,0 +1,29 @@
+{
+  "_id": "testdoc",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },      
+      "data": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {}
+      }
+    },
+    "required": [
+      "title"
+    ]
+  },
+  "storage": "memory",
+  "documentsHaveOwners": false,
+  "meta": {
+    "updated": "2017-08-24T04:39:29.866Z",
+    "created": "2017-08-24T04:39:29.866Z"
+  }
+}
