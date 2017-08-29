@@ -8,8 +8,8 @@ var express = require('express')
 var app = express()
 app.use('/api', api)
 
-api.addListener('ready', function() {
+api.addListener('ready', function () {
   app.listen(3000, function () {
-    console.log('Test server listening on port 3000!');
-  });
-});
+    console.log('Test server listening on port 3000!')
+  })
+})

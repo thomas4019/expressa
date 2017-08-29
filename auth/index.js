@@ -1,5 +1,6 @@
 var bcrypt = require('bcryptjs')
 var handler = require('./jwt')
+var debug = require('debug')('expressa')
 
 var createHash = function (password) {
   var salt = bcrypt.genSaltSync(10)
@@ -13,7 +14,11 @@ var isValidPassword = function (password, hashedPassword) {
 module.exports = {
   createHash: createHash,
   middleware: function (req, res, next) {
-    handler.isLoggedIn(req, function (user) {
+    handler.isLoggedIn(req, function (err, user) {
+      if (err) {
+        debug('error decrypting user token.')
+        debug(err)
+      }
       if (user) {
         req.uid = user._id
       }

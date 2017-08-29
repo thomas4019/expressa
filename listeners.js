@@ -83,7 +83,7 @@ module.exports = function (api) {
               resolve(undefined)
             }
           }, function (err) {
-            next(err)
+            reject(err)
           })
       })
     }

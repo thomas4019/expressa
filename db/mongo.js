@@ -7,6 +7,9 @@ module.exports = function (settings, collection) {
     all: function () {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
+          if (err) {
+            return reject(err)
+          }
           db.collection(collection).find({})
             .toArray(function (err, docs) {
               docs.forEach(function (doc) {
@@ -24,6 +27,9 @@ module.exports = function (settings, collection) {
     find: function (query, skip, limit, orderby) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
+          if (err) {
+            return reject(err)
+          }
           var cursor = db.collection(collection).find(query).sort(orderby)
           if (typeof skip !== 'undefined') {
             cursor.skip(skip)
@@ -47,6 +53,9 @@ module.exports = function (settings, collection) {
     get: function (id) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
+          if (err) {
+            return reject(err)
+          }
           db.collection(collection).findOne(new ObjectId(id), function (err, doc) {
             if (doc) {
               doc._id = doc._id.toString()
@@ -67,6 +76,9 @@ module.exports = function (settings, collection) {
     create: function (data) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
+          if (err) {
+            return reject(err)
+          }
           db.collection(collection).insert(data, function (err, doc) {
             if (err) {
               reject(err)
@@ -80,6 +92,9 @@ module.exports = function (settings, collection) {
     update: function (id, data) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
+          if (err) {
+            return reject(err)
+          }
           data._id = ObjectId(id)
           db.collection(collection).update({
             _id: ObjectId(id)
@@ -97,6 +112,9 @@ module.exports = function (settings, collection) {
     delete: function (id) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
+          if (err) {
+            return reject(err)
+          }
           db.collection(collection).remove({
             _id: ObjectId(id)
           }, function (err, doc) {

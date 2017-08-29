@@ -38,6 +38,7 @@ function bootstrapCollections (router) {
             debug('initialized ' + collection._id + ' using ' + collection.storage)
           }, function (err) {
             console.error('failed to initialize ' + collection._id + ' using ' + collection.storage)
+            console.error(err)
           })
       })
       return Promise.all(promises)
@@ -137,6 +138,11 @@ module.exports.api = function (settings) {
   router.use(function logger (req, res, next) {
     if (db.log) {
       onFinished(res, function (err) {
+        if (err) {
+          console.error('error found while logging.')
+          console.error(err)
+          return
+        }
         var severity = getSeverity(res.statusCode)
         var severityLoggingIndex = severities.indexOf(req.settings.logging_level || 'warning')
         var severityIndex = severities.indexOf(severity)

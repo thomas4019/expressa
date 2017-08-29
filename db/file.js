@@ -37,7 +37,7 @@ module.exports = function (settings, collection) {
           if (err) {
             reject(err)
           } else {
-            var filter = new filtr(query)
+            var filter = filtr(query)
             var arr = Object.keys(data).map(function (id) {
               return data[id]
             })

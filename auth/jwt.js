@@ -24,12 +24,12 @@ exports.isLoggedIn = function (req, callback) {
   if (token) {
     jwt.verify(token, req.settings.jwt_secret, function (err, decoded) {
       if (err) {
-        callback(false)
+        callback(err, false)
       } else {
-        callback(decoded)
+        callback(null, decoded)
       }
     })
   } else {
-    callback(false)
+    callback(null, false)
   }
 }

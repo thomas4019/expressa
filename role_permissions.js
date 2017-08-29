@@ -33,6 +33,7 @@ module.exports = function (api) {
           return result
         }, function (err) {
           console.log('failed to load role ' + name)
+          console.error(err)
           return {
             permissions: {}
           }

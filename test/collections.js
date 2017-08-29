@@ -92,7 +92,7 @@ describe('basic collections', function () {
         request(app)
           .get('/testdoc/test123')
           .set('x-access-token', token)
-          .expect(200, function(err, res) {
+          .expect(200, function (err, res) {
             if (err) {
               return done(err)
             }
@@ -111,7 +111,6 @@ describe('basic collections', function () {
       })
       .expect(401, done)
   })
-
 
   it('edit a document', function (done) {
     util.getUserWithPermissions(api, 'testdoc: edit')
@@ -132,25 +131,6 @@ describe('basic collections', function () {
           }, done)
       })
   })
-
-  /*it('change a document id', function (done) {
-    util.getUserWithPermissions(api, 'testdoc: edit')
-      .then(function (token) {
-        request(app)
-          .put('/testdoc/test123')
-          .set('x-access-token', token)
-          .send(JSON.stringify({
-            _id: 'test123changed'
-            title: 'doc1-updated',
-            data: { field: 'value' }
-          }))
-          .expect(200)
-          .expect({
-            id: 'test123',
-            status: 'OK'
-          }, done)
-      })
-  })*/
 
   it('fail to edit a document without permission', function (done) {
     request(app)
