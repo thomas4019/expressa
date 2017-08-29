@@ -1,7 +1,7 @@
-var MongoClient = require('mongodb').MongoClient;
-var ObjectId = require('mongodb').ObjectID;
+var MongoClient = require('mongodb').MongoClient
+var ObjectId = require('mongodb').ObjectID
 
-module.exports = (function (settings, collection) {
+module.exports = function (settings, collection) {
   return {
     init: function () {},
     all: function () {
@@ -13,22 +13,22 @@ module.exports = (function (settings, collection) {
                 doc._id = doc._id.toString()
               })
               if (err) {
-                reject(err);
+                reject(err)
               } else {
-                resolve(docs);
+                resolve(docs)
               }
             })
         })
-      });
+      })
     },
     find: function (query, skip, limit, orderby) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
           var cursor = db.collection(collection).find(query).sort(orderby)
-          if (typeof skip != 'undefined') {
+          if (typeof skip !== 'undefined') {
             cursor.skip(skip)
           }
-          if (typeof limit != 'undefined') {
+          if (typeof limit !== 'undefined') {
             cursor.limit(limit)
           }
           cursor.toArray(function (err, docs) {
@@ -36,13 +36,13 @@ module.exports = (function (settings, collection) {
               doc._id = doc._id.toString()
             })
             if (err) {
-              reject(err);
+              reject(err)
             } else {
-              resolve(docs);
+              resolve(docs)
             }
           })
         })
-      });
+      })
     },
     get: function (id) {
       return new Promise(function (resolve, reject) {
@@ -52,30 +52,30 @@ module.exports = (function (settings, collection) {
               doc._id = doc._id.toString()
             }
             if (err) {
-              reject(err);
+              reject(err)
             } else {
               if (doc) {
-                resolve(doc);
+                resolve(doc)
               } else {
                 reject('document not found', 404)
               }
             }
           })
         })
-      });
+      })
     },
     create: function (data) {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
           db.collection(collection).insert(data, function (err, doc) {
             if (err) {
-              reject(err);
+              reject(err)
             } else {
-              resolve(doc.insertedIds[0]);
+              resolve(doc.insertedIds[0])
             }
           })
         })
-      });
+      })
     },
     update: function (id, data) {
       return new Promise(function (resolve, reject) {
@@ -84,15 +84,15 @@ module.exports = (function (settings, collection) {
           db.collection(collection).update({
             _id: ObjectId(id)
           }, data, function (err, doc) {
-            //doc._id = doc._id.toString()
+            // doc._id = doc._id.toString()
             if (err) {
-              reject(err);
+              reject(err)
             } else {
-              resolve(doc);
+              resolve(doc)
             }
           })
         })
-      });
+      })
     },
     delete: function (id) {
       return new Promise(function (resolve, reject) {
@@ -100,17 +100,17 @@ module.exports = (function (settings, collection) {
           db.collection(collection).remove({
             _id: ObjectId(id)
           }, function (err, doc) {
-            if (typeof doc._id != 'undefined') {
+            if (typeof doc._id !== 'undefined') {
               doc._id = doc._id.toString()
             }
             if (err) {
-              reject(err);
+              reject(err)
             } else {
-              resolve(doc);
+              resolve(doc)
             }
           })
         })
-      });
+      })
     }
-  };
-});
+  }
+}

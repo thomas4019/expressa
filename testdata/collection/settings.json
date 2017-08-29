@@ -1,0 +1,39 @@
+{
+  "_id": "settings",
+  "schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "postgresql_uri": {
+        "type": "string",
+        "description": "The full path to your postgres database. E.g. postgres://username:password@host/db"
+      },
+      "mongodb_uri": {
+        "type": "string",
+        "description": "The full path to your mongo database."
+      },
+      "jwt_secret": {
+        "type": "string",
+        "description": "The secret key used to encode your json web tokens. It's important this is kept unique and secret."
+      },
+      "enforce_permissions": {
+        "type": "boolean",
+        "description": "Whether permissions should be checked. Only turn off if needed for testing."
+      },
+      "installed": {
+        "type": "boolean",
+        "description": "Used by the admin editor to track whether the installation is complete."
+      }
+    }
+  },
+  "storage": "file",
+  "cached": true,
+  "documentsHaveOwners": false,
+  "meta": {
+    "updated": "2017-08-24T04:39:29.434Z",
+    "created": "2017-08-24T04:39:29.434Z"
+  }
+}

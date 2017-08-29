@@ -1,4 +1,3 @@
-var pg = require('pg')
 var bcrypt = require('bcryptjs')
 var handler = require('./jwt')
 
@@ -30,7 +29,7 @@ module.exports = {
         'email': req.body.email
       })
         .then(function (result) {
-          if (result.length == 0) {
+          if (result.length === 0) {
             return res.status(400).send({
               error: 'No user found with this email.'
             })

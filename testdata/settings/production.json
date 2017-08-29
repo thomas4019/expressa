@@ -1,0 +1,13 @@
+{
+  "_id": "production",
+  "postgresql_uri": "",
+  "mongodb_uri": "mongodb://localhost:27017/test",
+  "jwt_secret": "ab5rt3QsBmXLcYBhpucI",
+  "enforce_permissions": true,
+  "installed": true,
+  "meta": {
+    "created": "2017-08-24T04:39:30.090Z",
+    "updated": "2017-08-24T04:39:30.090Z"
+  },
+  "file_storage_path": "testdata"
+}

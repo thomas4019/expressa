@@ -1,63 +1,46 @@
-var randomstring = require("randomstring");
-var dotty = require('dotty')
-var filtr = require("filtr")
+var randomstring = require('randomstring')
+var filtr = require('filtr')
 
-function orderBy (data, orderby) {
-  data.sort(function compare (a, b) {
-    for (var i = 0; i < orderby.length; i++) {
-      var ordering = orderby[i]
-      var key = ordering[0]
-      if (dotty.get(a, key) > dotty.get(b, key)) {
-        return ordering[1]
-      } else if (dotty.get(a, key) < dotty.get(b, key)) {
-        return -ordering[1]
-      }
-    }
-    return 0
-  })
-  return data
-}
+var util = require('../util')
 
-module.exports = (function (settings, collection) {
-  var store = {};
+module.exports = function (settings, collection) {
+  var store = {}
 
   return {
     init: function () {},
     all: function () {
-      var arr = Object.keys(data).map(function (id) {
-        return store[id];
-      });
-      return Promise.resolve(arr);
+      var arr = Object.keys(store).map(function (id) {
+        return store[id]
+      })
+      return Promise.resolve(arr)
     },
     find: function (query, offset, limit, orderby) {
       var arr = Object.keys(store).map(function (id) {
-        return store[id];
-      });
-      var filter = new filtr(query);
+        return store[id]
+      })
+      var filter = new filtr(query)
       var matches = filter.test(arr)
-      if (typeof offset != 'undefined' && typeof limit != 'undefined') {
+      if (typeof offset !== 'undefined' && typeof limit !== 'undefined') {
         matches = matches.slice(offset, offset + limit)
-      } else if (typeof offset != 'undefined') {
+      } else if (typeof offset !== 'undefined') {
         matches = matches.slice(offset)
-      } else if (typeof limit != 'undefined') {
+      } else if (typeof limit !== 'undefined') {
         matches = matches.slice(0, limit)
       }
       if (orderby) {
-        matches = orderBy(matches, orderby)
+        matches = util.orderBy(matches, orderby)
       }
-      return Promise.resolve(matches);
+      return Promise.resolve(matches)
     },
     get: function (id) {
       if (store[id]) {
         return Promise.resolve(store[id])
       } else {
-        return Promise.reject({
-          message: 'no document with the id exists.'
-        })
+        return Promise.reject('document not found', 404)
       }
     },
     create: function (data) {
-      var id = typeof data._id == 'undefined' ? randomstring.generate(8) : data._id;
+      var id = typeof data._id === 'undefined' ? randomstring.generate(8) : data._id
       data['_id'] = id
       store[id] = data
       return Promise.resolve(id)
@@ -67,8 +50,12 @@ module.exports = (function (settings, collection) {
       return Promise.resolve()
     },
     delete: function (id) {
-      delete store[id]
-      return Promise.resolve()
+      if (store[id]) {
+        delete store[id]
+        return Promise.resolve()
+      } else {
+        return Promise.reject('document not found', 404)
+      }
     }
-  };
-});
+  }
+}
