@@ -297,6 +297,7 @@ module.exports.api = function (settings) {
         delete params['skip']
         delete params['offset']
         delete params['limit']
+        delete params['page']
         delete params['orderby']
         query = router.queryStringParser.parse(params)
       }

@@ -107,13 +107,13 @@ describe('querying collections', function () {
 
   it('page 0 returns an error', function (done) {
     request(app)
-      .get('/testdoc?query={}&limit=2&page=0')
+      .get('/testdoc?limit=2&page=0')
       .expect(400, done)
   })
 
   it('returns page 1 correctly', function (done) {
     request(app)
-      .get('/testdoc?query={}&limit=2&page=1')
+      .get('/testdoc?limit=2&page=1')
       .expect(200, function (err, res) {
         if (err) {
           return done(err)
@@ -133,7 +133,7 @@ describe('querying collections', function () {
 
   it('returns page 2 correctly', function (done) {
     request(app)
-      .get('/testdoc?query={}&limit=2&page=2')
+      .get('/testdoc?limit=2&page=2')
       .expect(200, function (err, res) {
         if (err) {
           return done(err)
@@ -152,7 +152,7 @@ describe('querying collections', function () {
 
   it('page 3 is empty', function (done) {
     request(app)
-      .get('/testdoc?query={}&limit=2&page=3')
+      .get('/testdoc?limit=2&page=3')
       .expect(200, function (err, res) {
         if (err) {
           return done(err)
@@ -166,11 +166,10 @@ describe('querying collections', function () {
         done()
       })
   })
-
 
   it('page 4 is empty', function (done) {
     request(app)
-      .get('/testdoc?query={}&limit=2&page=3')
+      .get('/testdoc?limit=2&page=3')
       .expect(200, function (err, res) {
         if (err) {
           return done(err)
@@ -184,6 +183,26 @@ describe('querying collections', function () {
         done()
       })
   })
+
+
+  it('pagination works with query', function (done) {
+    request(app)
+      .get('/testdoc?query={"data.number":2}&limit=2&page=1')
+      .expect(200, function (err, res) {
+        if (err) {
+          return done(err)
+        }
+        expect(res.body.itemsTotal).to.equal(1)
+        expect(res.body.itemsPerPage).to.equal(2)
+        expect(res.body.pages).to.equal(1)
+        expect(res.body.pagePrev).to.equal(undefined)
+        expect(res.body.pageNext).to.equal(undefined)
+        expect(res.body.data).to.have.lengthOf(1)
+        expect(res.body.data[0].title).to.equal('doc3')
+        done()
+      })
+  })
+
 
   it('sort by deep field ascending', function (done) {
     util.getUserWithPermissions(api, 'testdoc: view')
