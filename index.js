@@ -248,14 +248,14 @@ module.exports.api = function (settings) {
       itemsPerPage: limit,
       pages: Math.ceil(data.length / limit)
     }
-    pagination.page = pagination.page > pagination.pages ? pagination.pages : pagination.page
-    if (pagination.page + 1 < pagination.pages) {
+    pagination.page = pagination.page > pagination.pages ? pagination.pages + 1 : pagination.page
+    if (pagination.page < pagination.pages) {
       pagination.pageNext = pagination.page + 1
     }
-    if (pagination.page - 1 > -1) {
+    if (pagination.page - 1 > 0) {
       pagination.pagePrev = pagination.page - 1
     }
-    pagination.data = data.splice(pagination.page * limit, limit)
+    pagination.data = data.splice((pagination.page-1) * limit, limit)
     return pagination
   }
 
@@ -349,6 +349,11 @@ module.exports.api = function (settings) {
             .then(function (allowed) {
               var result = data.filter((doc, i) => allowed[i] === true)
               if (req.query.page) {
+                if (req.query.page <= 0) {
+                  return res.status(400).send({
+                    error: 'invalid page number'
+                  })
+                }
                 result = createPagination(data, req, limit)
               }
               notify('getpresend', req, req.params.collection, result)
