@@ -103,7 +103,7 @@ module.exports = function (settings, collection) {
             if (err) {
               reject(err)
             }
-            resolve(data)
+            resolve( process.env.POSTGRES_RETURNID ? data._id : data )
           })
         })
       })
