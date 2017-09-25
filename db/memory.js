@@ -18,7 +18,7 @@ module.exports = function (settings, collection) {
       var arr = Object.keys(store).map(function (id) {
         return store[id]
       })
-      var filter = filtr(query)
+      var filter = new filtr(query)
       var matches = filter.test(arr)
       if (typeof offset !== 'undefined' && typeof limit !== 'undefined') {
         matches = matches.slice(offset, offset + limit)

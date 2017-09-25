@@ -20,10 +20,7 @@ module.exports = function (api) {
     if (collection === 'collection') {
       if (req.hasPermission('collection: view relevant')) {
         if (req.hasPermission(data._id + ': view') || req.hasPermission(data._id + ': view own')) {
-          return {
-            code: 401,
-            message: 'You do not have permission to perform this action.'
-          }
+          return true
         }
       }
     }
