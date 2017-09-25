@@ -70,7 +70,7 @@ module.exports.api = function (settings) {
 
   var db = {}
   router.settings = settings || {}
-  db.settings = dbTypes[settings.settings_db_type || 'file'](router.settings, 'settings')
+  db.settings = dbTypes[router.settings.settings_db_type || 'file'](router.settings, 'settings')
   router.db = db
 
   var eventListeners = {}
