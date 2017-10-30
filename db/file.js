@@ -1,6 +1,6 @@
 var Store = require('jfs')
 var randomstring = require('randomstring')
-var filtr = require('filtr')
+var sift = require('sift')
 
 var util = require('../util')
 
@@ -37,11 +37,10 @@ module.exports = function (settings, collection) {
           if (err) {
             reject(err)
           } else {
-            var filter = new filtr(query)
             var arr = Object.keys(data).map(function (id) {
               return data[id]
             })
-            var matches = filter.test(arr)
+            var matches = sift(query, arr)
             if (typeof offset !== 'undefined' && typeof limit !== 'undefined') {
               matches = matches.slice(offset, offset + limit)
             } else if (typeof offset !== 'undefined') {

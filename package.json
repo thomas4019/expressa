@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
@@ -25,7 +25,8 @@
     "on-finished": "^2.3.0",
     "pg": "6.1.4",
     "promise-sequential": "1.1.1",
-    "randomstring": "1.1.4"
+    "randomstring": "1.1.4",
+    "sift": "^5.0.0"
   },
   "devDependencies": {
     "chai": "^4.1.1",

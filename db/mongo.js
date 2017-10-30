@@ -3,7 +3,11 @@ var ObjectId = require('mongodb').ObjectID
 
 module.exports = function (settings, collection) {
   return {
-    init: function () {},
+    init: function () {
+      if (!settings.mongodb_uri) {
+        console.error(`{collection} uses mongo, but mongodb_url is undefined.`)
+      }
+    },
     all: function () {
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, function (err, db) {
