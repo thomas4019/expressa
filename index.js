@@ -65,6 +65,7 @@ function addStandardListeners (router) {
 
 module.exports.api = function (settings) {
   var router = express.Router()
+  router.custom = express.Router()
   router.dbTypes = dbTypes
   router.queryStringParser = new MongoQS({})
 
@@ -202,6 +203,7 @@ module.exports.api = function (settings) {
 
   var rolePermissions = require('./role_permissions')(router)
   router.use(rolePermissions.middleware) // Add user and permissions to request
+  router.use(router.custom)
 
   router.get('/user/me', function (req, res, next) {
     req.params.collection = 'users'
@@ -405,11 +407,13 @@ module.exports.api = function (settings) {
                 status: 'OK',
                 id: id
               })
-            }, function (err, code) {
-              res.errCode = code
+            }, function (err) {
+              res.errCode = err.errCode;
+              delete err.errCode;
               next(err)
             })
         } else {
+          debug('disallowed creation of ' + req.params.collection);
           res.status(allowed.code || 500).send({
             error: allowed.message
           })
