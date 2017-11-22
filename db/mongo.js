@@ -1,5 +1,4 @@
 var MongoClient = require('mongodb').MongoClient
-var ObjectId = require('mongodb').ObjectID
 
 module.exports = function (settings, collection) {
   return {
@@ -60,7 +59,7 @@ module.exports = function (settings, collection) {
           if (err) {
             return reject(err)
           }
-          db.collection(collection).findOne(new ObjectId(id), function (err, doc) {
+          db.collection(collection).findOne({ _id: id }, function (err, doc) {
             if (doc) {
               doc._id = doc._id.toString()
             }
@@ -85,6 +84,9 @@ module.exports = function (settings, collection) {
           }
           db.collection(collection).insert(data, function (err, doc) {
             if (err) {
+              if (err.message && err.message.includes('duplicate key error')) {
+                err.errCode = 409
+              }
               reject(err)
             } else {
               resolve(doc.insertedIds[0])
@@ -99,9 +101,9 @@ module.exports = function (settings, collection) {
           if (err) {
             return reject(err)
           }
-          data._id = ObjectId(id)
+          data._id = id
           db.collection(collection).update({
-            _id: ObjectId(id)
+            _id: id
           }, data, function (err, doc) {
             // doc._id = doc._id.toString()
             if (err) {
@@ -120,7 +122,7 @@ module.exports = function (settings, collection) {
             return reject(err)
           }
           db.collection(collection).remove({
-            _id: ObjectId(id)
+            _id: id
           }, function (err, doc) {
             if (typeof doc._id !== 'undefined') {
               doc._id = doc._id.toString()
