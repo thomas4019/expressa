@@ -39,6 +39,7 @@
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "mocha --exit",
+    "ci-test": "mocha test --reporter mocha-junit-reporter --exit",
     "clean": "rm -rf node_modules;"
   },
   "license": "MIT"

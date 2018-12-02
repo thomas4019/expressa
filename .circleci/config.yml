@@ -13,9 +13,7 @@ jobs:
           command: npm install
       - run:
           name: test
-          command: mocha test --reporter mocha-junit-reporter --exit
-          environment:
-            MOCHA_FILE: ~/junit/test-results.xml
+          command: MOCHA_FILE=~/junit/mocha/results.xml npm run ci-test
           when: always
       - store_test_results:
           path: ~/junit

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="1.1420000000000001" tests="40" failures="0" skipped="2">
+  <testsuite name="Root Suite" timestamp="2018-12-02T09:09:35" tests="3" failures="0" time="0.14900000000000002">
+    <testcase name="returns ready" time="0.116" classname="returns ready">
+    </testcase>
+    <testcase name="returns status" time="0.023" classname="returns status">
+    </testcase>
+    <testcase name="returns collections" time="0.01" classname="returns collections">
+    </testcase>
+  </testsuite>
+  <testsuite name="basic collections" timestamp="2018-12-02T09:09:36" tests="12" file="/Users/thomashansen/devp/expressa/test/collections.js" failures="0" time="0.05700000000000002">
+    <testcase name="basic collections create without id" time="0.021" classname="create without id">
+    </testcase>
+    <testcase name="basic collections create with a specific id" time="0.004" classname="create with a specific id">
+    </testcase>
+    <testcase name="basic collections fail to create without permission" time="0.004" classname="fail to create without permission">
+    </testcase>
+    <testcase name="basic collections fail to create with invalid field" time="0.004" classname="fail to create with invalid field">
+    </testcase>
+    <testcase name="basic collections fail to create with missing required field" time="0.002" classname="fail to create with missing required field">
+    </testcase>
+    <testcase name="basic collections read a sperific doc" time="0.003" classname="read a sperific doc">
+    </testcase>
+    <testcase name="basic collections fail to read without permission" time="0.002" classname="fail to read without permission">
+    </testcase>
+    <testcase name="basic collections edit a document" time="0.004" classname="edit a document">
+    </testcase>
+    <testcase name="basic collections fail to edit a document without permission" time="0.002" classname="fail to edit a document without permission">
+    </testcase>
+    <testcase name="basic collections fail to delete a document without permission" time="0.003" classname="fail to delete a document without permission">
+    </testcase>
+    <testcase name="basic collections delete a document" time="0.004" classname="delete a document">
+    </testcase>
+    <testcase name="basic collections fail to delete a non-existent document" time="0.004" classname="fail to delete a non-existent document">
+    </testcase>
+  </testsuite>
+  <testsuite name="querying collections" timestamp="2018-12-02T09:09:36" tests="14" file="/Users/thomashansen/devp/expressa/test/collections.querying.js" failures="0" time="0.04900000000000001">
+    <testcase name="querying collections create doc 1" time="0.005" classname="create doc 1">
+    </testcase>
+    <testcase name="querying collections create doc 2" time="0.004" classname="create doc 2">
+    </testcase>
+    <testcase name="querying collections create doc 3" time="0.004" classname="create doc 3">
+    </testcase>
+    <testcase name="querying collections read entire collection" time="0.005" classname="read entire collection">
+    </testcase>
+    <testcase name="querying collections return docs matching deep field" time="0.005" classname="return docs matching deep field">
+    </testcase>
+    <testcase name="querying collections returns no documents without permission" time="0.002" classname="returns no documents without permission">
+    </testcase>
+    <testcase name="querying collections page 0 returns an error" time="0.002" classname="page 0 returns an error">
+    </testcase>
+    <testcase name="querying collections returns page 1 correctly" time="0.005" classname="returns page 1 correctly">
+    </testcase>
+    <testcase name="querying collections returns page 2 correctly" time="0.003" classname="returns page 2 correctly">
+    </testcase>
+    <testcase name="querying collections page 3 is empty" time="0.002" classname="page 3 is empty">
+    </testcase>
+    <testcase name="querying collections page 4 is empty" time="0.002" classname="page 4 is empty">
+    </testcase>
+    <testcase name="querying collections pagination works with query" time="0.002" classname="pagination works with query">
+    </testcase>
+    <testcase name="querying collections sort by deep field ascending" time="0.003" classname="sort by deep field ascending">
+    </testcase>
+    <testcase name="querying collections sort by deep field descending" time="0.005" classname="sort by deep field descending">
+    </testcase>
+  </testsuite>
+  <testsuite name="memorytest basic functionality" timestamp="2018-12-02T09:09:36" tests="6" file="/Users/thomashansen/devp/expressa/test/db.js" failures="0" time="0.002">
+    <testcase name="memorytest basic functionality create without id" time="0.001" classname="create without id">
+    </testcase>
+    <testcase name="memorytest basic functionality create with id" time="0" classname="create with id">
+    </testcase>
+    <testcase name="memorytest basic functionality find by id" time="0" classname="find by id">
+    </testcase>
+    <testcase name="memorytest basic functionality find by id" time="0.001" classname="find by id">
+    </testcase>
+    <testcase name="memorytest basic functionality not find with mising title" time="0" classname="not find with mising title">
+    </testcase>
+  </testsuite>
+  <testsuite name="coding style" timestamp="2018-12-02T09:09:36" tests="2" file="/Users/thomashansen/devp/expressa/test/test.js" failures="0" time="0.7">
+    <testcase name="coding style tests conforms to standard" time="0.7" classname="tests conforms to standard">
+    </testcase>
+  </testsuite>
+  <testsuite name="user functionality" timestamp="2018-12-02T09:09:36" tests="3" file="/Users/thomashansen/devp/expressa/test/users.js" failures="0" time="0.185">
+    <testcase name="user functionality can login" time="0.093" classname="can login">
+    </testcase>
+    <testcase name="user functionality rejects unknown email" time="0.003" classname="rejects unknown email">
+    </testcase>
+    <testcase name="user functionality rejects invalid password" time="0.089" classname="rejects invalid password">
+    </testcase>
+  </testsuite>
+</testsuites>
