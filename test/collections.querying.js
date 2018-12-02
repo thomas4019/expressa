@@ -184,7 +184,6 @@ describe('querying collections', function () {
       })
   })
 
-
   it('pagination works with query', function (done) {
     request(app)
       .get('/testdoc?query={"data.number":2}&limit=2&page=1')
@@ -202,7 +201,6 @@ describe('querying collections', function () {
         done()
       })
   })
-
 
   it('sort by deep field ascending', function (done) {
     util.getUserWithPermissions(api, 'testdoc: view')

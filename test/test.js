@@ -1,16 +1,16 @@
-/*describe('coding style', function () {
+describe('coding style', function () {
   this.timeout(5000)
 
-  it('conforms to standard', require('mocha-standard').files([
+  xit('conforms to standard', require('mocha-standard').files([
     '*.js', 'db/*.js', 'auth/*.js'
   ]))
 
   it('tests conforms to standard', require('mocha-standard').files([
     'test/*.js'
   ], {
-    global: ['describe', 'it']
+    global: ['describe', 'it', 'before', 'after', 'xdescribe', 'xit']
   }))
-})*/
+})
 
 var expressa = require('../')
 var request = require('supertest')
@@ -35,9 +35,9 @@ it('returns status', function (done) {
     .get('/api/status')
     .expect(200)
     .end(function (err, res) {
-        if (err) {
-          return done(err)
-        }
+      if (err) {
+        return done(err)
+      }
       done()
     })
 })

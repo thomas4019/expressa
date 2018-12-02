@@ -257,7 +257,7 @@ module.exports.api = function (settings) {
     if (pagination.page - 1 > 0) {
       pagination.pagePrev = pagination.page - 1
     }
-    pagination.data = data.splice((pagination.page-1) * limit, limit)
+    pagination.data = data.splice((pagination.page - 1) * limit, limit)
     return pagination
   }
 
@@ -408,12 +408,12 @@ module.exports.api = function (settings) {
                 id: id
               })
             }, function (err) {
-              res.errCode = err.errCode;
-              delete err.errCode;
+              res.errCode = err.errCode
+              delete err.errCode
               next(err)
             })
         } else {
-          debug('disallowed creation of ' + req.params.collection);
+          debug('disallowed creation of ' + req.params.collection)
           res.status(allowed.code || 500).send({
             error: allowed.message
           })
@@ -442,7 +442,7 @@ module.exports.api = function (settings) {
               })
             }
           })
-      }, function (err, code) {
+      }, function () {
         res.status(404).send('document not found')
       })
   }

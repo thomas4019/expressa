@@ -1,5 +1,5 @@
 var randomstring = require('randomstring')
-var filtr = require('filtr')
+var Filtr = require('filtr')
 
 var util = require('../util')
 
@@ -18,7 +18,7 @@ module.exports = function (settings, collection) {
       var arr = Object.keys(store).map(function (id) {
         return store[id]
       })
-      var filter = new filtr(query)
+      var filter = new Filtr(query)
       var matches = filter.test(arr)
       if (typeof offset !== 'undefined' && typeof limit !== 'undefined') {
         matches = matches.slice(offset, offset + limit)
@@ -40,7 +40,7 @@ module.exports = function (settings, collection) {
       }
     },
     create: function (data) {
-      var id = typeof data._id === 'undefined' ? randomstring.generate(8) : data._id
+      var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
       store[id] = data
       return Promise.resolve(id)

@@ -1,4 +1,5 @@
-var MongoClient = require('mongodb').MongoClient
+const mongo = require('mongodb')
+const MongoClient = mongo.MongoClient
 
 module.exports = function (settings, collection) {
   return {
@@ -9,7 +10,8 @@ module.exports = function (settings, collection) {
     },
     all: function () {
       return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, function (err, db) {
+        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
+          const db = client.db(settings.mongodb_uri.split('/')[3])
           if (err) {
             return reject(err)
           }
@@ -29,7 +31,8 @@ module.exports = function (settings, collection) {
     },
     find: function (query, skip, limit, orderby) {
       return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, function (err, db) {
+        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
+          const db = client.db(settings.mongodb_uri.split('/')[3])
           if (err) {
             return reject(err)
           }
@@ -55,7 +58,8 @@ module.exports = function (settings, collection) {
     },
     get: function (id) {
       return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, function (err, db) {
+        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
+          const db = client.db(settings.mongodb_uri.split('/')[3])
           if (err) {
             return reject(err)
           }
@@ -78,18 +82,19 @@ module.exports = function (settings, collection) {
     },
     create: function (data) {
       return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, function (err, db) {
+        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
+          const db = client.db(settings.mongodb_uri.split('/')[3])
           if (err) {
             return reject(err)
           }
-          db.collection(collection).insert(data, function (err, doc) {
+          db.collection(collection).insertOne(data, function (err, doc) {
             if (err) {
               if (err.message && err.message.includes('duplicate key error')) {
                 err.errCode = 409
               }
               reject(err)
             } else {
-              resolve(doc.insertedIds[0])
+              resolve(doc.insertedId.toString())
             }
           })
         })
@@ -97,12 +102,13 @@ module.exports = function (settings, collection) {
     },
     update: function (id, data) {
       return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, function (err, db) {
+        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
+          const db = client.db(settings.mongodb_uri.split('/')[3])
           if (err) {
             return reject(err)
           }
           data._id = id
-          db.collection(collection).update({
+          db.collection(collection).updateOne({
             _id: id
           }, data, function (err, doc) {
             // doc._id = doc._id.toString()
@@ -117,11 +123,12 @@ module.exports = function (settings, collection) {
     },
     delete: function (id) {
       return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, function (err, db) {
+        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
+          const db = client.db(settings.mongodb_uri.split('/')[3])
           if (err) {
             return reject(err)
           }
-          db.collection(collection).remove({
+          db.collection(collection).deleteOne({
             _id: id
           }, function (err, doc) {
             if (typeof doc._id !== 'undefined') {
