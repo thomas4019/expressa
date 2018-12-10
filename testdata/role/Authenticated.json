@@ -1,8 +1,6 @@
 {
   "_id": "Authenticated",
   "permissions": {
-    "collection: view relevant": true,
-    "schemas: view": true,
     "view errors": false
   },
   "meta": {

@@ -7,6 +7,7 @@
   "dependencies": {
     "ajv": "^3.8.1",
     "bcryptjs": "2.4.3",
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "cors": "2.7.1",
     "debug": "^2.6.1",
@@ -24,23 +25,31 @@
     "node-uuid": "1.4.7",
     "on-finished": "^2.3.0",
     "pg": "^7.6.1",
-    "promise-sequential": "1.1.1",
     "randomstring": "1.1.4",
     "sift": "^5.0.0"
   },
   "devDependencies": {
-    "chai": "^4.1.1",
+    "chai": "^4.2.0",
+    "eslint": "^5.10.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.18.0",
     "mocha-standard": "^1.0.0",
-    "standard": "^12.0.1",
     "supertest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=0.10.3 <0.12"
   },
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "mocha --exit",
     "ci-test": "mocha test --reporter mocha-junit-reporter --exit",
-    "clean": "rm -rf node_modules;"
+    "clean": "rm -rf node_modules;",
+    "lint": "eslint ."
   },
   "license": "MIT"
 }

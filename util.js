@@ -1,6 +1,8 @@
-var dotty = require('dotty')
-var randomstring = require('randomstring')
-var jwt = require('jsonwebtoken')
+const dotty = require('dotty')
+const randomstring = require('randomstring')
+const jwt = require('jsonwebtoken')
+const Bluebird = require('bluebird')
+const debug = require('debug')('expressa')
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
@@ -52,4 +54,66 @@ exports.getUserWithPermissions = function (api, permissions) {
       var token = jwt.sign(user, api.settings.jwt_secret, {})
       return token
     })
+}
+
+const severities = ['critical', 'error', 'warning', 'notice', 'info', 'debug']
+exports.getLogSeverity = function (status) {
+  var severity = status >= 500 ? 'error'
+    : status >= 400 ? 'warning'
+      : status >= 300 ? 'notice'
+        : status >= 200 ? 'info'
+          : 'debug'
+  return severity
+}
+
+exports.shouldLogRequest = function (req, res) {
+  const severity = exports.getLogSeverity(res.statusCode)
+  const severityLoggingIndex = severities.indexOf(req.settings.logging_level || 'warning')
+  const severityIndex = severities.indexOf(severity)
+  return severityIndex <= severityLoggingIndex
+}
+
+exports.createLogEntry = function (req, res) {
+  const severity = exports.getLogSeverity(res.statusCode)
+  return {
+    severity: severity,
+    user: req.user ? req.user._id : undefined,
+    url: decodeURI(req.originalUrl || req.url),
+    method: req.method,
+    referer: req.headers['referer'],
+    req: {
+      ip: req.ip,
+      headers: req.headers
+    },
+    res: {
+      statusCode: res.statusCode,
+      headers: res._headers
+    },
+    meta: {
+      created: new Date().toISOString(),
+      updated: new Date().toISOString()
+    }
+  }
+}
+
+exports.notify = async function (event, req, collection, data) {
+  if (typeof req.eventListeners[event] === 'undefined' || req.eventListeners[event].length === 0) {
+    return Promise.resolve(true)
+  }
+  debug('notifying ' + req.eventListeners[event].length + ' of ' + event)
+  const results = await Bluebird.map(req.eventListeners[event], function (listener) {
+    debug('calling ' + listener.name + ' ' + listener.toString())
+    try {
+      return listener(req, collection, data)
+    } catch (e) {
+      console.error('error in listener')
+      console.error(e.stack)
+    }
+  })
+  debug('results ' + results)
+  // Result is the first defined value
+  const result = results.reduce(function (prev, current) {
+    return (prev === undefined) ? current : prev
+  })
+  return result || result === undefined
 }

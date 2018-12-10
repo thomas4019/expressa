@@ -1,3 +1,4 @@
+/* global it describe */
 var request = require('supertest')
 var chai = require('chai')
 var expect = chai.expect
@@ -8,6 +9,7 @@ var api = expressa.api({
 var express = require('express')
 var app = express()
 app.use(api)
+var util = require('../util.js')
 
 var validUser = {
   email: 'test@example.com',
@@ -54,5 +56,13 @@ describe('user functionality', function () {
         error: 'Incorrect password'
       })
       .expect(401, done)
+  })
+
+  it('get my user', async function () {
+    const token = await util.getUserWithPermissions(api, 'users: view own')
+    const res = await request(app)
+      .get('/user/me')
+      .set('x-access-token', token)
+    expect(res.body.permissions).to.eql({ 'users: view own': true })
   })
 })

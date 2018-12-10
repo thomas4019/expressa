@@ -86,6 +86,24 @@ describe('basic collections', function () {
       })
   })
 
+  it('fail to read a schema without permission', async function () {
+    const token = await util.getUserWithPermissions(api, 'blah')
+    await request(app)
+      .get('/testdoc/schema')
+      .set('x-access-token', token)
+      .expect(401)
+  })
+
+  it('read a schema', async function () {
+    const token = await util.getUserWithPermissions(api, 'schemas: view')
+    const res = await request(app)
+      .get('/testdoc/schema')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body.type).to.equal('object')
+    expect(res.body).to.have.property('properties')
+  })
+
   it('read a sperific doc', function (done) {
     util.getUserWithPermissions(api, 'testdoc: view')
       .then(function (token) {
@@ -132,6 +150,24 @@ describe('basic collections', function () {
       })
   })
 
+  it('update document by id', async function () {
+    const token = await util.getUserWithPermissions(api, 'testdoc: edit')
+    const res = await request(app)
+      .post('/testdoc/test123/update')
+      .set('x-access-token', token)
+      .send(JSON.stringify({
+        $set: {
+          title: 'cool'
+        },
+        $unset: {
+          data: 1
+        }
+      }))
+      .expect(200)
+    expect(res.body.title).to.equal('cool')
+    expect(res.body.data).to.be.undefined
+  })
+
   it('fail to edit a document without permission', function (done) {
     request(app)
       .put('/testdoc/test123')
@@ -171,7 +207,7 @@ describe('basic collections', function () {
           .set('x-access-token', token)
           .expect(500)
           .expect({
-            error: 'something wrong happened'
+            error: 'document not found'
           }, done)
       })
   })

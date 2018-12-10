@@ -1,0 +1,26 @@
+{
+  "_id": "log",
+  "schema": {
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {}
+      }
+    },
+    "required": [
+      "title"
+    ]
+  },
+  "storage": "memory",
+  "documentsHaveOwners": false,
+  "meta": {
+    "updated": "2017-08-24T04:39:29.866Z",
+    "created": "2017-08-24T04:39:29.866Z"
+  }
+}

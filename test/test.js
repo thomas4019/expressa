@@ -1,17 +1,3 @@
-describe('coding style', function () {
-  this.timeout(5000)
-
-  xit('conforms to standard', require('mocha-standard').files([
-    '*.js', 'db/*.js', 'auth/*.js'
-  ]))
-
-  it('tests conforms to standard', require('mocha-standard').files([
-    'test/*.js'
-  ], {
-    global: ['describe', 'it', 'before', 'after', 'xdescribe', 'xit']
-  }))
-})
-
 var expressa = require('../')
 var request = require('supertest')
 
@@ -43,6 +29,7 @@ it('returns status', function (done) {
 })
 
 it('returns collections', function (done) {
+  console.error(Object.keys(api.db))
   request(app)
     .get('/api/collection')
     .expect(200, done)
