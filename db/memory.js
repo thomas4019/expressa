@@ -1,20 +1,17 @@
-var randomstring = require('randomstring')
-var Filtr = require('filtr')
+const randomstring = require('randomstring')
+const Filtr = require('filtr')
 
-var util = require('../util')
+const util = require('../util')
 
 module.exports = function (settings, collection) {
   var store = {}
 
   return {
-    init: function () {},
-    all: function () {
-      var arr = Object.keys(store).map(function (id) {
-        return store[id]
-      })
-      return Promise.resolve(arr)
+    init: async function () {},
+    all: async function () {
+      return await this.find({})
     },
-    find: function (query, offset, limit, orderby) {
+    find: async function (query, offset, limit, orderby) {
       var arr = Object.keys(store).map(function (id) {
         return store[id]
       })
@@ -30,32 +27,30 @@ module.exports = function (settings, collection) {
       if (orderby) {
         matches = util.orderBy(matches, orderby)
       }
-      return Promise.resolve(matches)
+      return matches
     },
-    get: function (id) {
-      if (store[id]) {
-        return Promise.resolve(store[id])
-      } else {
-        return Promise.reject('document not found', 404)
+    get: async function (id) {
+      if (!store[id]) {
+        throw new util.ApiError(404, 'document not found')
       }
+      return store[id]
     },
-    create: function (data) {
+    create: async function (data) {
       var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
       store[id] = data
-      return Promise.resolve(id)
+      return id
     },
-    update: function (id, data) {
+    update: async function (id, data) {
       data._id = data._id || id
       store[id] = data
-      return Promise.resolve(data)
+      return data
     },
-    delete: function (id) {
+    delete: async function (id) {
       if (store[id]) {
         delete store[id]
-        return Promise.resolve()
       } else {
-        return Promise.reject('document not found', 404)
+        throw new util.ApiError(404, 'document not found')
       }
     }
   }

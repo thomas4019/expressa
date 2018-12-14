@@ -117,3 +117,15 @@ exports.notify = async function (event, req, collection, data) {
   })
   return result || result === undefined
 }
+
+class ApiError extends Error {
+  constructor (status, message) {
+    super(message);
+    console.error('----');
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+    this.status = status || this.constructor.status || 500;
+    console.error(this.status);
+  }
+}
+exports.ApiError = ApiError

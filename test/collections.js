@@ -179,7 +179,7 @@ describe('basic collections', function () {
     await request(app)
       .delete('/testdoc/test123')
       .set('x-access-token', token)
-      .expect(500)
+      .expect(404)
       .expect({
         error: 'document not found'
       })

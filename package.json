@@ -47,6 +47,7 @@
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "mocha --exit",
+    "testlint": "mocha --exit && npm run lint",
     "ci-test": "mocha test --reporter mocha-junit-reporter --exit",
     "clean": "rm -rf node_modules;",
     "lint": "eslint ."

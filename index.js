@@ -75,6 +75,7 @@ function ph (requestHandler) {
       console.error(err)
       console.error(err.message)
       console.error(err.stack)
+      console.error(err.status)
       res.status(err.status || 500).send({ error: err.result || err.message || err })
     }
   }

@@ -1,5 +1,7 @@
 const mongo = require('mongodb')
+const randomstring = require('randomstring')
 const MongoClient = mongo.MongoClient
+const util = require('../util')
 
 module.exports = function (settings, collection) {
   return {
@@ -8,26 +10,8 @@ module.exports = function (settings, collection) {
         console.error(`{collection} uses mongo, but mongodb_url is undefined.`)
       }
     },
-    all: function () {
-      return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
-          const db = client.db(settings.mongodb_uri.split('/')[3])
-          if (err) {
-            return reject(err)
-          }
-          db.collection(collection).find({})
-            .toArray(function (err, docs) {
-              docs.forEach(function (doc) {
-                doc._id = doc._id.toString()
-              })
-              if (err) {
-                reject(err)
-              } else {
-                resolve(docs)
-              }
-            })
-        })
-      })
+    all: async function () {
+      return await this.find({})
     },
     find: function (query, skip, limit, orderby) {
       return new Promise(function (resolve, reject) {
@@ -56,31 +40,21 @@ module.exports = function (settings, collection) {
         })
       })
     },
-    get: function (id) {
-      return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
-          const db = client.db(settings.mongodb_uri.split('/')[3])
-          if (err) {
-            return reject(err)
-          }
-          db.collection(collection).findOne({ _id: id }, function (err, doc) {
-            if (doc) {
-              doc._id = doc._id.toString()
-            }
-            if (err) {
-              reject(err)
-            } else {
-              if (doc) {
-                resolve(doc)
-              } else {
-                reject('document not found', 404)
-              }
-            }
-          })
-        })
-      })
+    get: async function (id) {
+      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
+      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const doc = await db.collection(collection).findOne({ _id: id })
+      if (doc) {
+        doc._id = doc._id.toString()
+      }
+      if (!doc) {
+        throw new util.ApiError(404, 'document not found')
+      }
+      return doc
     },
     create: function (data) {
+      var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
+      data['_id'] = id
       return new Promise(function (resolve, reject) {
         MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
           const db = client.db(settings.mongodb_uri.split('/')[3])
@@ -100,48 +74,25 @@ module.exports = function (settings, collection) {
         })
       })
     },
-    update: function (id, data) {
-      return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
-          const db = client.db(settings.mongodb_uri.split('/')[3])
-          if (err) {
-            return reject(err)
-          }
-          data._id = id
-          db.collection(collection).replaceOne({
-            _id: id
-          }, data, function (err, doc) {
-            // doc._id = doc._id.toString()
-            if (err) {
-              reject(err)
-            } else {
-              resolve(data)
-            }
-          })
-        })
-      })
+    update: async function (id, data) {
+      data._id = id
+      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
+      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const doc = await db.collection(collection).replaceOne({
+        _id: id
+      }, data)
+      // doc._id = doc._id.toString()
+      return data
     },
-    delete: function (id) {
-      return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
-          const db = client.db(settings.mongodb_uri.split('/')[3])
-          if (err) {
-            return reject(err)
-          }
-          db.collection(collection).deleteOne({
-            _id: id
-          }, function (err, doc) {
-            if (typeof doc._id !== 'undefined') {
-              doc._id = doc._id.toString()
-            }
-            if (err) {
-              reject(err)
-            } else {
-              resolve(doc)
-            }
-          })
-        })
+    delete: async function (id) {
+      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
+      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const res = await db.collection(collection).deleteOne({
+        _id: id
       })
+      if (res.result.n !== 1) {
+        throw new util.ApiError(404, 'document not found')
+      }
     }
   }
 }

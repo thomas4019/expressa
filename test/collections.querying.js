@@ -45,6 +45,7 @@ describe('querying collections', function () {
       .post('/testdoc')
       .set('x-access-token', token)
       .send({
+        _id: 'testid123',
         title: 'doc3',
         data: {
           number: 2,
@@ -52,6 +53,24 @@ describe('querying collections', function () {
         }
       })
       .expect(200)
+  })
+
+  it('read doc by id', async function () {
+    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const res = await request(app)
+      .get(`/testdoc/testid123`)
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body.title).to.equal('doc3')
+  })
+
+  it('read doc by missing id returns 404', async function () {
+    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const res = await request(app)
+      .get(`/testdoc/missingdoc`)
+      .set('x-access-token', token)
+      .expect(404)
+    expect(res.body.error).to.equal('document not found')
   })
 
   it('read entire collection', async function () {
