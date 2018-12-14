@@ -46,8 +46,9 @@ module.exports = function (settings, collection) {
       return Promise.resolve(id)
     },
     update: function (id, data) {
+      data._id = data._id || id
       store[id] = data
-      return Promise.resolve()
+      return Promise.resolve(data)
     },
     delete: function (id) {
       if (store[id]) {

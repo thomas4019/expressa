@@ -11,51 +11,45 @@ var app = express()
 app.use(api)
 var util = require('../util.js')
 
-var validUser = {
+const validUser = {
   email: 'test@example.com',
   password: 'test123'
 }
+const badPasswordUser = {
+  email: 'test@example.com',
+  password: 'test2'
+}
+const invalidEmailUser = {
+  email: 'test2@example.com',
+  password: 'test'
+}
 describe('user functionality', function () {
-  it('can login', function (done) {
-    request(app)
+  it('can login', async function () {
+    const res = await request(app)
       .post('/user/login')
-      .send(JSON.stringify(validUser))
+      .send(validUser)
       .expect(200)
-      .end(function (err, res) {
-        if (err) {
-          return done(err)
-        }
-        expect(res.body.uid).to.equal('42Fxx1Qz')
-        done()
-      })
+    expect(res.body.uid).to.equal('42Fxx1Qz')
   })
 
-  var wrongUser = {
-    email: 'test2@example.com',
-    password: 'test'
-  }
-  it('rejects unknown email', function (done) {
-    request(app)
+  it('rejects unknown email', async function () {
+    await request(app)
       .post('/user/login')
-      .send(JSON.stringify(wrongUser))
+      .send(invalidEmailUser)
       .expect({
         error: 'No user found with this email.'
       })
-      .expect(400, done)
+      .expect(400)
   })
 
-  var badPasswordUser = {
-    email: 'test@example.com',
-    password: 'test2'
-  }
-  it('rejects invalid password', function (done) {
-    request(app)
+  it('rejects invalid password', async function () {
+    await request(app)
       .post('/user/login')
-      .send(JSON.stringify(badPasswordUser))
+      .send(badPasswordUser)
       .expect({
         error: 'Incorrect password'
       })
-      .expect(401, done)
+      .expect(401)
   })
 
   it('get my user', async function () {

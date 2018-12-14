@@ -108,14 +108,14 @@ module.exports = function (settings, collection) {
             return reject(err)
           }
           data._id = id
-          db.collection(collection).updateOne({
+          db.collection(collection).replaceOne({
             _id: id
           }, data, function (err, doc) {
             // doc._id = doc._id.toString()
             if (err) {
               reject(err)
             } else {
-              resolve(doc)
+              resolve(data)
             }
           })
         })

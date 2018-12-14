@@ -16,21 +16,14 @@ it('returns ready', function (done) {
   })
 })
 
-it('returns status', function (done) {
-  request(app)
+it('returns status', async function () {
+  await request(app)
     .get('/api/status')
     .expect(200)
-    .end(function (err, res) {
-      if (err) {
-        return done(err)
-      }
-      done()
-    })
 })
 
-it('returns collections', function (done) {
-  console.error(Object.keys(api.db))
-  request(app)
+it('returns collections', async function () {
+  await request(app)
     .get('/api/collection')
-    .expect(200, done)
+    .expect(200)
 })

@@ -127,7 +127,7 @@ module.exports = function (settings, collection) {
             if (result.rowCount === 0) {
               return reject('document not found', 404)
             }
-            resolve()
+            resolve(data)
           })
         })
       })
