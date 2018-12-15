@@ -68,9 +68,9 @@ async function initCollections (db, router) {
 }
 
 function ph (requestHandler) {
-  return async function wrapper (req, res) {
+  return async function wrapper (req, res, next) {
     try {
-      await requestHandler(req, res)
+      await requestHandler(req, res, next)
     } catch (err) {
       console.error(err)
       console.error(err.message)
@@ -155,7 +155,7 @@ module.exports.api = function (settings) {
     req.url = '/users'
     next('route')
   })
-  router.post('/user/login', auth.getLoginRoute(router))
+  router.post('/user/login', ph(auth.getLoginRoute(router)))
 
   router.use(auth.middleware) // Add user id to request, if logged in
 
@@ -163,7 +163,7 @@ module.exports.api = function (settings) {
   router.use(rolePermissions.middleware) // Add user and permissions to request
   router.use(router.custom)
 
-  router.get('/user/me', function (req, res, next) {
+  router.get('/users?/me', function (req, res, next) {
     req.params.collection = 'users'
     req.params.id = req.uid
     collectionsApi.getById(req, res, next)

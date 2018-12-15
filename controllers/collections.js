@@ -191,7 +191,7 @@ exports.updateById = async function (req, res, next) {
   const allowed = await util.notify('put', req, req.params.collection, doc)
   if (allowed === true) {
     req.body.meta.owner = newOwner
-    const data = req.db[req.params.collection].update(req.params.id, req.body)
+    req.db[req.params.collection].update(req.params.id, req.body)
     await util.notify('changed', req, req.params.collection, req.body)
     res.send(doc)
   } else {
@@ -206,7 +206,7 @@ exports.deleteById = async function (req, res, next) {
     _id: req.params.id
   })
   if (allowed === true) {
-    const data = await req.db[req.params.collection].delete(req.params.id)
+    await req.db[req.params.collection].delete(req.params.id)
     await util.notify('deleted', req, req.params.collection, {
       _id: req.params.id
     })

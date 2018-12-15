@@ -28,6 +28,10 @@ collectionNames.forEach(function (collection) {
       expect(id).to.equal('5bfd9a1311771c805d161498')
     })
 
+    xit('create with duplicate id returns 409', async function () {
+      await assert.rejects(async () => db.create({ _id: '5bfd9a1311771c805d161498' }), { name: 'ApiError' })
+    })
+
     it('get by id', async function () {
       const doc = await db.get('5bfd9a1311771c805d161498')
       expect(doc.title).to.equal('second')

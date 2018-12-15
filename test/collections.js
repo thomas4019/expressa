@@ -88,6 +88,7 @@ describe('basic collections', function () {
       .expect(200)
     expect(res.body.type).to.equal('object')
     expect(res.body).to.have.property('properties')
+    expect(res.body.properties.meta.properties).to.have.property('created')
   })
 
   it('read a sperific doc', async function () {

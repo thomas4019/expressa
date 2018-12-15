@@ -1,5 +1,6 @@
-var auth = require('./auth')
-var debug = require('debug')('expressa/' + String(__filename).replace(/.*\//, ''))
+const auth = require('./auth')
+const util = require('./util.js')
+const debug = require('debug')('expressa/' + String(__filename).replace(/.*\//, ''))
 
 module.exports = function (api) {
   // Add db interface for new collections immediately
@@ -31,23 +32,10 @@ module.exports = function (api) {
     data.meta.updated = new Date().toISOString()
   })
 
-  api.addListener('put', function roleChangeCheck (req, collection, data) {
-    if (collection === 'users') {
-      return new Promise(function (resolve, reject) {
-        if (req.hasPermission('users: modify roles')) {
-          resolve(undefined)
-        } else {
-          api.db.users.get(data._id)
-            .then(function (oldData) {
-              data.roles = oldData.roles
-              resolve(undefined)
-            }, function (err) {
-              console.error('error during roleChangeCheck')
-              console.error(err)
-              reject(err)
-            })
-        }
-      })
+  api.addListener('put', async function roleChangeCheck (req, collection, data) {
+    if (collection === 'users' && !req.hasPermission('users: modify roles')) {
+      const oldData = await api.db.users.get(data._id)
+      data.roles = oldData.roles
     }
   })
 
@@ -67,25 +55,12 @@ module.exports = function (api) {
     }
   })
 
-  api.addListener('post', function userUniquenessCheck (req, collection, data) {
+  api.addListener('post', async function userUniquenessCheck (req, collection, data) {
     if (collection === 'users') {
-      return new Promise(function (resolve, reject) {
-        api.db.users.find({
-          'email': data.email
-        })
-          .then(function (result) {
-            if (result.length > 0) {
-              resolve({
-                code: 409,
-                message: 'User with this email already registered.'
-              })
-            } else {
-              resolve(undefined)
-            }
-          }, function (err) {
-            reject(err)
-          })
-      })
+      const result = await api.db.users.find({ 'email': data.email })
+      if (result.length > 0) {
+        throw new util.ApiError(409, 'User with this email already registered.')
+      }
     }
   })
 
@@ -125,7 +100,7 @@ module.exports = function (api) {
     }
   })
 
-  api.addListener(['get'], function addMetaToSchema (req, collection, data) {
+  api.addListener('get', function addMetaToSchema (req, collection, data) {
     if (collection === 'schemas') {
       var schema = data.schema
       schema.properties.meta = {

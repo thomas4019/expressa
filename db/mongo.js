@@ -11,34 +11,21 @@ module.exports = function (settings, collection) {
       }
     },
     all: async function () {
-      return await this.find({})
+      return this.find({})
     },
-    find: function (query, skip, limit, orderby) {
-      return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
-          const db = client.db(settings.mongodb_uri.split('/')[3])
-          if (err) {
-            return reject(err)
-          }
-          var cursor = db.collection(collection).find(query).sort(orderby)
-          if (typeof skip !== 'undefined') {
-            cursor.skip(skip)
-          }
-          if (typeof limit !== 'undefined') {
-            cursor.limit(limit)
-          }
-          cursor.toArray(function (err, docs) {
-            docs.forEach(function (doc) {
-              doc._id = doc._id.toString()
-            })
-            if (err) {
-              reject(err)
-            } else {
-              resolve(docs)
-            }
-          })
-        })
-      })
+    find: async function (query, skip, limit, orderby) {
+      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
+      const db = client.db(settings.mongodb_uri.split('/')[3])
+      var cursor = db.collection(collection).find(query).sort(orderby)
+      if (typeof skip !== 'undefined') {
+        cursor.skip(skip)
+      }
+      if (typeof limit !== 'undefined') {
+        cursor.limit(limit)
+      }
+      const docs = await cursor.toArray()
+      docs.forEach((doc) => { doc._id = doc._id.toString() })
+      return docs
     },
     get: async function (id) {
       const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
@@ -52,33 +39,26 @@ module.exports = function (settings, collection) {
       }
       return doc
     },
-    create: function (data) {
+    create: async function (data) {
       var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
-      return new Promise(function (resolve, reject) {
-        MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true }, function (err, client) {
-          const db = client.db(settings.mongodb_uri.split('/')[3])
-          if (err) {
-            return reject(err)
-          }
-          db.collection(collection).insertOne(data, function (err, doc) {
-            if (err) {
-              if (err.message && err.message.includes('duplicate key error')) {
-                err.errCode = 409
-              }
-              reject(err)
-            } else {
-              resolve(doc.insertedId.toString())
-            }
-          })
-        })
-      })
+
+      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
+      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      try {
+        const doc = await db.collection(collection).insertOne(data)
+        return doc.insertedId.toString()
+      } catch (err) {
+        if (err && err.message && err.message.includes('duplicate key error')) {
+          throw new util.ApiError(409, 'document already exists')
+        }
+      }
     },
     update: async function (id, data) {
       data._id = id
       const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
       const db = await client.db(settings.mongodb_uri.split('/')[3])
-      const doc = await db.collection(collection).replaceOne({
+      await db.collection(collection).replaceOne({
         _id: id
       }, data)
       // doc._id = doc._id.toString()

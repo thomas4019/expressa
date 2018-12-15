@@ -1,7 +1,6 @@
 const Bluebird = require('bluebird')
-const Promise = require('bluebird')
 const Store = require('jfs')
-Bluebird.promisifyAll(Store.prototype);
+Bluebird.promisifyAll(Store.prototype)
 
 const randomstring = require('randomstring')
 const sift = require('sift')
@@ -17,7 +16,7 @@ module.exports = function (settings, collection) {
   return {
     init: function () {},
     all: async function () {
-      return await this.find({})
+      return this.find({})
     },
     find: async function (query, offset, limit, orderby) {
       const data = await store.allAsync()
@@ -60,7 +59,7 @@ module.exports = function (settings, collection) {
     },
     update: async function (id, data) {
       data._id = data._id || id
-      const resData = await store.saveAsync(data._id, data)
+      await store.saveAsync(data._id, data)
       if (data._id !== id) {
         await store.delete(id)
       }

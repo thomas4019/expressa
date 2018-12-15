@@ -1,4 +1,5 @@
-var jwt = require('jsonwebtoken')
+const Bluebird = require('bluebird')
+const jwt = Bluebird.promisifyAll(require('jsonwebtoken'))
 
 // User document already validated, created, and saved to database
 // The id of that document is given.
@@ -17,19 +18,12 @@ exports.doLogin = function (user, req, res, next) {
 }
 
 // Returns the user id, or false if not logged in.
-exports.isLoggedIn = function (req, callback) {
+exports.isLoggedIn = async function (req) {
   req.query = req.query || {}
   var token = req.query.token || req.headers['x-access-token']
   delete req.query.token
   if (token) {
-    jwt.verify(token, req.settings.jwt_secret, function (err, decoded) {
-      if (err) {
-        callback(err, false)
-      } else {
-        callback(null, decoded)
-      }
-    })
-  } else {
-    callback(null, false)
+    return jwt.verify(token, req.settings.jwt_secret)
   }
+  return false
 }

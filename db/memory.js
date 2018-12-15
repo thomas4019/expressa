@@ -1,5 +1,6 @@
 const randomstring = require('randomstring')
 const Filtr = require('filtr')
+const _ = require('lodash')
 
 const util = require('../util')
 
@@ -9,7 +10,7 @@ module.exports = function (settings, collection) {
   return {
     init: async function () {},
     all: async function () {
-      return await this.find({})
+      return this.find({})
     },
     find: async function (query, offset, limit, orderby) {
       var arr = Object.keys(store).map(function (id) {
@@ -33,7 +34,7 @@ module.exports = function (settings, collection) {
       if (!store[id]) {
         throw new util.ApiError(404, 'document not found')
       }
-      return store[id]
+      return _.clone(store[id])
     },
     create: async function (data) {
       var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
