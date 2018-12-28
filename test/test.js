@@ -56,3 +56,17 @@ it('returns collections', async function () {
     .get('/collection')
     .expect(200)
 })
+
+it('allows custom endpoints', async function () {
+  // Add a custom endpoint which returns the current user
+  api.custom.get('/test', function (req, res) {
+    res.send(req.user)
+  })
+
+  const token = await util.getUserWithPermissions(api, [])
+  const res = await request(app)
+    .get('/test')
+    .set('x-access-token', token)
+    .expect(200)
+  expect(res.body).to.have.property('email')
+})
