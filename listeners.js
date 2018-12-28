@@ -1,16 +1,19 @@
 const debug = require('debug')('expressa')
+const _ = require('lodash')
 
 module.exports = function (api) {
   /* Listeners to avoid the need for a server restart */
   api.addCollectionListener('changed', 'collection', function setupNewCollections (req, collection, data) {
-    api.db[data._id] = api.dbTypes[data.storage](req.settings, data._id)
+    if (!(data.storage === 'memory' && _.get(api.db[data._id], 'type') === 'memory')) {
+      api.db[data._id] = api.dbTypes[data.storage](req.settings, data._id)
+    }
     debug('updated ' + data._id + ' collection storage')
   })
   api.addCollectionListener('delete', 'collection', function cleanupCollections (req, collection, data) {
     delete api.db[data._id]
     debug('removed ' + data._id + ' collection storage')
   })
-  api.addListener('changed', 'settings', function updateSettings (req, collection, data) {
+  api.addCollectionListener('changed', 'settings', function updateSettings (req, collection, data) {
     // TODO: only reload if current environment is updated
     Object.assign(req.settings, data);
   })

@@ -1,4 +1,5 @@
 const util = require('./util')
+const debug = require('debug')('expressa')
 
 function ensureCollectionPermission (permission) {
   return function collectionPermissionCheck (req, collection, data) {
@@ -7,6 +8,7 @@ function ensureCollectionPermission (permission) {
     const editingOwn = ((editingOwnUser || editingOwnDoc) &&
       req.hasPermission(collection + ': ' + permission + ' own'))
     if (!editingOwn && !req.hasPermission(collection + ': ' + permission)) {
+      debug(`cancelling, missing permission "${collection}: ${permission}"`)
       throw new util.ApiError(401, 'You do not have permission to perform this action.')
     }
   }

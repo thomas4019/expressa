@@ -9,6 +9,7 @@ module.exports = function (settings, collection) {
   const store = {}
 
   return {
+    type: 'memory',
     init: async function () {},
     all: async function () {
       return this.find({})

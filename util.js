@@ -118,7 +118,7 @@ exports.createLogEntry = function (req, res) {
 
 exports.notify = async function (event, req, collection, data) {
   const listeners = req.eventListeners[event] || []
-  debug('notifying ' + listeners.length + ' of ' + event)
+  debug('notifying ' + listeners.length + ' of ' + event + ' for ' + collection)
   let result;
   for (const listener of listeners) {
     if (listener.collections && !listener.collections.includes(collection)) {

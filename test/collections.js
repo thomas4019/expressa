@@ -119,12 +119,39 @@ describe('basic collections', function () {
       .expect(401)
   })
 
+  it('caching is configurable for each collection', async function () {
+    const token = await util.getUserWithPermissions(api, ['testdoc: view', 'collection: edit'])
+    const res = await request(app)
+      .get('/testdoc/test123')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.headers['cache-control']).to.equal('no-cache, no-store, must-revalidate')
+
+    await request(app)
+      .post('/collection/testdoc/update')
+      .set('x-access-token', token)
+      .send({ $set: { allowCaching: true }})
+      .expect(200)
+
+    const res2 = await request(app)
+      .get('/testdoc/test123')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res2.headers).to.not.have.property('cache-control')
+
+    await request(app)
+      .post('/collection/testdoc/update')
+      .set('x-access-token', token)
+      .send({ $unset: { allowCaching: 1 }})
+      .expect(200)
+  })
+
   it('edit a document adding new field', async function () {
     const updatedDoc = {
       title: 'doc1-updated',
       new_field: 'cool'
     }
-    const token = await util.getUserWithPermissions(api, ['testdoc: edit', 'collection: edit', 'collection: delete'])
+    const token = await util.getUserWithPermissions(api, ['testdoc: edit', 'collection: edit', 'collection: delete', 'collection: create'])
     await request(app)
       .put('/testdoc/test123')
       .set('x-access-token', token)
@@ -166,7 +193,7 @@ describe('basic collections', function () {
 
     // Restore old schema
     await request(app)
-      .put('/collection/testdoc')
+      .post('/collection')
       .set('x-access-token', token)
       .send(_.clone(body))
       .expect(200)

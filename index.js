@@ -75,14 +75,28 @@ async function initCollections (db, router) {
 
 function ph (requestHandler) {
   return async function wrapper (req, res, next) {
+    const collectionName = req.params.collection
+    let collection = {}
+    try {
+      collection = collectionName ? await req.db.collection.get(collectionName) : {}
+    } catch (e) {
+      console.error(e)
+    }
+    if (!collection.allowCaching) {
+      res.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+      res.header('Expires', '-1')
+      res.header('Pragma', 'no-cache')
+    }
     try {
       const result = await requestHandler(req, res, next)
       if (typeof result !== 'object') {
         res.status(500).send('invalid result')
       }
+      debug(`${200} ${req.method} ${req.url} body: ${JSON.stringify(req.body)} result: ${JSON.stringify(result)}`)
       res.send(result)
     } catch (err) {
       err.status = err.status || 500
+      debug(`${err.status} ${req.method} ${req.url} ${err.stack}`)
       if ((req.settings.logging && req.settings.logging.print_400_errors) || err.status >= 500) {
         console.error(err)
       }

@@ -24,6 +24,11 @@
       "documentsHaveOwners": {
         "type": "boolean",
         "format": "checkbox"
+      },
+      "allowCaching": {
+        "type": "boolean",
+        "format": "checkbox",
+        "description": "If unset, headers will be sent to prevent caching"
       }
     },
     "required": [

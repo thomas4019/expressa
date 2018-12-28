@@ -27,16 +27,16 @@ module.exports = function (storage) {
     get: function (id) {
       return cache.get(id)
     },
-    create: function (data) {
-      cache.create(data)
+    create: async function (data) {
+      await cache.create(data)
       return storage.create(data)
     },
-    update: function (id, data) {
-      cache.update(id, data)
+    update: async function (id, data) {
+      await cache.update(id, data)
       return storage.update(id, data)
     },
-    delete: function (id) {
-      cache.delete(id)
+    delete: async function (id) {
+      await cache.delete(id)
       return storage.delete(id)
     }
   }

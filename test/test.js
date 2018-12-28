@@ -43,6 +43,14 @@ it('returns status', async function () {
     .expect(200)
 })
 
+it('Prevents caching by default', async function () {
+  const res = await request(app)
+    .get('/status')
+    .expect(200)
+  expect(res.headers['cache-control']).to.equal('no-cache, no-store, must-revalidate')
+  expect(res.headers.expires).to.equal('-1')
+})
+
 it('returns collections', async function () {
   await request(app)
     .get('/collection')
