@@ -42,7 +42,14 @@ module.exports = function (settings, collection) {
       if (typeof data._id === 'undefined') {
         data._id = uuid.v4()
       }
-      await pool.query('INSERT INTO ' + collection + ' (id, data) VALUES ($1, $2)', [data._id, data])
+      try {
+        await pool.query('INSERT INTO ' + collection + ' (id, data) VALUES ($1, $2)', [data._id, data])
+      } catch (e) {
+        if (e.message.includes('duplicate key')) {
+          throw new util.ApiError(409, 'document already exists')
+        }
+        throw e
+      }
       return data._id
     },
     update: async function (id, data) {

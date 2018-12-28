@@ -3,20 +3,10 @@ module.exports = function (storage) {
 
   return {
     cache: cache,
-    init: function () {
-      const result = Promise.resolve(storage.init())
-      return result.then(function () {
-        return storage.all()
-          .then(function (data) {
-            data.forEach(function (doc) {
-              // TODO: if the cache is not memory, wait on the returned promise.
-              cache.create(doc)
-            })
-          }, function (err) {
-            console.error('failed to load backing data')
-            console.error(err)
-          })
-      })
+    init: async function () {
+      await Promise.resolve(storage.init())
+      const data = await storage.all()
+      await Promise.all(data.map((doc) => cache.create(doc)))
     },
     all: function () {
       return cache.all()

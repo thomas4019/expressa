@@ -54,8 +54,20 @@ module.exports = function (settings, collection) {
         throw new util.ApiError(404, 'document not found')
       }
     },
+    exists: async function (id) {
+      try {
+        await store.getAsync(id)
+        return true
+      } catch (err) {
+        return false
+      }
+    },
     create: async function (data) {
       const id = typeof data._id === 'undefined' ? randomstring.generate(8) : data._id
+      const existing = await this.exists(id)
+      if (existing) {
+        throw new util.ApiError(409, 'document already exists')
+      }
       await store.saveAsync(id, data)
       return id
     },

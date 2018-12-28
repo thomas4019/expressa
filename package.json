@@ -37,8 +37,8 @@
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
     "test": "NODE_ENV=local_test_suite mocha --exit",
-    "testlint": "NODE_ENV=local_test_suite mocha -b --exit && npm run lint",
-    "testdebug": "NODE_ENV=local_test_suite DEBUG=expressa mocha --exit && npm run lint",
+    "testlint": "NODE_ENV=local_test_suite mocha --exit && npm run lint",
+    "testdebug": "NODE_ENV=local_test_suite DEBUG=expressa mocha -b --exit && npm run lint",
     "ci-test": "mocha test --reporter mocha-junit-reporter --exit",
     "clean": "rm -rf node_modules;",
     "lint": "eslint .",

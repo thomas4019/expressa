@@ -40,6 +40,9 @@ module.exports = function (settings, collection) {
     create: async function (data) {
       const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
+      if (store[id]) {
+        throw new util.ApiError(409, 'document already exists')
+      }
       store[id] = data
       return id
     },
