@@ -1,13 +1,13 @@
 /* global it describe */
-var request = require('supertest')
-var chai = require('chai')
-var expect = chai.expect
-var expressa = require('../')
-var api = expressa.api({
+const request = require('supertest')
+const chai = require('chai')
+const expect = chai.expect
+const expressa = require('../')
+const api = expressa.api({
   'file_storage_path': 'testdata'
 })
-var express = require('express')
-var app = express()
+const express = require('express')
+const app = express()
 app.use(api)
 
 describe('request logging', function () {

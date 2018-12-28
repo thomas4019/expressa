@@ -1,5 +1,10 @@
 {
-    "extends": "standard",
+    "extends": "eslint:recommended",
+    "rules": {
+        "no-var": "error",
+        "prefer-const": "error",
+        "no-console": ["error", { "allow": ["error"] }]
+    },
     "globals": {
         "after": true,
         "before": true,
@@ -7,5 +12,12 @@
         "it": true,
         "xit": true,
         "xdescribe": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
+    "env": {
+        "es6": true,
+        "node": true
     }
 }

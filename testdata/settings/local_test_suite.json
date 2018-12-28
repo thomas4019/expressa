@@ -1,13 +1,16 @@
 {
   "_id": "development",
-  "postgresql_uri": "",
+  "postgresql_uri": "postgresql://localhost/pgtest",
   "mongodb_uri": "mongodb://localhost:27017/test",
   "jwt_secret": "gCYqff0grKX5oRMp2BY3",
   "enforce_permissions": true,
   "installed": true,
+  "logging": {
+    "print_400_errors": false
+  },
   "meta": {
     "created": "2017-08-24T04:39:30.093Z",
-    "updated": "2018-12-28T00:50:21.694Z"
+    "updated": "2018-12-27T23:45:55.302Z"
   },
   "file_storage_path": "testdata"
 }

@@ -1,10 +1,10 @@
 module.exports = function (storage) {
-  var cache = require('./memory')()
+  const cache = require('./memory')()
 
   return {
     cache: cache,
     init: function () {
-      var result = Promise.resolve(storage.init())
+      const result = Promise.resolve(storage.init())
       return result.then(function () {
         return storage.all()
           .then(function (data) {

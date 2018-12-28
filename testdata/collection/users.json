@@ -6,8 +6,25 @@
     "properties": {
       "meta": {
         "type": "object",
-        "additionalProperties": true,
-        "properties": {}
+        "propertyOrder": 2000,
+        "properties": {
+          "created": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string",
+            "links": [
+              {
+                "rel": "» view owner user",
+                "href": "/admin/#/edit/users/{{self}}",
+                "class": "comment-link open-in-modal primary-text"
+              }
+            ]
+          }
+        }
       },
       "email": {
         "type": "string"
@@ -38,7 +55,7 @@
       "password"
     ]
   },
-  "storage": "file",
+  "storage": "memory",
   "cached": true,
   "documentsHaveOwners": true,
   "meta": {

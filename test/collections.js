@@ -1,13 +1,14 @@
-var request = require('supertest')
-var chai = require('chai')
-var expect = chai.expect
-var expressa = require('../')
-var util = require('../util.js')
-var api = expressa.api({
+const request = require('supertest')
+const chai = require('chai')
+const expect = chai.expect
+const _ = require('lodash')
+const expressa = require('../')
+const util = require('../util.js')
+const api = expressa.api({
   'file_storage_path': 'testdata'
 })
-var express = require('express')
-var app = express()
+const express = require('express')
+const app = express()
 app.use(api)
 
 describe('basic collections', function () {
@@ -60,7 +61,7 @@ describe('basic collections', function () {
         title: 'doc1',
         bad: 'test'
       })
-      .expect(500)
+      .expect(400)
   })
 
   it('fail to create with missing required field', async function () {
@@ -69,7 +70,7 @@ describe('basic collections', function () {
       .post('/testdoc')
       .set('x-access-token', token)
       .send({})
-      .expect(500)
+      .expect(400)
   })
 
   it('fail to read a schema without permission', async function () {
@@ -91,7 +92,15 @@ describe('basic collections', function () {
     expect(res.body.properties.meta.properties).to.have.property('created')
   })
 
-  it('read a sperific doc', async function () {
+  it('fail to read a specific doc without permission', async function () {
+    const token = await util.getUserWithPermissions(api)
+    await request(app)
+      .get('/testdoc/test123')
+      .set('x-access-token', token)
+      .expect(401)
+  })
+
+  it('read a specific doc', async function () {
     const token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc/test123')
@@ -108,6 +117,59 @@ describe('basic collections', function () {
         error: 'You do not have permission to perform this action.'
       })
       .expect(401)
+  })
+
+  it('edit a document adding new field', async function () {
+    const updatedDoc = {
+      title: 'doc1-updated',
+      new_field: 'cool'
+    }
+    const token = await util.getUserWithPermissions(api, ['testdoc: edit', 'collection: edit', 'collection: delete'])
+    await request(app)
+      .put('/testdoc/test123')
+      .set('x-access-token', token)
+      .send(updatedDoc)
+      .expect(400)
+
+    const { body } = await request(app)
+      .get('/collection/testdoc')
+      .expect(200)
+    body.schema.properties.new_field = { type: 'string' }
+
+    // Add new_field to schema
+    await request(app)
+      .put('/collection/testdoc')
+      .set('x-access-token', token)
+      .send(_.clone(body))
+      .expect(200)
+
+    // The new doc should now be considered valid
+    await request(app)
+      .put('/testdoc/test123')
+      .set('x-access-token', token)
+      .send(updatedDoc)
+      .expect(200)
+
+    delete body.schema.properties.new_field
+
+    // Delete the collection
+    await request(app)
+      .delete('/collection/testdoc')
+      .set('x-access-token', token)
+
+    // Should get 404 when inserting
+    await request(app)
+      .put('/testdoc/test123')
+      .set('x-access-token', token)
+      .send(updatedDoc)
+      .expect(404)
+
+    // Restore old schema
+    await request(app)
+      .put('/collection/testdoc')
+      .set('x-access-token', token)
+      .send(_.clone(body))
+      .expect(200)
   })
 
   it('edit a document', async function () {
@@ -184,5 +246,58 @@ describe('basic collections', function () {
       .expect({
         error: 'document not found'
       })
+  })
+
+  it('creating new collection updates Admin role', async function () {
+    const token = await util.getUserWithPermissions(api, ['collection: create', 'collection: delete'])
+    await request(app)
+      .post('/collection')
+      .set('x-access-token', token)
+      .send({
+        _id: 'newcoll',
+        storage: 'memory',
+        documentsHaveOwners: false,
+        schema: {}
+      })
+      .expect(200)
+
+    let admin = await api.db.role.get('Admin')
+    expect(admin.permissions).to.have.property('newcoll: create')
+    expect(admin.permissions).to.not.have.property('newcoll: edit own')
+
+    await request(app)
+      .delete('/collection/newcoll')
+      .set('x-access-token', token)
+      .expect(200)
+
+    admin = await api.db.role.get('Admin')
+    expect(admin.permissions).to.not.have.property('newcoll: create')
+  })
+
+  it('creating new collection updates Admin role (with owners)', async function () {
+    const token = await util.getUserWithPermissions(api, ['collection: create', 'collection: delete'])
+    await request(app)
+      .post('/collection')
+      .set('x-access-token', token)
+      .send({
+        _id: 'newcoll',
+        storage: 'memory',
+        documentsHaveOwners: true,
+        schema: {}
+      })
+      .expect(200)
+
+    let admin = await api.db.role.get('Admin')
+    expect(admin.permissions).to.have.property('newcoll: create')
+    expect(admin.permissions).to.have.property('newcoll: edit own')
+
+    await request(app)
+      .delete('/collection/newcoll')
+      .set('x-access-token', token)
+      .expect(200)
+
+    admin = await api.db.role.get('Admin')
+    expect(admin.permissions).to.not.have.property('newcoll: create')
+    expect(admin.permissions).to.not.have.property('newcoll: edit own')
   })
 })

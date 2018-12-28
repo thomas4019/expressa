@@ -17,7 +17,8 @@
         "enum": [
           "file",
           "postgres",
-          "mongo"
+          "mongo",
+          "memory"
         ]
       },
       "documentsHaveOwners": {

@@ -9,11 +9,23 @@
       },
       "title": {
         "type": "string"
-      },      
+      },
       "data": {
         "type": "object",
         "additionalProperties": true,
         "properties": {}
+      },
+      "meta": {
+        "type": "object",
+        "propertyOrder": 2000,
+        "properties": {
+          "created": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "string"
+          }
+        }
       }
     },
     "required": [
@@ -23,7 +35,7 @@
   "storage": "memory",
   "documentsHaveOwners": false,
   "meta": {
-    "updated": "2017-08-24T04:39:29.866Z",
+    "updated": "2018-12-28T00:50:21.750Z",
     "created": "2017-08-24T04:39:29.866Z"
   }
 }

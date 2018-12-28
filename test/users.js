@@ -1,16 +1,15 @@
 /* global it describe */
-var request = require('supertest')
-var chai = require('chai')
-var expect = chai.expect
-var expressa = require('../')
-var api = expressa.api({
+const request = require('supertest')
+const chai = require('chai')
+const expect = chai.expect
+const expressa = require('../')
+const api = expressa.api({
   'file_storage_path': 'testdata'
 })
-var express = require('express')
-var _ = require('lodash')
-var app = express()
+const express = require('express')
+const app = express()
 app.use(api)
-var util = require('../util.js')
+const util = require('../util.js')
 
 const validUser = {
   email: 'test@example.com',
@@ -25,12 +24,22 @@ const invalidEmailUser = {
   password: 'test'
 }
 describe('user functionality', function () {
+  let validId
+
+  it('can signup', async function () {
+    const res = await request(app)
+      .post('/user/register')
+      .send(validUser)
+      .expect(200)
+    validId = res.body.id
+  })
+
   it('can login', async function () {
     const res = await request(app)
       .post('/user/login')
       .send(validUser)
       .expect(200)
-    expect(res.body.uid).to.equal('42Fxx1Qz')
+    expect(res.body.uid).to.equal(validId)
   })
 
   it('rejects unknown email', async function () {
@@ -79,7 +88,7 @@ describe('user functionality', function () {
     await request(app)
       .put(`/users/${user._id}`)
       .set('x-access-token', token)
-      .send(_.extend({}, user, { password: 'test', roles: ['Admin'] }))
+      .send(Object.assign({}, user, { password: 'test', roles: ['Admin'] }))
       .expect(200)
 
     await request(app)
@@ -107,5 +116,31 @@ describe('user functionality', function () {
       .get(`/users/${user._id}`)
       .set('x-access-token', token)
     expect(res2.body.roles).to.include('Admin')
+  })
+
+  it('adding a role modifies user schema', async function () {
+    const token = await util.getUserWithPermissions(api, ['role: create', 'role: delete', 'schemas: view'])
+    await request(app)
+      .post(`/role`)
+      .set('x-access-token', token)
+      .send({ _id: 'testrole', permissions: {} })
+      .expect(200)
+
+    const res2 = await request(app)
+      .get('/users/schema')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res2.body.properties.roles.items.enum).to.include('testrole')
+
+    await request(app)
+      .delete(`/role/testrole`)
+      .set('x-access-token', token)
+      .expect(200)
+
+    const res3 = await request(app)
+      .get('/users/schema')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res3.body.properties.roles.items.enum).to.not.include('testrole')
   })
 })

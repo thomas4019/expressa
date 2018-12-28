@@ -1,11 +1,12 @@
+/* eslint no-unused-vars: ["error", { "args": "none" }] */
 const randomstring = require('randomstring')
-const Filtr = require('filtr')
+const sift = require('sift')
 const _ = require('lodash')
 
 const util = require('../util')
 
 module.exports = function (settings, collection) {
-  var store = {}
+  const store = {}
 
   return {
     init: async function () {},
@@ -13,20 +14,19 @@ module.exports = function (settings, collection) {
       return this.find({})
     },
     find: async function (query, offset, limit, orderby) {
-      var arr = Object.keys(store).map(function (id) {
+      const arr = Object.keys(store).map(function (id) {
         return store[id]
       })
-      var filter = new Filtr(query)
-      var matches = filter.test(arr)
+      let matches = sift(query || {}, arr)
+      if (orderby) {
+        matches = util.orderBy(matches, orderby)
+      }
       if (typeof offset !== 'undefined' && typeof limit !== 'undefined') {
         matches = matches.slice(offset, offset + limit)
       } else if (typeof offset !== 'undefined') {
         matches = matches.slice(offset)
       } else if (typeof limit !== 'undefined') {
         matches = matches.slice(0, limit)
-      }
-      if (orderby) {
-        matches = util.orderBy(matches, orderby)
       }
       return matches
     },
@@ -37,7 +37,7 @@ module.exports = function (settings, collection) {
       return _.clone(store[id])
     },
     create: async function (data) {
-      var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
+      const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
       store[id] = data
       return id

@@ -1,23 +1,46 @@
-const dotty = require('dotty')
+const _ = require('lodash')
 const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken')
-const Bluebird = require('bluebird')
 const debug = require('debug')('expressa')
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
-    for (var i = 0; i < orderby.length; i++) {
-      var ordering = orderby[i]
-      var key = ordering[0]
-      if (dotty.get(a, key) > dotty.get(b, key)) {
+    for (let i = 0; i < orderby.length; i++) {
+      const ordering = orderby[i]
+      const key = ordering[0]
+      if (_.get(a, key) > _.get(b, key)) {
         return ordering[1]
-      } else if (dotty.get(a, key) < dotty.get(b, key)) {
+      } else if (_.get(a, key) < _.get(b, key)) {
         return -ordering[1]
       }
     }
     return 0
   })
   return data
+}
+
+exports.normalizeOrderBy = function(orderby) {
+  if (Array.isArray(orderby)) {
+    orderby = orderby.map(function (ordering) {
+      if (typeof ordering === 'string') {
+        return [ordering, 1]
+      } else if (Array.isArray(ordering)) {
+        if (ordering.length === 1) {
+          return [ordering[0], 1] // add 1 (default to ascending sort)
+        }
+      }
+      return ordering
+    })
+  } else if (_.isObject(orderby)) {
+    const arr = []
+    for (const key in orderby) {
+      arr.push([key, orderby[key]])
+    }
+    orderby = arr
+  } else {
+    throw exports.ApiError(400, 'orderby param must be array or object')
+  }
+  return orderby
 }
 
 exports.clone = function (obj) {
@@ -27,38 +50,35 @@ exports.clone = function (obj) {
   return JSON.parse(JSON.stringify(obj))
 }
 
-exports.getUserWithPermissions = function (api, permissions) {
+exports.getUserWithPermissions = async function (api, permissions) {
   if (typeof permissions === 'string') {
     permissions = [permissions]
   }
-  var permissionsMap = {}
+  permissions = permissions || []
+  const permissionsMap = {}
   permissions.forEach(function (permission) {
     permissionsMap[permission] = true
   })
-  var randId = randomstring.generate(12)
-  var roleName = 'role' + randId
-  var user = {
+  const randId = randomstring.generate(12)
+  const roleName = 'role' + randId
+  const user = {
     'email': 'test' + randId + '@example.com',
     'password': '123',
     'roles': [roleName]
   }
-  return api.db.role.cache.create({
+  await api.db.role.cache.create({
     '_id': roleName,
     'permissions': permissionsMap
   })
-    .then(function () {
-      return api.db.users.cache.create(user)
-    })
-    .then(function (result) {
-      user._id = result
-      var token = jwt.sign(user, api.settings.jwt_secret, {})
-      return token
-    })
+  const result = await api.db.users.cache.create(user)
+  user._id = result
+  const token = jwt.sign(user, api.settings.jwt_secret, {})
+  return token
 }
 
 const severities = ['critical', 'error', 'warning', 'notice', 'info', 'debug']
 exports.getLogSeverity = function (status) {
-  var severity = status >= 500 ? 'error'
+  const severity = status >= 500 ? 'error'
     : status >= 400 ? 'warning'
       : status >= 300 ? 'notice'
         : status >= 200 ? 'info'
@@ -97,24 +117,23 @@ exports.createLogEntry = function (req, res) {
 }
 
 exports.notify = async function (event, req, collection, data) {
-  if (typeof req.eventListeners[event] === 'undefined' || req.eventListeners[event].length === 0) {
-    return Promise.resolve(true)
-  }
-  debug('notifying ' + req.eventListeners[event].length + ' of ' + event)
-  const results = await Bluebird.map(req.eventListeners[event], function (listener) {
-    debug('calling ' + listener.name + ' ' + listener.toString())
-    try {
-      return listener(req, collection, data)
-    } catch (e) {
-      console.error('error in listener')
-      console.error(e.stack)
+  const listeners = req.eventListeners[event] || []
+  debug('notifying ' + listeners.length + ' of ' + event)
+  let result;
+  for (const listener of listeners) {
+    if (listener.collections && !listener.collections.includes(collection)) {
+      continue // skip since it's not relevant
     }
-  })
-  debug('results ' + results)
-  // Result is the first defined value
-  const result = results.reduce(function (prev, current) {
-    return (prev === undefined) ? current : prev
-  })
+    debug('calling ' + listener.name)
+    try {
+      result = result || await listener(req, collection, data)
+    } catch (e) {
+      // If a listener has already allowed the request, do not error
+      if (!result) {
+        throw e
+      }
+    }
+  }
   return result || result === undefined
 }
 
@@ -124,7 +143,6 @@ class ApiError extends Error {
     this.name = this.constructor.name
     Error.captureStackTrace(this, this.constructor)
     this.status = status || this.constructor.status || 500
-    console.error(this.status)
   }
 }
 exports.ApiError = ApiError

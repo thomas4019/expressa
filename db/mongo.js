@@ -16,7 +16,7 @@ module.exports = function (settings, collection) {
     find: async function (query, skip, limit, orderby) {
       const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
       const db = client.db(settings.mongodb_uri.split('/')[3])
-      var cursor = db.collection(collection).find(query).sort(orderby)
+      const cursor = db.collection(collection).find(query).sort(orderby)
       if (typeof skip !== 'undefined') {
         cursor.skip(skip)
       }
@@ -40,7 +40,7 @@ module.exports = function (settings, collection) {
       return doc
     },
     create: async function (data) {
-      var id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
+      const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
 
       const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })

@@ -1,10 +1,13 @@
-var fs = require('fs')
-var express = require('express')
-var bodyParser = require('body-parser')
-var auth = require('./auth')
-var debug = require('debug')('expressa')
-var onFinished = require('on-finished')
+const fs = require('fs')
+const express = require('express')
+const bodyParser = require('body-parser')
+const debug = require('debug')('expressa')
+const _ = require('lodash')
 const Bluebird = require('bluebird')
+Bluebird.config({
+  longStackTraces: true
+})
+global.Promise = Bluebird
 
 const dbTypes = {
   cached: require('./db/cached'),
@@ -14,16 +17,20 @@ const dbTypes = {
   mongo: require('./db/mongo'),
   mongodb: require('./db/mongo')
 }
+const auth = require('./auth')
 const util = require('./util')
 const collectionsApi = require('./controllers/collections')
+const usersApi = require('./controllers/users')
+const userPermissionsMiddleware = require('./middleware/users_permissions')
+const loggingMiddleware = require('./middleware/logging')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
 async function bootstrapCollections (router) {
-  var db = router.db
-  const result = await db.collection.all()
-  await Bluebird.map(result, function (collection) {
-    if (typeof dbTypes[collection.storage] !== 'function') {
+  const db = router.db
+  const collections = await db.collection.all()
+  await Promise.all(collections.map((collection) => {
+    if (!dbTypes[collection.storage]) {
       console.error('missing ' + collection.storage + ' dbtype which is used by ' + collection._id)
       console.error('try updating to the latest version of expressa')
     }
@@ -32,17 +39,8 @@ async function bootstrapCollections (router) {
       db[collection._id] = dbTypes['cached'](db[collection._id])
       debug('initializing ' + collection._id + ' as a memory cached collection')
     }
-    return Promise.resolve(db[collection._id].init())
-  })
-}
-
-async function addStandardListeners (router) {
-  await Promise.all([
-    require('./collection_permissions')(router), // Add standard collection based permissions
-    require('./listeners')(router),
-    require('./validation_listeners')(router)
-  ])
-  debug('added standard listeners')
+    return db[collection._id].init()
+  }))
 }
 
 async function initCollections (db, router) {
@@ -63,77 +61,85 @@ async function initCollections (db, router) {
     db.collection = dbTypes[router.settings.collection_db_type || 'file'](router.settings, 'collection')
   }
   debug('collections loaded.')
-  await addStandardListeners(router)
+
+  await Promise.all([
+    require('./listeners_collection_permissions')(router),
+    require('./listeners')(router),
+    require('./listeners_validation')(router),
+    require('./listeners_users')(router),
+  ])
+  debug('added standard listeners')
+
   await util.notify('ready', router)
 }
 
 function ph (requestHandler) {
   return async function wrapper (req, res, next) {
     try {
-      await requestHandler(req, res, next)
+      const result = await requestHandler(req, res, next)
+      if (typeof result !== 'object') {
+        res.status(500).send('invalid result')
+      }
+      res.send(result)
     } catch (err) {
-      console.error(err)
-      console.error(err.message)
-      console.error(err.stack)
-      console.error(err.status)
-      res.status(err.status || 500).send({ error: err.result || err.message || err })
+      err.status = err.status || 500
+      if ((req.settings.logging && req.settings.logging.print_400_errors) || err.status >= 500) {
+        console.error(err)
+      }
+      res.status(err.status).send({ error: err.result || err.message || err })
     }
   }
 }
 
 module.exports.api = function (settings) {
-  var router = express.Router()
+  const router = express.Router()
   router.custom = express.Router()
   router.dbTypes = dbTypes
-
-  var db = {}
   router.settings = settings || {}
-  db.settings = dbTypes[router.settings.settings_db_type || 'file'](router.settings, 'settings')
-  router.db = db
+  router.db = {
+    settings: dbTypes[router.settings.settings_db_type || 'file'](router.settings, 'settings')
+  }
+  router.eventListeners = {}
 
-  var eventListeners = {}
-  router.eventListeners = eventListeners
+  router.addSingleCollectionListener = function (event, listener) {
+    if (!router.eventListeners[event]) {
+      router.eventListeners[event] = []
+    }
+    router.eventListeners[event].push(listener)
+    router.eventListeners[event].sort((a, b) => a.priority - b.priority)
+  }
+
+  router.addLateCollectionListener = function (events, collections, listener) {
+    listener.priority = 10;
+    router.addCollectionListener(events, collections, listener)
+  }
+
+  router.addCollectionListener = function (events, collections, listener) {
+    events = _.castArray(events)
+    collections = _.castArray(collections)
+    listener.priority = listener.priority || 0
+    listener.collections = collections
+    events.forEach(function (event) {
+      router.addSingleCollectionListener(event, listener)
+    })
+  }
 
   router.addListener = function addListener (events, priority, listener) {
-    if (typeof events === 'string') {
-      events = [events]
-    }
+    events = _.castArray(events)
     if (typeof priority === 'function') {
       listener = priority
       priority = 0
     }
     listener.priority = priority
     events.forEach(function (event) {
-      eventListeners[event] = eventListeners[event] || []
-      eventListeners[event].push(listener)
-      eventListeners[event].sort(function (a, b) {
-        return a.priority - b.priority
-      })
+      router.addSingleCollectionListener(event, listener)
     })
   }
 
-  initCollections(db, router)
+  initCollections(router.db, router)
 
-  router.use(function logger (req, res, next) {
-    if (db.log) {
-      onFinished(res, async function (err) {
-        if (err) {
-          console.error('error found while logging.')
-          console.error(err)
-          return
-        }
-        if (util.shouldLogRequest(req, res)) {
-          const entry = util.createLogEntry(req, res)
-          await db.log.create(entry)
-        }
-      })
-    }
-    next()
-  })
-
-  // The wildcard type ensures it works without the application/json header
   router.use(bodyParser.json({
-    type: '*/*'
+    type: '*/*' // The wildcard type ensures it works even without the application/json header
   }))
 
   router.use(function (req, res, next) {
@@ -143,31 +149,21 @@ module.exports.api = function (settings) {
     next()
   })
 
+  router.use(loggingMiddleware)
+
   router.notify = util.notify
 
-  router.get('/status', function (req, res, next) {
-    res.send({
-      installed: req.settings.installed || false
-    })
-  })
+  router.get('/status', ph((req) => ({ installed: req.settings.installed || false })))
 
-  router.post('/user/register', function (req, res, next) {
-    req.url = '/users'
-    next('route')
-  })
-  router.post('/user/login', ph(auth.getLoginRoute(router)))
+  router.post('/user/login', ph(usersApi.login))
 
-  router.use(auth.middleware) // Add user id to request, if logged in
+  router.use(auth.middleware) // Add user id to request
+  router.use(userPermissionsMiddleware) // Add user and permissions to request
 
-  var rolePermissions = require('./role_permissions')(router)
-  router.use(rolePermissions.middleware) // Add user and permissions to request
-  router.use(router.custom)
+  router.use(router.custom) // Externally added middleware
 
-  router.get('/users?/me', function (req, res, next) {
-    req.params.collection = 'users'
-    req.params.id = req.uid
-    collectionsApi.getById(req, res, next)
-  })
+  router.post('/user/register', ph(usersApi.register))
+  router.get('/users?/me', ph(usersApi.getMe))
 
   router.get('/:collection/schema', ph(collectionsApi.getSchema))
   router.get('/:collection', ph(collectionsApi.get))
@@ -178,8 +174,9 @@ module.exports.api = function (settings) {
   router.delete('/:collection/:id', ph(collectionsApi.deleteById))
 
   // Error handler, log and send to user
+  // eslint-disable-next-line no-unused-vars
   router.use(function (err, req, res, next) {
-    console.log('my err handler')
+    console.error('my err handler')
     console.error(err.stack)
     res.status(res.errCode || 500)
     if (process.env.DEBUG || (req.hasPermission && req.hasPermission('view errors'))) {
@@ -197,7 +194,7 @@ module.exports.api = function (settings) {
 }
 
 module.exports.admin = function (settings) {
-  var router = express.Router()
+  const router = express.Router()
   router.get('/settings.js', function (req, res) {
     res.set('Content-Type', 'text/javascript')
     res.send('window.settings = ' + JSON.stringify(settings || {}) + '')

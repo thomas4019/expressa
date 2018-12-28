@@ -17,10 +17,11 @@ collectionNames.forEach(function (collection) {
       db = api.db[collection]
     })
 
+    let id
+
     it('create without id', async function () {
-      const id = await db.create({ title: 'first' })
+      id = await db.create({ title: 'first', data: { field: '123' } })
       expect(id.length).to.be.greaterThan(6)
-      await db.delete(id)
     })
 
     it('create with id', async function () {
@@ -49,8 +50,35 @@ collectionNames.forEach(function (collection) {
       await assert.rejects(async () => db.delete('111d9a1311771c805d161555'), { name: 'ApiError', message: 'document not found' })
     })
 
+    it('find all', async function () {
+      const docs = await db.find()
+      expect(docs.length).to.equal(2)
+    })
+
+    it('find with offset', async function () {
+      const docs = await db.find({}, 1)
+      expect(docs.length).to.equal(1)
+    })
+
+    it('find orderby asc', async function () {
+      const docs = await db.find({}, 0, 1, [['title', 1]])
+      expect(docs.length).to.equal(1)
+      expect(docs[0].title).to.equal('first')
+    })
+
+    it('find orderby desc', async function () {
+      const docs = await db.find({}, 0, 1, [['title', -1]])
+      expect(docs.length).to.equal(1)
+      expect(docs[0].title).to.equal('second')
+    })
+
     it('find by id', async function () {
       const docs = await db.find({ _id: '5bfd9a1311771c805d161498' })
+      expect(docs.length).to.equal(1)
+    })
+
+    it('find using nested $exists', async function () {
+      const docs = await db.find({ 'data.field': { $exists: true } })
       expect(docs.length).to.equal(1)
     })
 
@@ -71,6 +99,7 @@ collectionNames.forEach(function (collection) {
 
     after(async function () {
       await db.delete('5bfd9a1311771c805d161498')
+      await db.delete(id)
     })
   })
 })

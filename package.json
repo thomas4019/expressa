@@ -9,16 +9,11 @@
     "bcryptjs": "2.4.3",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
-    "cors": "2.7.1",
     "debug": "^2.6.1",
-    "dotty": "0.0.2",
     "express": "^4.16.4",
     "expressa-admin": "^0.4.3",
-    "filtr": "0.3.0",
-    "handlebars": "4.0.5",
     "jfs": "0.2.6",
     "jsonwebtoken": "5.7.0",
-    "mongo-query": "0.5.7",
     "mongo-query-to-postgres-jsonb": "^0.2.1",
     "mongo-querystring": "3.0.0",
     "mongodb": "3.1.9",
@@ -31,14 +26,8 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.10.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-node": "^8.0.0",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0",
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.18.0",
-    "mocha-standard": "^1.0.0",
     "supertest": "^3.0.0"
   },
   "engines": {
@@ -46,11 +35,12 @@
   },
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
-    "test": "mocha --exit",
-    "testlint": "mocha --exit && npm run lint",
+    "test": "NODE_ENV=local_test_suite mocha --exit",
+    "testlint": "NODE_ENV=local_test_suite mocha --exit && npm run lint",
     "ci-test": "mocha test --reporter mocha-junit-reporter --exit",
     "clean": "rm -rf node_modules;",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "fixlint": "eslint . --fix"
   },
   "license": "MIT"
 }
