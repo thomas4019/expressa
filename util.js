@@ -62,17 +62,17 @@ exports.getUserWithPermissions = async function (api, permissions) {
   const randId = randomstring.generate(12)
   const roleName = 'role' + randId
   const user = {
-    'email': 'test' + randId + '@example.com',
-    'password': '123',
-    'roles': [roleName]
+    email: 'test' + randId + '@example.com',
+    password: '123',
+    roles: [roleName]
   }
   await api.db.role.cache.create({
-    '_id': roleName,
-    'permissions': permissionsMap
+    _id: roleName,
+    permissions: permissionsMap
   })
-  const result = await api.db.users.cache.create(user)
+  const result = await api.db.users.create(user)
   user._id = result
-  const token = jwt.sign(user, api.settings.jwt_secret, {})
+  const token = jwt.sign(user, api.settings.core.jwt_secret, {})
   return token
 }
 
@@ -88,7 +88,7 @@ exports.getLogSeverity = function (status) {
 
 exports.shouldLogRequest = function (req, res) {
   const severity = exports.getLogSeverity(res.statusCode)
-  const severityLoggingIndex = severities.indexOf(req.settings.logging_level || 'warning')
+  const severityLoggingIndex = severities.indexOf(req.getSetting('logging.level') || 'warning')
   const severityIndex = severities.indexOf(severity)
   return severityIndex <= severityLoggingIndex
 }
@@ -119,12 +119,12 @@ exports.createLogEntry = function (req, res) {
 exports.notify = async function (event, req, collection, data) {
   const listeners = req.eventListeners[event] || []
   debug('notifying ' + listeners.length + ' of ' + event + ' for ' + collection)
-  let result;
+  let result
   for (const listener of listeners) {
     if (listener.collections && !listener.collections.includes(collection)) {
       continue // skip since it's not relevant
     }
-    debug('calling ' + listener.name)
+    debug('calling ' + listener.name + ' ' + (result ? '(skipped)' : ''))
     try {
       result = result || await listener(req, collection, data)
     } catch (e) {
@@ -152,3 +152,11 @@ exports.asyncMiddleware = fn =>
     Promise.resolve(fn(req, res, next))
       .catch(next)
   }
+
+exports.resolve = async function resolve (handler, app) {
+  if (typeof handler === 'function') {
+    return handler(app)
+  }
+  return handler
+}
+

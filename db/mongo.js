@@ -5,17 +5,21 @@ const util = require('../util')
 
 module.exports = function (settings, collection) {
   return {
+    getClient: async function () {
+      const client = await MongoClient.connect(settings.core.mongodb_uri, { useNewUrlParser: true })
+      const db = client.db(settings.core.mongodb_uri.split('/')[3])
+      return db
+    },
     init: function () {
-      if (!settings.mongodb_uri) {
-        console.error(`{collection} uses mongo, but mongodb_url is undefined.`)
+      if (!settings.core.core.mongodb_uri) {
+        console.error('{collection} uses mongo, but mongodb_url is undefined.')
       }
     },
     all: async function () {
       return this.find({})
     },
     find: async function (query, skip, limit, orderby) {
-      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
-      const db = client.db(settings.mongodb_uri.split('/')[3])
+      const db = await this.getClient()
       const cursor = db.collection(collection).find(query).sort(orderby)
       if (typeof skip !== 'undefined') {
         cursor.skip(skip)
@@ -28,8 +32,7 @@ module.exports = function (settings, collection) {
       return docs
     },
     get: async function (id) {
-      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
-      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const db = await this.getClient()
       const doc = await db.collection(collection).findOne({ _id: id })
       if (doc) {
         doc._id = doc._id.toString()
@@ -43,8 +46,7 @@ module.exports = function (settings, collection) {
       const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
       data['_id'] = id
 
-      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
-      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const db = await this.getClient()
       try {
         const doc = await db.collection(collection).insertOne(data)
         return doc.insertedId.toString()
@@ -56,8 +58,7 @@ module.exports = function (settings, collection) {
     },
     update: async function (id, data) {
       data._id = id
-      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
-      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const db = await this.getClient()
       await db.collection(collection).replaceOne({
         _id: id
       }, data)
@@ -65,8 +66,7 @@ module.exports = function (settings, collection) {
       return data
     },
     delete: async function (id) {
-      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
-      const db = await client.db(settings.mongodb_uri.split('/')[3])
+      const db = await this.getClient()
       const res = await db.collection(collection).deleteOne({
         _id: id
       })

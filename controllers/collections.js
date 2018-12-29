@@ -125,9 +125,9 @@ exports.updateById = async function (req) {
   const modifier = req.body
 
   const doc = await req.db[req.params.collection].get(req.params.id)
-  const owner = doc.meta.owner
+  const owner = doc.owner && doc.meta.owner
   mongoQuery(doc, {}, modifier)
-  const newOwner = doc.meta.owner
+  const newOwner = doc.meta && doc.meta.owner
   if (owner !== newOwner) {
     debug('attempting to change document owner.')
     doc.meta.owner = owner

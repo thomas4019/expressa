@@ -1,14 +1,9 @@
 const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
-const expressa = require('../')
 const util = require('../util.js')
-const api = expressa.api({
-  'file_storage_path': 'testdata'
-})
-const express = require('express')
-const app = express()
-app.use(api)
+const testutils = require('./testutils')
+const { app, api } = testutils
 
 describe('querying collections', function () {
   it('create doc 1', async function () {
@@ -58,7 +53,7 @@ describe('querying collections', function () {
   it('read doc by id', async function () {
     const token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
-      .get(`/testdoc/testid123`)
+      .get('/testdoc/testid123')
       .set('x-access-token', token)
       .expect(200)
     expect(res.body.title).to.equal('doc3')
@@ -67,7 +62,7 @@ describe('querying collections', function () {
   it('read doc by missing id returns 404', async function () {
     const token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
-      .get(`/testdoc/missingdoc`)
+      .get('/testdoc/missingdoc')
       .set('x-access-token', token)
       .expect(404)
     expect(res.body.error).to.equal('document not found')

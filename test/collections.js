@@ -2,18 +2,60 @@ const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
 const _ = require('lodash')
-const expressa = require('../')
-const util = require('../util.js')
-const api = expressa.api({
-  'file_storage_path': 'testdata'
-})
-const express = require('express')
-const app = express()
-app.use(api)
+const testutils = require('./testutils')
+const { app, api } = testutils
 
 describe('basic collections', function () {
+  it('insert collection', async function() {
+    const testdocColl = {
+      _id: 'testdoc',
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          _id: {
+            type: 'string'
+          },
+          title: {
+            type: 'string'
+          },
+          data: {
+            type: 'object',
+            additionalProperties: true,
+            properties: {}
+          },
+          meta: {
+            type: 'object',
+            propertyOrder: 2000,
+            properties: {
+              created: {
+                type: 'string'
+              },
+              updated: {
+                type: 'string'
+              }
+            }
+          }
+        },
+        required: [
+          'title'
+        ]
+      },
+      storage: 'memory',
+      documentsHaveOwners: false,
+    }
+
+    const token = await testutils.getUserWithPermissions(api, 'collection: create')
+    const res = await request(app)
+      .post('/collection')
+      .set('x-access-token', token)
+      .send(testdocColl)
+      .expect(200)
+    expect(res.body.status).to.equal('OK')
+  })
+
   it('create without id', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     const res = await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -25,7 +67,7 @@ describe('basic collections', function () {
   })
 
   it('create with a specific id', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -53,7 +95,7 @@ describe('basic collections', function () {
   })
 
   it('fail to create with invalid field', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -65,7 +107,7 @@ describe('basic collections', function () {
   })
 
   it('fail to create with missing required field', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -74,7 +116,7 @@ describe('basic collections', function () {
   })
 
   it('fail to read a schema without permission', async function () {
-    const token = await util.getUserWithPermissions(api, 'blah')
+    const token = await testutils.getUserWithPermissions(api, 'blah')
     await request(app)
       .get('/testdoc/schema')
       .set('x-access-token', token)
@@ -82,7 +124,7 @@ describe('basic collections', function () {
   })
 
   it('read a schema', async function () {
-    const token = await util.getUserWithPermissions(api, 'schemas: view')
+    const token = await testutils.getUserWithPermissions(api, 'schemas: view')
     const res = await request(app)
       .get('/testdoc/schema')
       .set('x-access-token', token)
@@ -93,7 +135,7 @@ describe('basic collections', function () {
   })
 
   it('fail to read a specific doc without permission', async function () {
-    const token = await util.getUserWithPermissions(api)
+    const token = await testutils.getUserWithPermissions(api)
     await request(app)
       .get('/testdoc/test123')
       .set('x-access-token', token)
@@ -101,7 +143,7 @@ describe('basic collections', function () {
   })
 
   it('read a specific doc', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc/test123')
       .set('x-access-token', token)
@@ -120,7 +162,7 @@ describe('basic collections', function () {
   })
 
   it('caching is configurable for each collection', async function () {
-    const token = await util.getUserWithPermissions(api, ['testdoc: view', 'collection: edit'])
+    const token = await testutils.getUserWithPermissions(api, ['testdoc: view', 'collection: edit'])
     const res = await request(app)
       .get('/testdoc/test123')
       .set('x-access-token', token)
@@ -130,7 +172,7 @@ describe('basic collections', function () {
     await request(app)
       .post('/collection/testdoc/update')
       .set('x-access-token', token)
-      .send({ $set: { allowCaching: true }})
+      .send({ $set: { allowHTTPCaching: true }})
       .expect(200)
 
     const res2 = await request(app)
@@ -142,7 +184,7 @@ describe('basic collections', function () {
     await request(app)
       .post('/collection/testdoc/update')
       .set('x-access-token', token)
-      .send({ $unset: { allowCaching: 1 }})
+      .send({ $unset: { allowHTTPCaching: 1 }})
       .expect(200)
   })
 
@@ -151,7 +193,7 @@ describe('basic collections', function () {
       title: 'doc1-updated',
       new_field: 'cool'
     }
-    const token = await util.getUserWithPermissions(api, ['testdoc: edit', 'collection: edit', 'collection: delete', 'collection: create'])
+    const token = await testutils.getUserWithPermissions(api, ['testdoc: edit', 'collection: view', 'collection: edit', 'collection: delete', 'collection: create'])
     await request(app)
       .put('/testdoc/test123')
       .set('x-access-token', token)
@@ -160,6 +202,7 @@ describe('basic collections', function () {
 
     const { body } = await request(app)
       .get('/collection/testdoc')
+      .set('x-access-token', token)
       .expect(200)
     body.schema.properties.new_field = { type: 'string' }
 
@@ -200,7 +243,7 @@ describe('basic collections', function () {
   })
 
   it('edit a document', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: edit')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: edit')
     await request(app)
       .put('/testdoc/test123')
       .set('x-access-token', token)
@@ -218,7 +261,7 @@ describe('basic collections', function () {
   })
 
   it('update document by id', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: edit')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: edit')
     const res = await request(app)
       .post('/testdoc/test123/update')
       .set('x-access-token', token)
@@ -254,7 +297,7 @@ describe('basic collections', function () {
   })
 
   it('delete a document', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: delete')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: delete')
     await request(app)
       .delete('/testdoc/test123')
       .set('x-access-token', token)
@@ -265,7 +308,7 @@ describe('basic collections', function () {
   })
 
   it('fail to delete a non-existent document', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: delete')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: delete')
     await request(app)
       .delete('/testdoc/test123')
       .set('x-access-token', token)
@@ -276,7 +319,7 @@ describe('basic collections', function () {
   })
 
   it('creating new collection updates Admin role', async function () {
-    const token = await util.getUserWithPermissions(api, ['collection: create', 'collection: delete'])
+    const token = await testutils.getUserWithPermissions(api, ['collection: create', 'collection: delete'])
     await request(app)
       .post('/collection')
       .set('x-access-token', token)
@@ -302,7 +345,7 @@ describe('basic collections', function () {
   })
 
   it('creating new collection updates Admin role (with owners)', async function () {
-    const token = await util.getUserWithPermissions(api, ['collection: create', 'collection: delete'])
+    const token = await testutils.getUserWithPermissions(api, ['collection: create', 'collection: delete'])
     await request(app)
       .post('/collection')
       .set('x-access-token', token)

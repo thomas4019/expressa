@@ -1,19 +1,63 @@
 const assert = require('assert')
 const chai = require('chai')
 const expect = chai.expect
-const expressa = require('../')
-const api = expressa.api({
-  'file_storage_path': 'testdata'
-})
+const request = require('supertest')
+const testutils = require('./testutils')
+const { app, api } = testutils
 
 const collectionNames = ['memorytest', 'filetest']
-// const collectionNames = ['filetest', 'memorytest', 'mongotest', 'pgtest']
+// const collectionNames = ['filetest', 'memorytest', 'mongotest', 'postgrestest']
 
 collectionNames.forEach(function (collection) {
   describe(`${collection} basic functionality`, function () {
     let db
 
-    before(function () {
+    before(async function () {
+      const coll = {
+        _id: collection,
+        schema: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            _id: {
+              type: 'string'
+            },
+            title: {
+              type: 'string'
+            },
+            data: {
+              type: 'object',
+              additionalProperties: true,
+              properties: {}
+            },
+            meta: {
+              type: 'object',
+              propertyOrder: 2000,
+              properties: {
+                created: {
+                  type: 'string'
+                },
+                updated: {
+                  type: 'string'
+                }
+              }
+            }
+          },
+          required: [
+            'title'
+          ]
+        },
+        storage: collection.replace('test', ''),
+        documentsHaveOwners: false,
+      }
+
+      const token = await testutils.getUserWithPermissions(api, 'collection: create')
+      await request(app)
+        .post('/collection')
+        .set('x-access-token', token)
+        .send(coll)
+        .expect(200)
+
       db = api.db[collection]
     })
 
@@ -100,6 +144,7 @@ collectionNames.forEach(function (collection) {
     after(async function () {
       await db.delete('5bfd9a1311771c805d161498')
       await db.delete(id)
+      await api.db.collection.delete(collection)
     })
   })
 })

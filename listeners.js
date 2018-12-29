@@ -5,7 +5,7 @@ module.exports = function (api) {
   /* Listeners to avoid the need for a server restart */
   api.addCollectionListener('changed', 'collection', function setupNewCollections (req, collection, data) {
     if (!(data.storage === 'memory' && _.get(api.db[data._id], 'type') === 'memory')) {
-      api.db[data._id] = api.dbTypes[data.storage](req.settings, data._id)
+      api.setupCollectionDb(data)
     }
     debug('updated ' + data._id + ' collection storage')
   })
@@ -15,7 +15,7 @@ module.exports = function (api) {
   })
   api.addCollectionListener('changed', 'settings', function updateSettings (req, collection, data) {
     // TODO: only reload if current environment is updated
-    Object.assign(req.settings, data);
+    Object.assign(req.settings, data)
   })
 
   api.addListener('post', function updateMetadata (req, collection, data) {
@@ -35,25 +35,25 @@ module.exports = function (api) {
   api.addCollectionListener('get', 'schemas', function addMetaToSchema (req, collection, data) {
     const schema = data.schema
     schema.properties.meta = {
-      'type': 'object',
-      'propertyOrder': 2000,
-      'properties': {
-        'created': {
-          'type': 'string'
+      type: 'object',
+      propertyOrder: 2000,
+      properties: {
+        created: {
+          type: 'string'
         },
-        'updated': {
-          'type': 'string'
+        updated: {
+          type: 'string'
         }
       }
     }
     if (data.documentsHaveOwners) {
       schema.properties.meta.properties.owner = {
-        'type': 'string',
-        'links': [
+        type: 'string',
+        links: [
           {
-            'rel': '» view owner user',
-            'href': '/admin/#/edit/users/{{self}}',
-            'class': 'comment-link open-in-modal primary-text'
+            rel: '» view owner user',
+            href: '/admin/#/edit/users/{{self}}',
+            class: 'comment-link open-in-modal primary-text'
           }
         ]
       }

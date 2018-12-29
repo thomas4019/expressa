@@ -11,7 +11,7 @@ exports.login = async (req) => {
 
   // check if user exists
   const result = await req.db.users.find({
-    'email': req.body.email
+    email: req.body.email
   })
   if (result.length === 0) {
     throw new util.ApiError(400, 'No user found with this email.')

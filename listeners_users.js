@@ -34,7 +34,7 @@ module.exports = function (api) {
   })
 
   api.addCollectionListener('post', 'users', async function userUniquenessCheck (req, collection, data) {
-    const result = await api.db.users.find({ 'email': data.email })
+    const result = await api.db.users.find({ email: data.email })
     if (result.length > 0) {
       throw new util.ApiError(409, 'User with this email already registered.')
     }

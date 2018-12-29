@@ -2,14 +2,9 @@
 const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
-const expressa = require('../')
-const api = expressa.api({
-  'file_storage_path': 'testdata'
-})
-const express = require('express')
-const app = express()
-app.use(api)
-const util = require('../util.js')
+
+const testutils = require('./testutils')
+const { app, api } = testutils
 
 const validUser = {
   email: 'test@example.com',
@@ -74,7 +69,7 @@ describe('user functionality', function () {
 
   let user
   it('get my user', async function () {
-    const token = await util.getUserWithPermissions(api, 'users: view own')
+    const token = await testutils.getUserWithPermissions(api, 'users: view own')
     const res = await request(app)
       .get('/user/me')
       .set('x-access-token', token)
@@ -83,7 +78,7 @@ describe('user functionality', function () {
   })
 
   it('cannot change role by default', async function () {
-    const token = await util.getUserWithPermissions(api, ['users: view', 'users: edit'])
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit'])
     delete user.permissions
     await request(app)
       .put(`/users/${user._id}`)
@@ -104,7 +99,7 @@ describe('user functionality', function () {
   })
 
   it('can change role with correct permission', async function () {
-    const token = await util.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify roles'])
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify roles'])
     delete user.permissions
     await request(app)
       .post(`/users/${user._id}/update`)
@@ -119,9 +114,9 @@ describe('user functionality', function () {
   })
 
   it('adding a role modifies user schema', async function () {
-    const token = await util.getUserWithPermissions(api, ['role: create', 'role: delete', 'schemas: view'])
+    const token = await testutils.getUserWithPermissions(api, ['role: create', 'role: delete', 'schemas: view'])
     await request(app)
-      .post(`/role`)
+      .post('/role')
       .set('x-access-token', token)
       .send({ _id: 'testrole', permissions: {} })
       .expect(200)
@@ -133,7 +128,7 @@ describe('user functionality', function () {
     expect(res2.body.properties.roles.items.enum).to.include('testrole')
 
     await request(app)
-      .delete(`/role/testrole`)
+      .delete('/role/testrole')
       .set('x-access-token', token)
       .expect(200)
 

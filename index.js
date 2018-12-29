@@ -21,36 +21,32 @@ const auth = require('./auth')
 const util = require('./util')
 const collectionsApi = require('./controllers/collections')
 const usersApi = require('./controllers/users')
+const installApi = require('./controllers/install')
 const userPermissionsMiddleware = require('./middleware/users_permissions')
 const loggingMiddleware = require('./middleware/logging')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
 async function bootstrapCollections (router) {
-  const db = router.db
-  const collections = await db.collection.all()
+  const collections = await router.db.collection.all()
   await Promise.all(collections.map((collection) => {
     if (!dbTypes[collection.storage]) {
       console.error('missing ' + collection.storage + ' dbtype which is used by ' + collection._id)
       console.error('try updating to the latest version of expressa')
     }
-    db[collection._id] = dbTypes[collection.storage](router.settings, collection._id)
-    if (collection.cached) {
-      db[collection._id] = dbTypes['cached'](db[collection._id])
-      debug('initializing ' + collection._id + ' as a memory cached collection')
-    }
-    return db[collection._id].init()
+    return router.setupCollectionDb(collection)
   }))
 }
 
+let initialized = false
+
 async function initCollections (db, router) {
-  const data = await db.settings.get(process.env.NODE_ENV)
-  router.settings = data
-  db.collection = dbTypes[router.settings.collection_db_type || 'file'](router.settings, 'collection')
+  debug('init collections')
   try {
-    await bootstrapCollections(router)
+    const data = await db.settings.get(process.env.NODE_ENV)
+    router.settings = data
   } catch (err) {
-    const filePath = router.settings.file_storage_path || data
+    const filePath = router.settings.file_storage_path || 'data'
     if (!fs.existsSync(filePath + '/settings/' + process.env.NODE_ENV + '.json')) {
       console.error(process.env.NODE_ENV + ' settings file does not exist.')
       console.error('Please visit the expressa admin page to run the installation process.')
@@ -59,8 +55,9 @@ async function initCollections (db, router) {
       console.error('error reading settings')
       console.error(err.stack)
     }
-    db.collection = dbTypes[router.settings.collection_db_type || 'file'](router.settings, 'collection')
   }
+  db.collection = dbTypes[router.settings.collection_db_type || 'file'](router.settings, 'collection')
+  await bootstrapCollections(router)
   debug('collections loaded.')
 
   await Promise.all([
@@ -71,6 +68,7 @@ async function initCollections (db, router) {
   ])
   debug('added standard listeners')
 
+  initialized = true
   await util.notify('ready', router)
 }
 
@@ -81,9 +79,11 @@ function ph (requestHandler) {
     try {
       collection = collectionName ? await req.db.collection.get(collectionName) : {}
     } catch (e) {
-      console.error(e)
+      if (!e.message.includes('document not found')) {
+        console.error(e)
+      }
     }
-    if (!collection.allowCaching) {
+    if (!collection.allowHTTPCaching) {
       res.header('Cache-Control', 'no-cache, no-store, must-revalidate')
       res.header('Expires', '-1')
       res.header('Pragma', 'no-cache')
@@ -116,16 +116,28 @@ module.exports.api = function (settings) {
   }
   router.eventListeners = {}
 
+  router.setupCollectionDb = async function(collection) {
+    router.db[collection._id] = dbTypes[collection.storage](router.settings, collection._id)
+    if (collection.cacheInMemory) {
+      router.db[collection._id] = dbTypes['cached'](router.db[collection._id])
+      debug('initializing ' + collection._id + ' as a memory cached collection')
+    }
+    return router.db[collection._id].init()
+  }
+
   router.addSingleCollectionListener = function (event, listener) {
     if (!router.eventListeners[event]) {
       router.eventListeners[event] = []
     }
     router.eventListeners[event].push(listener)
     router.eventListeners[event].sort((a, b) => a.priority - b.priority)
+    if (event === 'ready' && initialized) {
+      listener(router)
+    }
   }
 
   router.addLateCollectionListener = function (events, collections, listener) {
-    listener.priority = 10;
+    listener.priority = 10
     router.addCollectionListener(events, collections, listener)
   }
 
@@ -151,7 +163,20 @@ module.exports.api = function (settings) {
     })
   }
 
+  router.getSetting = function (name) {
+    return _.get(router.settings, name)
+  }
+
   initCollections(router.db, router)
+
+  const modules = ['collections', 'core', 'logging', 'permissions']
+  router.modules = {}
+  for (const module of modules) {
+    router.modules[module] = require(`./modules/${module}/${module}`)
+    if (router.modules[module].init) {
+      router.modules[module].init(router)
+    }
+  }
 
   router.use(bodyParser.json({
     type: '*/*' // The wildcard type ensures it works even without the application/json header
@@ -161,6 +186,9 @@ module.exports.api = function (settings) {
     req.settings = router.settings
     req.eventListeners = router.eventListeners
     req.db = router.db
+    req.modules = router.modules
+    req.setupCollectionDb = router.setupCollectionDb
+    req.getSetting = router.getSetting
     next()
   })
 
@@ -169,6 +197,7 @@ module.exports.api = function (settings) {
   router.notify = util.notify
 
   router.get('/status', ph((req) => ({ installed: req.settings.installed || false })))
+  router.post('/install', ph(async (req) => installApi.install(req, router)))
 
   router.post('/user/login', ph(usersApi.login))
 

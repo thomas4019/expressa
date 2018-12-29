@@ -3,7 +3,12 @@
     "rules": {
         "no-var": "error",
         "prefer-const": "error",
-        "no-console": ["error", { "allow": ["error"] }]
+        "no-console": ["error", { "allow": ["error"] }],
+        "semi": ["error", "never"],
+        "quotes": ["error", "single"],
+        "quote-props": ["error", "as-needed"],
+        "indent": ["error", 2, { "MemberExpression": 1 }],
+        "linebreak-style": ["error", "unix"]
     },
     "globals": {
         "after": true,

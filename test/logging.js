@@ -2,13 +2,8 @@
 const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
-const expressa = require('../')
-const api = expressa.api({
-  'file_storage_path': 'testdata'
-})
-const express = require('express')
-const app = express()
-app.use(api)
+const testutils = require('./testutils')
+const { app, api } = testutils
 
 describe('request logging', function () {
   it('logs 404', async function () {
@@ -22,7 +17,8 @@ describe('request logging', function () {
   })
 
   it('respects logging severity level', async function () {
-    api.settings.logging_level = 'error'
+    api.settings.logging = api.settings.logging || {}
+    api.settings.logging.level = 'error'
     await request(app)
       .post('/user/login3')
       .send()

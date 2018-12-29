@@ -1,7 +1,7 @@
 // This is for starting a server with the test configuration/data.
 const expressa = require('../index')
 const api = expressa.api({
-  'file_storage_path': 'testdata'
+  file_storage_path: 'testdata'
 })
 
 const express = require('express')

@@ -8,9 +8,9 @@ const schemaValidators = {}
 
 function addImplicitFields (schema) {
   return _.merge({ properties: {
-      meta: { type: 'object' },
-      _id: { type: 'string' }
-    } }, schema)
+    meta: { type: 'object' },
+    _id: { type: 'string' }
+  } }, schema)
 }
 
 module.exports = async function (api) {
@@ -30,7 +30,7 @@ module.exports = async function (api) {
 
   api.addListener(['put', 'post'], function checkValid (req, collection, data) {
     // TODO (switch to check if "installed" after install tests are done.
-    if (!req.settings.enforce_permissions) {
+    if (!req.settings.permissions.enforce_permissions) {
       return
     }
     if (!schemaValidators[collection]) {
