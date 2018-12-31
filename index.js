@@ -44,7 +44,7 @@ async function initCollections (db, router) {
   debug('init collections')
   try {
     const data = await db.settings.get(process.env.NODE_ENV)
-    router.settings = data
+    Object.assign(router.settings, data)
   } catch (err) {
     const filePath = router.settings.file_storage_path || 'data'
     if (!fs.existsSync(filePath + '/settings/' + process.env.NODE_ENV + '.json')) {
@@ -117,6 +117,7 @@ module.exports.api = function (settings) {
   router.eventListeners = {}
 
   router.setupCollectionDb = async function(collection) {
+    debug(`init collection db ${collection._id}`)
     router.db[collection._id] = dbTypes[collection.storage](router.settings, collection._id)
     if (collection.cacheInMemory) {
       router.db[collection._id] = dbTypes['cached'](router.db[collection._id])
@@ -178,6 +179,14 @@ module.exports.api = function (settings) {
     }
   }
 
+  // Allow CORS
+  router.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
+    next();
+  });
+
   router.use(bodyParser.json({
     type: '*/*' // The wildcard type ensures it works even without the application/json header
   }))
@@ -198,6 +207,7 @@ module.exports.api = function (settings) {
 
   router.get('/status', ph((req) => ({ installed: req.settings.installed || false })))
   router.post('/install', ph(async (req) => installApi.install(req, router)))
+  router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
 
   router.post('/user/login', ph(usersApi.login))
 

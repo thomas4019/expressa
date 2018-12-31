@@ -1,7 +1,7 @@
 const util = require('../../util')
 
 exports.permissions = function () {
-  return ['view errors']
+  return ['view errors', 'schemas: view']
 }
 
 exports.settingSchema = {
@@ -90,7 +90,7 @@ exports.collections = async function(app) {
         'password'
       ]
     },
-    storage: 'memory',
+    storage: 'file',
     documentsHaveOwners: true
   }
 
@@ -137,7 +137,8 @@ exports.collections = async function(app) {
       },
       required: [
         'storage',
-        'documentsHaveOwners'
+        'documentsHaveOwners',
+        'schema'
       ]
     },
     storage: 'file',

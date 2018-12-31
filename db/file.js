@@ -1,4 +1,5 @@
 const Store = require('jfs')
+const debug = require('debug')('expressa')
 const { promisify } = require('util')
 Store.prototype.allAsync = promisify(Store.prototype.all)
 Store.prototype.getAsync = promisify(Store.prototype.get)
@@ -51,6 +52,7 @@ module.exports = function (settings, collection) {
         }
         return data
       } catch (err) {
+        debug(collection + ' ' + id)
         throw new util.ApiError(404, 'document not found')
       }
     },

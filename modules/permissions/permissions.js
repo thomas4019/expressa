@@ -1,3 +1,7 @@
+const _ = require('lodash')
+
+const util = require('../../util')
+
 exports.settingSchema = {
   enforce_permissions: {
     type: 'boolean',
@@ -38,7 +42,11 @@ exports.install = async function (app) {
 
   app.db.role.create({
     _id: 'Authenticated',
-    permissions: {}
+    permissions: {
+      'users: view own': true,
+      'users: edit own': true,
+      'users: delete own': true,
+    }
   })
 
   app.db.role.create({
@@ -48,6 +56,8 @@ exports.install = async function (app) {
     }
   })
 }
+
+exports.permissions = ['users: modify roles']
 
 function collectionPermissions (name) {
   return ['create', 'view', 'edit', 'delete'].map((action) => `${name}: ${action}`)
@@ -83,6 +93,19 @@ exports.init = async function (api) {
         delete admin.permissions[permission]
       })
       await api.db.role.update('Admin', admin)
+    }
+  })
+
+  // TODO (updates that are really inserting should trigger a post, not a put)
+  api.addCollectionListener('post', 'users', async function allowFirstAdmin (req, collection, data) {
+    const userCount = (await api.db.users.find()).length
+    if (userCount === 0 && _.eq(data.roles, ['Admin'])) {
+      throw new util.ApiError(400, 'first user must have role Admin')
+    }
+    if (userCount > 0 && !req.hasPermission('users: modify roles')) {
+      if (data.roles && data.roles.length > 0) {
+        throw new util.ApiError(400, 'insufficient permissions to create user with roles')
+      }
     }
   })
 }

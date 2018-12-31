@@ -7,10 +7,13 @@ const util = require('./util')
 const schemaValidators = {}
 
 function addImplicitFields (schema) {
-  return _.merge({ properties: {
-    meta: { type: 'object' },
-    _id: { type: 'string' }
-  } }, schema)
+  schema.required = _.union(['_id'], schema.required || [])
+  return _.merge({
+    properties: {
+      meta: { type: 'object' },
+      _id: { type: 'string' }
+    }
+  }, schema)
 }
 
 module.exports = async function (api) {
@@ -28,6 +31,12 @@ module.exports = async function (api) {
     schemaValidators[data._id] = ajv.compile(schema)
   })
 
+  // Load new and update validators as necessary
+  api.addCollectionListener('get', ['collection', 'schemas'], function updateValidators (req, collection, data) {
+    console.log(data)
+    data.schema = addImplicitFields(data.schema)
+  })
+
   api.addListener(['put', 'post'], function checkValid (req, collection, data) {
     // TODO (switch to check if "installed" after install tests are done.
     if (!req.settings.permissions.enforce_permissions) {
@@ -39,7 +48,7 @@ module.exports = async function (api) {
     }
     const isValid = schemaValidators[collection](data)
     if (!isValid) {
-      throw new util.ApiError(400, schemaValidators[collection].errors)
+      throw new util.ApiError(400, JSON.stringify(schemaValidators[collection].errors))
     }
   })
 }

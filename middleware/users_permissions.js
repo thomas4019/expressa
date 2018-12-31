@@ -21,9 +21,13 @@ module.exports = util.asyncMiddleware(async function addRolePermissionsMiddlewar
   req.hasPermission = (permission) => req.user.permissions[permission]
   let roles = ['Anonymous']
   if (req.uid) {
-    const user = await req.db.users.get(req.uid)
-    req.user = user
-    roles = (user.roles || []).concat(['Authenticated'])
+    try {
+      const user = await req.db.users.get(req.uid)
+      req.user = user
+      roles = (user.roles || []).concat(['Authenticated'])
+    } catch (e) {
+      throw new util.ApiError('User no longer exists')
+    }
   } else {
     req.user = { permissions: {} }
   }

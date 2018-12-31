@@ -46,3 +46,9 @@ exports.install = async (req, api) => {
 
   return { }
 }
+
+exports.getSettingsSchema = async (req, api) => {
+  const colls = await util.resolve(api.modules.core.collections, api)
+  const settings = _.find(colls, (m) => m._id === 'settings')
+  return settings
+}
