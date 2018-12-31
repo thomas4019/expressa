@@ -7,7 +7,6 @@ const util = require('./util')
 const schemaValidators = {}
 
 function addImplicitFields (schema) {
-  schema.required = _.union(['_id'], schema.required || [])
   return _.merge({
     properties: {
       meta: { type: 'object' },
@@ -33,7 +32,6 @@ module.exports = async function (api) {
 
   // Load new and update validators as necessary
   api.addCollectionListener('get', ['collection', 'schemas'], function updateValidators (req, collection, data) {
-    console.log(data)
     data.schema = addImplicitFields(data.schema)
   })
 
