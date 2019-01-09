@@ -18,7 +18,7 @@
     "jfs": "0.2.6",
     "jsonwebtoken": "5.7.0",
     "mongo-query": "0.5.7",
-    "mongo-query-to-postgres-jsonb": "^0.1.2",
+    "mongo-query-to-postgres-jsonb": "^0.2.2",
     "mongo-querystring": "3.0.0",
     "mongodb": "2.2.19",
     "node-uuid": "1.4.7",
