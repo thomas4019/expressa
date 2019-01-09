@@ -253,6 +253,6 @@ module.exports.admin = function (settings) {
     res.set('Content-Type', 'text/javascript')
     res.send('window.settings = ' + JSON.stringify(settings || {}) + '')
   })
-  router.use(express.static('node_modules/expressa-admin'))
+  router.use(express.static('modules/admin/dist'))
   return router
 }

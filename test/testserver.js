@@ -7,6 +7,7 @@ const api = expressa.api({
 const express = require('express')
 const app = express()
 app.use('/api', api)
+app.use('/admin', expressa.admin())
 
 api.addListener('ready', function () {
   app.listen(3000, function () {
