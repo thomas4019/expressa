@@ -156,17 +156,19 @@ module.exports = function (api) {
   })
 
   api.addListener(['post'], function allowFirstAdmin (req, collection, data) {
-    return api.db.users.find()
-      .then(function (users) {
-        const userCount = users.length;
-        if (userCount > 0 && !req.hasPermission('users: modify roles')) {
-          if (data.roles && data.roles.length > 0) {
-            return {
-              code: 400,
-              message: 'insufficient permissions to create user with roles'
+    if (api.db.users) {
+      return api.db.users.find()
+        .then(function (users) {
+          const userCount = users.length;
+          if (userCount > 0 && !req.hasPermission('users: modify roles')) {
+            if (data.roles && data.roles.length > 0) {
+              return {
+                code: 400,
+                message: 'insufficient permissions to create user with roles'
+              }
             }
           }
-        }
-      });
+        });
+    }
   })
 }
