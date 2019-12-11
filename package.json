@@ -7,29 +7,28 @@
   "dependencies": {
     "ajv": "^3.8.1",
     "bcryptjs": "2.4.3",
-    "bluebird": "^3.5.3",
-    "body-parser": "^1.18.3",
+    "bluebird": "^3.7.2",
+    "body-parser": "^1.19.0",
     "debug": "^2.6.1",
-    "express": "^4.16.4",
-    "expressa-admin": "^0.4.3",
+    "express": "^4.17.1",
     "jfs": "0.2.6",
     "jsonwebtoken": "5.7.0",
     "mongo-query": "^0.5.7",
-    "mongo-query-to-postgres-jsonb": "^0.2.1",
+    "mongo-query-to-postgres-jsonb": "^0.2.3",
     "mongo-querystring": "3.0.0",
-    "mongodb": "3.1.9",
+    "mongodb": "^3.4.0",
     "node-uuid": "1.4.7",
     "on-finished": "^2.3.0",
-    "pg": "^7.6.1",
+    "pg": "^7.14.0",
     "randomstring": "1.1.4",
-    "sift": "^5.0.0"
+    "sift": "^5.1.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^5.10.0",
+    "eslint": "^5.16.0",
     "mocha": "^5.2.0",
-    "mocha-junit-reporter": "^1.18.0",
-    "supertest": "^3.0.0"
+    "mocha-junit-reporter": "^1.23.1",
+    "supertest": "^3.4.2"
   },
   "engines": {
     "node": ">=0.10.3 <0.12"
