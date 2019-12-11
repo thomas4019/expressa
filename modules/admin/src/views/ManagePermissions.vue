@@ -22,7 +22,6 @@
 
 <script>
 import request from '@/utils/request'
-import _ from 'lodash'
 
 export default {
   name: 'ManagePermissions',
@@ -37,7 +36,7 @@ export default {
     async update() {
       this.roles = (await request({ url: `/role/` })).data
 
-      const Admin = _.find(this.roles, (r) => r._id === 'Admin')
+      const Admin = this.roles.find((r) => r._id === 'Admin')
       const permissions = Object.keys(Admin.permissions)
       const ordering = ['Admin', 'Authenticated', 'Anonymous']
       this.roles.sort(function(a, b) {
