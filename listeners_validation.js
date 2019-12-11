@@ -1,18 +1,15 @@
 const ajv = require('ajv')({
   allErrors: true
 })
-const _ = require('lodash')
 
 const util = require('./util')
 const schemaValidators = {}
 
 function addImplicitFields (schema) {
-  return _.merge({
-    properties: {
-      meta: { type: 'object' },
-      _id: { type: 'string' }
-    }
-  }, schema)
+  schema['properties'] = schema['properties'] || {}
+  schema['properties']['meta'] = schema['properties']['meta'] || { type: 'object' }
+  schema['properties']['_id'] = schema['properties']['_id'] || { type: 'string' }
+  return schema
 }
 
 module.exports = async function (api) {

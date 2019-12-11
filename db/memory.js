@@ -1,7 +1,6 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 const randomstring = require('randomstring')
 const sift = require('sift')
-const _ = require('lodash')
 
 const util = require('../util')
 
@@ -35,7 +34,7 @@ module.exports = function (settings, collection) {
       if (!store[id]) {
         throw new util.ApiError(404, 'document not found')
       }
-      return _.clone(store[id])
+      return util.clone(store[id])
     },
     create: async function (data) {
       const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id

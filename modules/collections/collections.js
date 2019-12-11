@@ -1,5 +1,3 @@
-const _ = require('lodash')
-
 function getCollectionPermissions (name, hasOwner) {
   let permissions = ['create', 'view', 'edit', 'delete'].map((action) => `${name}: ${action}`)
   if (hasOwner) {
@@ -10,7 +8,8 @@ function getCollectionPermissions (name, hasOwner) {
 
 exports.permissions = async function (app) {
   const collections = (await app.db.collection.all()).map((collection) => collection._id)
-  const permissions = _.flatten(collections.map(getCollectionPermissions))
+  // flatten the permissions into a single list
+  const permissions = [].concat(...collections.map(getCollectionPermissions))
   return permissions
 }
 

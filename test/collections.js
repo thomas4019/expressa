@@ -1,7 +1,6 @@
 const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
-const _ = require('lodash')
 const testutils = require('./testutils')
 const { app, api } = testutils
 
@@ -210,7 +209,7 @@ describe('basic collections', function () {
     await request(app)
       .put('/collection/testdoc')
       .set('x-access-token', token)
-      .send(_.clone(body))
+      .send(testutils.clone(body))
       .expect(200)
 
     // The new doc should now be considered valid
@@ -238,7 +237,7 @@ describe('basic collections', function () {
     await request(app)
       .post('/collection')
       .set('x-access-token', token)
-      .send(_.clone(body))
+      .send(testutils.clone(body))
       .expect(200)
   })
 

@@ -29,3 +29,4 @@ exports.app = express()
 exports.app.use(exports.api)
 
 exports.getUserWithPermissions = util.getUserWithPermissions
+exports.clone = util.clone

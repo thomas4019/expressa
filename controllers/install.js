@@ -1,19 +1,19 @@
-const _ = require('lodash')
 const Bluebird = require('bluebird')
 
 const util = require('../util')
 
 exports.updateAdminPermissions = async function (api) {
   const modules = Object.values(api.modules)
-  const permissions = _.flatten(await Bluebird.map(modules, (m) => util.resolve(m.permissions, api)))
+  const permissions = [].concat(...await Bluebird.map(modules, (m) => util.resolve(m.permissions, api)))
   await api.db.role.update('Admin', {
-    permissions: _.zipObject(permissions, permissions.map(() => 1))
+    permissions: permissions.reduce((obj, p) => { obj[p] = 1; return obj }, {})
   })
 }
 
 exports.install = async (req, api) => {
   const selectedModules = req.body.modules
-  const missingModules = _.difference(selectedModules, Object.keys(req.modules))
+  const installedModules = Object.keys(req.modules)
+  const missingModules = selectedModules.filter((module) => !installedModules.includes(module))
   if (missingModules.length > 0) {
     throw new util.ApiError(400, 'unknown modules')
   }
@@ -49,6 +49,6 @@ exports.install = async (req, api) => {
 
 exports.getSettingsSchema = async (req, api) => {
   const colls = await util.resolve(api.modules.core.collections, api)
-  const settings = _.find(colls, (m) => m._id === 'settings')
+  const settings = colls.find((m) => m._id === 'settings')
   return settings
 }

@@ -1,4 +1,3 @@
-const _ = require('lodash')
 const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken')
 const debug = require('debug')('expressa')
@@ -8,9 +7,9 @@ exports.orderBy = function (data, orderby) {
     for (let i = 0; i < orderby.length; i++) {
       const ordering = orderby[i]
       const key = ordering[0]
-      if (_.get(a, key) > _.get(b, key)) {
+      if (exports.getPath(a, key) > exports.getPath(b, key)) {
         return ordering[1]
-      } else if (_.get(a, key) < _.get(b, key)) {
+      } else if (exports.getPath(a, key) < exports.getPath(b, key)) {
         return -ordering[1]
       }
     }
@@ -31,7 +30,7 @@ exports.normalizeOrderBy = function(orderby) {
       }
       return ordering
     })
-  } else if (_.isObject(orderby)) {
+  } else if (typeof orderby === 'object') {
     const arr = []
     for (const key in orderby) {
       arr.push([key, orderby[key]])
@@ -41,6 +40,17 @@ exports.normalizeOrderBy = function(orderby) {
     throw exports.ApiError(400, 'orderby param must be array or object')
   }
   return orderby
+}
+
+exports.getPath = (obj, path, defaultValue) => {
+  const result = String.prototype.split.call(path, /[,[\].]+?/)
+      .filter(Boolean)
+      .reduce((res, key) => (res !== null && res !== undefined) ? res[key] : res, obj);
+  return (result === undefined || result === obj) ? defaultValue : result;
+}
+
+exports.castArray = function(arr) {
+  return Array.isArray(arr) ? arr : [arr]
 }
 
 exports.clone = function (obj) {

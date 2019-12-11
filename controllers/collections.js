@@ -1,7 +1,6 @@
 const debug = require('debug')('expressa')
 const MongoQS = require('mongo-querystring')
 const mongoQuery = require('mongo-query')
-const _ = require('lodash')
 
 const util = require('../util')
 const queryStringParser = new MongoQS({})
@@ -46,7 +45,7 @@ exports.get = async function (req) {
   if (req.query.query) {
     query = JSON.parse(req.query.query)
   } else {
-    const params = _.omit(req.query, ['skip', 'offset', 'limit', 'page', 'orderby'])
+    const { skip, offset, limit, page, orderby, ...params } = req.query
     query = queryStringParser.parse(params)
   }
   if (req.query.skip) {

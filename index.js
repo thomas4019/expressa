@@ -2,23 +2,21 @@ const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const debug = require('debug')('expressa')
-const _ = require('lodash')
 const Bluebird = require('bluebird')
 Bluebird.config({
   longStackTraces: true
 })
 global.Promise = Bluebird
 
-const dbTypes = {
-  cached: require('./db/cached'),
-  file: require('./db/file'),
-  memory: require('./db/memory'),
-  postgres: require('./db/postgres'),
-  mongo: require('./db/mongo'),
-  mongodb: require('./db/mongo')
-}
+const dbTypeNames = ['cached', 'file', 'memory', 'postgres', 'mongo']
+const dbTypes = dbTypeNames.reduce((obj, name) => {
+  obj[name] = require('./db/' + name);
+  return obj;
+}, {})
+dbTypes['mongodb'] = dbTypes['mongo'] // alias
 const auth = require('./auth')
 const util = require('./util')
+
 const collectionsApi = require('./controllers/collections')
 const usersApi = require('./controllers/users')
 const installApi = require('./controllers/install')
@@ -143,8 +141,8 @@ module.exports.api = function (settings) {
   }
 
   router.addCollectionListener = function (events, collections, listener) {
-    events = _.castArray(events)
-    collections = _.castArray(collections)
+    events = util.castArray(events)
+    collections = util.castArray(collections)
     listener.priority = listener.priority || 0
     listener.collections = collections
     events.forEach(function (event) {
@@ -153,7 +151,7 @@ module.exports.api = function (settings) {
   }
 
   router.addListener = function addListener (events, priority, listener) {
-    events = _.castArray(events)
+    events = util.castArray(events)
     if (typeof priority === 'function') {
       listener = priority
       priority = 0
@@ -165,7 +163,7 @@ module.exports.api = function (settings) {
   }
 
   router.getSetting = function (name) {
-    return _.get(router.settings, name)
+    return util.getPath(router.settings, name)
   }
 
   initCollections(router.db, router)

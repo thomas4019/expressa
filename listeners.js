@@ -1,10 +1,10 @@
 const debug = require('debug')('expressa')
-const _ = require('lodash')
+const util = require('./util')
 
 module.exports = function (api) {
   /* Listeners to avoid the need for a server restart */
   api.addCollectionListener('changed', 'collection', function setupNewCollections (req, collection, data) {
-    if (!(data.storage === 'memory' && _.get(api.db[data._id], 'type') === 'memory')) {
+    if (!(data.storage === 'memory' && util.getPath(api.db[data._id], 'type') === 'memory')) {
       api.setupCollectionDb(data)
     }
     debug('updated ' + data._id + ' collection storage')
