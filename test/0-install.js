@@ -9,29 +9,31 @@ describe('install flow', function () {
     const { body } = await request(app)
       .get('/install/settings/schema')
       .expect(200)
-    expect(body.schema.properties.core.properties.jwt_secret).to.eql({
+    expect(body.schema.properties.jwt_secret).to.eql({
       type: 'string',
       description: 'The secret key used to encode your json web tokens. It\'s important this is kept unique and secret.'
     })
   })
 
   it('call install', async function () {
+    expect(api.db.collections).to.not.exist;
+
     await request(app)
       .post('/install')
       .send({
         modules: ['collections', 'core', 'logging', 'permissions'],
         settings: {
-          core: {
-            jwt_secret: 'testing 123',
-            mongodb_uri: 'mongodb://localhost:27017/test',
-            postgresql_uri: 'postgresql://localhost/pgtest',
-          },
-          permissions: {
-            enforce_permissions: true
-          }
+          jwt_secret: 'testing 123',
+          mongodb_uri: 'mongodb://localhost:27017/test',
+          postgresql_uri: 'postgresql://localhost/pgtest',
+          enforce_permissions: true
         }
       })
       .expect(200)
+
+    expect(api.db.collection).to.exist
+    expect(api.db.role).to.exist
+    expect(api.db.users).to.exist;
   })
 
   it('can create admin account', async function() {

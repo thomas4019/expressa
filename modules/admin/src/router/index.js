@@ -39,6 +39,7 @@ const capitalize = (s) => {
 **/
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
+  { path: '/install', component: () => import('@/views/Install'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
 
   {

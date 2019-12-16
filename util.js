@@ -82,7 +82,7 @@ exports.getUserWithPermissions = async function (api, permissions) {
   })
   const result = await api.db.users.create(user)
   user._id = result
-  const token = jwt.sign(user, api.settings.core.jwt_secret, {})
+  const token = jwt.sign(user, api.settings.jwt_secret, {})
   return token
 }
 
@@ -98,7 +98,7 @@ exports.getLogSeverity = function (status) {
 
 exports.shouldLogRequest = function (req, res) {
   const severity = exports.getLogSeverity(res.statusCode)
-  const severityLoggingIndex = severities.indexOf(req.getSetting('logging.level') || 'warning')
+  const severityLoggingIndex = severities.indexOf(req.getSetting('logging_level') || 'warning')
   const severityIndex = severities.indexOf(severity)
   return severityIndex <= severityLoggingIndex
 }

@@ -34,7 +34,7 @@ module.exports = async function (api) {
 
   api.addListener(['put', 'post'], function checkValid (req, collection, data) {
     // TODO (switch to check if "installed" after install tests are done.
-    if (!req.settings.permissions.enforce_permissions) {
+    if (!req.settings.enforce_permissions) {
       return
     }
     if (!schemaValidators[collection]) {

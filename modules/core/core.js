@@ -36,12 +36,8 @@ exports.collections = async function(app) {
 
   for (const name of Object.keys(app.modules)) {
     const module = app.modules[name]
-    const moduleSettings = await util.resolve(module.settingSchema, app)
-    settingsProperties[name] = {
-      type: 'object',
-      additionalProperties: false,
-      properties: moduleSettings
-    }
+    const moduleSettings = await util.resolve(module.settingSchema, app) || {}
+    Object.assign(settingsProperties, moduleSettings);
   }
 
   const settings = {
@@ -49,7 +45,7 @@ exports.collections = async function(app) {
     schema: {
       type: 'object',
       additionalProperties: false,
-      properties: settingsProperties
+      properties: settingsProperties,
     },
     documentsHaveOwners: false
   }

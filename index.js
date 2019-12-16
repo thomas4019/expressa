@@ -96,7 +96,7 @@ function ph (requestHandler) {
     } catch (err) {
       err.status = err.status || 500
       debug(`${err.status} ${req.method} ${req.url} ${err.stack}`)
-      if ((req.settings.logging && req.settings.logging.print_400_errors) || err.status >= 500) {
+      if ((req.settings.print_400_errors) || err.status >= 500) {
         console.error(err)
       }
       res.status(err.status).send({ error: err.result || err.message || err })

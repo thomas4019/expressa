@@ -13,7 +13,7 @@ async function addRolePermissions (req, user, roles) {
 }
 
 module.exports = util.asyncMiddleware(async function addRolePermissionsMiddleware (req, res, next) {
-  if (!req.settings || !req.settings.permissions.enforce_permissions) {
+  if (!req.settings || !req.settings.enforce_permissions) {
     // Use a dummy permission getter
     req.hasPermission = () => true
     return next()

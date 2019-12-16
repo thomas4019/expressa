@@ -4,7 +4,7 @@ const mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 const util = require('../util')
 
 module.exports = function (settings, collection) {
-  const pool = new pg.Pool({ connectionString: settings.core.postgresql_uri })
+  const pool = new pg.Pool({ connectionString: settings.postgresql_uri })
 
   return {
     init: async function () {

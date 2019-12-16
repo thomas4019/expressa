@@ -4,8 +4,9 @@ import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
 import { Message } from 'element-ui'
 import { getToken } from '@/utils/auth' // 验权
+import request from '@/utils/request'
 
-const whiteList = ['/login'] // 不重定向白名单
+const whiteList = ['/login', '/install'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
   NProgress.start()
   if (getToken()) {
@@ -27,12 +28,19 @@ router.beforeEach((to, from, next) => {
       }
     }
   } else {
-    if (whiteList.indexOf(to.path) !== -1) {
-      next()
-    } else {
-      next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
-      NProgress.done()
-    }
+    request({ url: `/status` }).then((res) => {
+      if (!res.data.installed && to.path !== '/install') {
+        next(`/install`) // 否则全部重定向到登录页
+        NProgress.done()
+      } else {
+        if (whiteList.indexOf(to.path) !== -1) {
+          next()
+        } else {
+          next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页
+          NProgress.done()
+        }
+      }
+    })
   }
 })
 

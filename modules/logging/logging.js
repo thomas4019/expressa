@@ -3,7 +3,7 @@ exports.settingSchema = {
     type: 'boolean',
     description: 'Print messages to console for each request with a 4xx response code.'
   },
-  level: {
+  logging_level: {
     type: 'string',
     description: 'The minimum severity level to preserve logs in the log collection.',
     enum: ['critical', 'error', 'warning', 'notice', 'info', 'debug']

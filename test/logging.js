@@ -17,8 +17,7 @@ describe('request logging', function () {
   })
 
   it('respects logging severity level', async function () {
-    api.settings.logging = api.settings.logging || {}
-    api.settings.logging.level = 'error'
+    api.settings.logging_level = 'error'
     await request(app)
       .post('/user/login3')
       .send()

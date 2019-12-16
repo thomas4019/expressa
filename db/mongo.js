@@ -6,12 +6,12 @@ const util = require('../util')
 module.exports = function (settings, collection) {
   return {
     getClient: async function () {
-      const client = await MongoClient.connect(settings.core.mongodb_uri, { useNewUrlParser: true })
-      const db = client.db(settings.core.mongodb_uri.split('/')[3])
+      const client = await MongoClient.connect(settings.mongodb_uri, { useNewUrlParser: true })
+      const db = client.db(settings.mongodb_uri.split('/')[3])
       return db
     },
     init: function () {
-      if (!settings.core.core.mongodb_uri) {
+      if (!settings.mongodb_uri) {
         console.error('{collection} uses mongo, but mongodb_url is undefined.')
       }
     },
