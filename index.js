@@ -251,6 +251,6 @@ module.exports.admin = function (settings) {
     res.set('Content-Type', 'text/javascript')
     res.send('window.settings = ' + JSON.stringify(settings || {}) + '')
   })
-  router.use(express.static('modules/admin/dist'))
+  router.use(express.static(__dirname + '/modules/admin/dist'))
   return router
 }

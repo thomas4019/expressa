@@ -5,6 +5,7 @@ const user = {
   state: {
     token: getToken(),
     name: '',
+    email: '',
     avatar: '',
     roles: []
   },
@@ -15,6 +16,9 @@ const user = {
     },
     SET_NAME: (state, name) => {
       state.name = name
+    },
+    SET_EMAIL: (state, email) => {
+      state.email = email
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
@@ -51,6 +55,7 @@ const user = {
             reject('getInfo: roles must be a non-null array !')
           }
           commit('SET_NAME', data.name)
+          commit('SET_EMAIL', data.email)
           commit('SET_AVATAR', 'https://www.podplus.co.uk/wp-content/uploads/2018/09/person-icon.jpg')
           resolve(response)
         }).catch(error => {
