@@ -9,7 +9,7 @@ const app = express()
 app.use('/api', api)
 app.use('/admin', expressa.admin())
 
-api.addListener('ready', function () {
+api.addListener('ready', function onStart() {
   app.listen(3000, function () {
     // eslint-disable-next-line no-console
     console.log('Test server listening on port 3000!')

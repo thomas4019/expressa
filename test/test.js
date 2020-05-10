@@ -8,7 +8,7 @@ const { app, api } = testutils
 
 describe('General Tests:', () => {
   it('returns ready', function (done) {
-    api.addListener('ready', function () {
+    api.addListener('ready', function onStart() {
       done()
     })
   })

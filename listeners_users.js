@@ -18,18 +18,10 @@ module.exports = function (api) {
   })
 
   // TODO how to add back in the password on PUT?
-  api.addCollectionListener('get', -100, function hidePasswordHashes (req, collection, data) {
+  api.addCollectionListenerWithPriority('get', 'users', -100, function hidePasswordHashes (req, collection, data) {
     if (collection === 'users' && !req.hasPermission('users: view hashed passwords')) {
       debug('deleting password because "users: view hashed passwords"-permission is not set')
       delete data.password
-    }
-  })
-
-  api.addListener('get', -5, function allowViewOwnUser (req, collection, data) {
-    if (collection === 'users' && req.hasPermission('users: view own')) {
-      if (req.uid === data._id) {
-        return true
-      }
     }
   })
 
@@ -41,7 +33,7 @@ module.exports = function (api) {
   })
 
   /* Mantain users-roles reference */
-  api.addCollectionListener('changed', 'role', async function (req, collection, data) {
+  api.addCollectionListener('changed', 'role', async function addRoleToUserSchema(req, collection, data) {
     const doc = await api.db.collection.get('users')
     if (!doc.schema.properties.roles.items.enum.includes(data._id)) {
       doc.schema.properties.roles.items.enum.push(data._id)
@@ -49,7 +41,7 @@ module.exports = function (api) {
       await api.notify('changed', req, 'users', doc)
     }
   })
-  api.addCollectionListener('deleted', 'role', async function (req, collection, data) {
+  api.addCollectionListener('deleted', 'role', async function removeRoleToUserSchema(req, collection, data) {
     const doc = await api.db.collection.get('users')
     const roles = doc.schema.properties.roles.items.enum
     if (roles.includes(data._id)) {

@@ -74,7 +74,24 @@ describe('user functionality', function () {
       .get('/user/me')
       .set('x-access-token', token)
     expect(res.body.email).to.include('@example.com')
+
+    const res2 = await request(app)
+      .get('/users/' + res.body._id)
+      .set('x-access-token', token)
+    expect(res2.body.email).to.include('@example.com')
+    expect(res2.body.password).to.be.undefined
+
     user = res.body
+  })
+
+  it('sees password hash with permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: view hashed passwords'])
+
+    const res = await request(app)
+      .get('/users/' + user._id)
+      .set('x-access-token', token)
+    expect(res.body.email).to.include('@example.com')
+    expect(res.body.password).to.not.be.undefined
   })
 
   it('cannot change role by default', async function () {

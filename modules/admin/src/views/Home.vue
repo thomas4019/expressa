@@ -2,8 +2,7 @@
   <div class="dashboard-container">
     <div class="dashboard-text">Welcome: {{ email }}</div>
     <div class="dashboard-text">roles: <span v-for="role in roles" :key="role">{{ role }}</span></div>
-    <div class="dashboard-text">listeners: <span v-for="handler in statusInfo.listeners" :key="handler">{{ handler }}</span>
-    </div>
+    <div class="dashboard-text">listeners: {{ statusInfo.listeners.length }} active</div>
   </div>
 </template>
 

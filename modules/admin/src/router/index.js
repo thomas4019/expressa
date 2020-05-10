@@ -45,12 +45,12 @@ export const constantRouterMap = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/home',
     name: 'Dashboard',
     hidden: true,
     children: [{
-      path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
+      path: 'home',
+      component: () => import('@/views/home')
     }, {
       path: '/edit/:collectionName/:id',
       component: () => import('@/views/EditDocument'),
@@ -137,6 +137,22 @@ export const constantRouterMap = [
       }
     ]
   },
+
+  {
+    path: '/manage/listeners',
+    component: Layout,
+    name: 'listeners',
+    meta: { title: 'Manage', icon: 'table' },
+    children: [
+      {
+        path: '',
+        name: 'listeners',
+        component: () => import('@/views/ManageListeners'),
+        meta: { title: 'Listeners' }
+      }
+    ]
+  },
+
 
   {
     path: 'external-link',

@@ -22,17 +22,16 @@ module.exports = async function (api) {
   })
 
   // Load new and update validators as necessary
-  api.addCollectionListener('changed', 'collection', function updateValidators (req, collection, data) {
+  api.addCollectionListener('changed', 'collection', function updateSchemaValidators (req, collection, data) {
     const schema = addImplicitFields(data.schema)
     schemaValidators[data._id] = ajv.compile(schema)
   })
 
-  // Load new and update validators as necessary
-  api.addCollectionListener('get', ['collection', 'schemas'], function updateValidators (req, collection, data) {
+  api.addCollectionListener('get', ['collection', 'schemas'], function ensureIdAdded (req, collection, data) {
     data.schema = addImplicitFields(data.schema)
   })
 
-  api.addListener(['put', 'post'], function checkValid (req, collection, data) {
+  api.addListener(['put', 'post'], function matchesSchema (req, collection, data) {
     // TODO (switch to check if "installed" after install tests are done.
     if (!req.settings.enforce_permissions) {
       return

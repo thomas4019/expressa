@@ -66,7 +66,7 @@ function collectionOwnerPermissions (name) {
 }
 
 exports.init = async function (api) {
-  api.addCollectionListener(['put', 'post'], 'collection', async function addPerms (req, collection, data) {
+  api.addCollectionListener(['changed'], 'collection', async function addCollectionPerms (req, collection, data) {
     if (api.db.role) {
       const admin = await api.db.role.get('Admin')
       collectionPermissions(data._id).forEach(function (permission) {
@@ -82,7 +82,7 @@ exports.init = async function (api) {
     }
   })
 
-  api.addCollectionListener('delete', 'collection', async function removePerms (req, collection, data) {
+  api.addCollectionListener('delete', 'collection', async function removeCollectionPerms (req, collection, data) {
     if (api.db.role) {
       const coll = data._id
       const admin = await api.db.role.get('Admin')
@@ -95,7 +95,7 @@ exports.init = async function (api) {
   })
 
   // TODO (updates that are really inserting should trigger a post, not a put)
-  api.addCollectionListener('post', 'users', async function allowFirstAdmin (req, collection, data) {
+  api.addCollectionListener('post', 'users', async function allowFirstUserAsAdmin (req, collection, data) {
     const userCount = (await api.db.users.find()).length
     if (userCount === 0 && !data.roles.includes('Admin')) {
       throw new util.ApiError(400, 'first user must have role Admin')

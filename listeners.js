@@ -13,7 +13,7 @@ module.exports = function (api) {
     delete api.db[data._id]
     debug('removed ' + data._id + ' collection storage')
   })
-  api.addCollectionListener('changed', 'settings', function updateSettings (req, collection, data) {
+  api.addCollectionListener('changed', 'settings', function updateInMemorySettings (req, collection, data) {
     // TODO: only reload if current environment is updated
     Object.assign(req.settings, data)
   })

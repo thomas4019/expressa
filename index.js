@@ -135,6 +135,11 @@ module.exports.api = function (settings) {
     }
   }
 
+  router.addCollectionListenerWithPriority = function (events, collections, priority, listener) {
+    listener.priority = priority
+    router.addCollectionListener(events, collections, listener)
+  }
+
   router.addLateCollectionListener = function (events, collections, listener) {
     listener.priority = 10
     router.addCollectionListener(events, collections, listener)
@@ -145,6 +150,9 @@ module.exports.api = function (settings) {
     collections = util.castArray(collections)
     listener.priority = listener.priority || 0
     listener.collections = collections
+    if (!listener.name) {
+      throw new Error("Listeners must be named");
+    }
     events.forEach(function (event) {
       router.addSingleCollectionListener(event, listener)
     })
@@ -155,6 +163,9 @@ module.exports.api = function (settings) {
     if (typeof priority === 'function') {
       listener = priority
       priority = 0
+    }
+    if (!listener.name) {
+      throw new Error("Listeners must be named");
     }
     listener.priority = priority
     events.forEach(function (event) {
@@ -204,10 +215,25 @@ module.exports.api = function (settings) {
   router.notify = util.notify
 
   router.get('/status', ph(function(req) {
-    const listeners = [].concat.apply([], Object.values(router.eventListeners));
+    const allListeners = [].concat.apply([], Object.values(router.eventListeners));
+    const uniqueListeners = [...new Set(allListeners)]
+    const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted'];
+    const listeners = uniqueListeners.map(function (listener) {
+      const o = {}
+      o.name = listener.name
+      o.priority = listener.priority
+      o.collections = listener.collections
+      for (const type of eventTypes) {
+        if (router.eventListeners[type].includes(listener)) {
+          o[type] = true;
+        }
+      }
+      return o
+    })
+    listeners.sort((a,b) => a.priority - b.priority)
     return {
       installed: req.settings.installed || false,
-      listeners: [...new Set(listeners.map((handler) => handler.name))],
+      listeners,
       collections: Object.keys(router.db),
     }
   }))

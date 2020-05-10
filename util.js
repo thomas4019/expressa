@@ -136,7 +136,7 @@ exports.notify = async function (event, req, collection, data) {
     }
     debug('calling ' + listener.name + ' ' + (result ? '(skipped)' : ''))
     try {
-      result = result || await listener(req, collection, data)
+      result = result || await listener(req, collection, data, { event })
     } catch (e) {
       // If a listener has already allowed the request, do not error
       if (!result) {

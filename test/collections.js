@@ -131,6 +131,12 @@ describe('basic collections', function () {
     expect(res.body.type).to.equal('object')
     expect(res.body).to.have.property('properties')
     expect(res.body.properties.meta.properties).to.have.property('created')
+
+    const token2 = await testutils.getUserWithPermissions(api, ['testdoc: view', 'collection: view relevant'])
+    const res2 = await request(app)
+      .get('/collection/testdoc')
+      .set('x-access-token', token2)
+      .expect(200)
   })
 
   it('fail to read a specific doc without permission', async function () {
