@@ -203,7 +203,14 @@ module.exports.api = function (settings) {
 
   router.notify = util.notify
 
-  router.get('/status', ph((req) => ({ installed: req.settings.installed || false })))
+  router.get('/status', ph(function(req) {
+    const listeners = [].concat.apply([], Object.values(router.eventListeners));
+    return {
+      installed: req.settings.installed || false,
+      listeners: [...new Set(listeners.map((handler) => handler.name))],
+      collections: Object.keys(router.db),
+    }
+  }))
   router.post('/install', ph(async (req) => installApi.install(req, router)))
   router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
 
