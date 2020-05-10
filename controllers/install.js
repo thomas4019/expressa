@@ -41,9 +41,11 @@ exports.install = async (req, api) => {
 
   const settings = req.body.settings
   settings._id = process.env.NODE_ENV
+  settings.installed = true
+  settings.jwt_secret = "123423"
   Object.assign(req.settings, settings)
   await req.db.settings.create(settings)
-
+  console.log('installed')
   return { }
 }
 
