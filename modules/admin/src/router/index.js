@@ -139,16 +139,22 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/manage/listeners',
+    path: '/dev',
     component: Layout,
     name: 'listeners',
-    meta: { title: 'Manage', icon: 'table' },
+    meta: { title: 'Dev', icon: 'table' },
     children: [
       {
-        path: '',
+        path: '/listeners',
         name: 'listeners',
         component: () => import('@/views/ManageListeners'),
         meta: { title: 'Listeners' }
+      },
+      {
+        path: '/middleware',
+        name: 'middleware',
+        component: () => import('@/views/ManageMiddleware'),
+        meta: { title: 'Middleware' }
       }
     ]
   },

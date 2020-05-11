@@ -34,7 +34,7 @@
 import request from '@/utils/request'
 
 export default {
-  name: 'ManagePermissions',
+  name: 'ManageListeners',
   data: () => ({
     listeners: [],
     columns: ['get', 'post', 'put', 'delete', 'changed', 'deleted', 'priority'],

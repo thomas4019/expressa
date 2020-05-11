@@ -216,6 +216,10 @@ module.exports.api = function (settings) {
 
   router.get('/status', ph(function(req) {
     const allListeners = [].concat.apply([], Object.values(router.eventListeners))
+    const middleware = router.stack.filter((item) => !item.route).map((item) => ({
+      name: item.name,
+      params: util.getFunctionParamNames(item.handle),
+    }))
     const uniqueListeners = [...new Set(allListeners)]
     const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted']
     const listeners = uniqueListeners.map(function (listener) {
@@ -233,6 +237,7 @@ module.exports.api = function (settings) {
     listeners.sort((a,b) => a.priority - b.priority)
     return {
       installed: req.settings.installed || false,
+      middleware,
       listeners,
       collections: Object.keys(router.db),
     }
