@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
-   <span>Filter by Collection</span>
-   <select v-model="selectedCollection">
-     <option value="">Any collection</option>
-     <option v-for="c in collections">{{ c }}</option>
-   </select>
+    <span>Filter by Collection</span>
+    <select v-model="selectedCollection">
+      <option value="">Any collection</option>
+      <option v-for="c in collections" :key="c">{{ c }}</option>
+    </select>
     <el-table
       :data="filterListeners(listeners)"
       element-loading-text="Loading"
@@ -46,16 +46,13 @@ export default {
   },
   methods: {
     filterListeners(data) {
-      console.log(data);
       const filtered = data.filter((l) => !this.selectedCollection || !l.collections || l.collections.includes(this.selectedCollection))
-      console.log(filtered);
       return filtered
     },
     async update() {
       const statusInfo = (await request({ url: `/status` })).data
-      this.listeners = statusInfo.listeners;
-      this.collections = statusInfo.collections;
-      console.log(this.listeners)
+      this.listeners = statusInfo.listeners
+      this.collections = statusInfo.collections
     },
   }
 }

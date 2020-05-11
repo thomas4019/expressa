@@ -236,6 +236,7 @@ module.exports.api = function (settings) {
     })
     listeners.sort((a,b) => a.priority - b.priority)
     return {
+      env: process.env.NODE_ENV,
       installed: req.settings.installed || false,
       middleware,
       listeners,

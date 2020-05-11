@@ -47,9 +47,10 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/home',
     name: 'Dashboard',
-    hidden: true,
+    meta: { title: 'Home' },
     children: [{
       path: 'home',
+      meta: { title: 'Home' },
       component: () => import('@/views/home')
     }, {
       path: '/edit/:collectionName/:id',
@@ -141,7 +142,6 @@ export const constantRouterMap = [
   {
     path: '/dev',
     component: Layout,
-    name: 'listeners',
     meta: { title: 'Dev', icon: 'table' },
     children: [
       {

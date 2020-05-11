@@ -14,18 +14,19 @@
       highlight-current-row>
       <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
         <template slot-scope="scope">
-          <router-link v-if="i === 0" :to="'/edit/'+collectionName+'/'+scope.row._id">{{ scope.row[name] }}</router-link>
-          <span v-if="i !== 0">{{ scope.row[name] }}</span>
+          <router-link v-if="i === 0" :to="'/edit/'+collectionName+'/'+scope.row._id">{{ getPath(scope.row, name) }}</router-link>
+          <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination
+      v-if="showPaginateOnBottom"
       :page-size="pageSize"
       :total="count"
       :current-page.sync="page"
       layout="prev, pager, next"
       @current-change="update()"/>
-    <router-link :to="'/edit/' + collectionName + '/create'">
+    <router-link v-if="showAddButton" :to="'/edit/' + collectionName + '/create'">
       <button class="btn btn-primary">Add</button>
     </router-link>
     <button class="btn btn-secondary download-button" @click="downloadCSV()">Download All</button>
@@ -41,7 +42,23 @@ export default {
     collectionName: {
       type: String,
       default: 'collection'
-    }
+    },
+    filter: {
+      type: Object,
+      default: () => {}
+    },
+    columns: {
+      type: Array,
+      default: () => undefined
+    },
+    showAddButton: {
+      type: Boolean,
+      default: true
+    },
+    showPaginateOnBottom: {
+      type: Boolean,
+      default: true
+    },
   },
   data: () => ({
     start: 0,
@@ -61,18 +78,33 @@ export default {
     this.update()
   },
   methods: {
+    getPath(obj, path, defaultValue) {
+      const result = String.prototype.split.call(path, /[,[\].]+?/)
+        .filter(Boolean)
+        .reduce((res, key) => (res !== null && res !== undefined) ? res[key] : res, obj)
+      return (result === undefined || result === obj) ? defaultValue : result
+    },
     async update() {
       if (this.$route.params.collectionName) {
         this.collectionName = this.$route.params.collectionName
       }
       console.log(this.page)
-      const info = (await request({ url: `/${this.collectionName}/?page=${this.page}&limit=${this.pageSize}&orderby={"meta.created":-1}` })).data
+      console.log(this.filter)
+      const params = {
+        page: this.page,
+        limit: this.pageSize,
+        orderby: '{"meta.created":-1}',
+        ...this.filter,
+      }
+      const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = info.data
-      this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
-      this.schema = this.collection.schema
+      if (!this.collection) {
+        this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
+        this.schema = this.collection.schema
+      }
 
-      this.listedProperties = (this.collection.admin && this.collection.admin.columns) || Object.keys(this.schema.properties)
+      this.listedProperties = this.columns || (this.collection.admin && this.collection.admin.columns) || Object.keys(this.schema.properties)
     }
   }
 }

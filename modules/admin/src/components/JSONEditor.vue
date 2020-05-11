@@ -40,7 +40,8 @@ export default {
         schema: this.schema,
         startval: this.value,
         theme: 'bootstrap4',
-        iconlib: 'materialicons'
+        iconlib: 'materialicons',
+        required_by_default: true,
       }
       if (this.editor) {
         this.editor.destroy()

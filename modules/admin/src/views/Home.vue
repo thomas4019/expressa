@@ -3,17 +3,35 @@
     <div class="dashboard-text">Welcome: {{ email }}</div>
     <div class="dashboard-text">roles: <span v-for="role in roles" :key="role">{{ role }}</span></div>
     <div class="dashboard-text">listeners: {{ statusInfo.listeners.length }} active</div>
+    <div class="dashboard-text">enviroment: {{ statusInfo.env }}
+      <router-link :to="'/edit/settings/' + statusInfo.env">(edit settings)</router-link>
+    </div>
+    <br>
+    <br>
+    <h3>Recent API Requests</h3>
+    <ListDocuments2
+      :show-paginate-on-bottom="false"
+      :show-add-button="false"
+      :filter="{ limit: 5, query: { method: { $ne: 'OPTIONS' } } }"
+      :columns="['method', 'url', 'user', 'res.statusCode']"
+      collection-name="log" />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import request from '@/utils/request'
+import ListDocuments2 from './ListDocuments2'
 
 export default {
   name: 'Dashboard',
+  components: {
+    ListDocuments2
+  },
   data: () => ({
-    statusInfo: {}
+    statusInfo: {
+      listeners: {}
+    }
   }),
   computed: {
     ...mapGetters([
