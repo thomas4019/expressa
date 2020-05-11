@@ -37,7 +37,7 @@ exports.collections = async function(app) {
   for (const name of Object.keys(app.modules)) {
     const module = app.modules[name]
     const moduleSettings = await util.resolve(module.settingSchema, app) || {}
-    Object.assign(settingsProperties, moduleSettings);
+    Object.assign(settingsProperties, moduleSettings)
   }
 
   const settings = {

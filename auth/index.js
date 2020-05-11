@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs')
 const handler = require('./jwt')
-const util = require('../util')
 
 exports.createHash = function (password) {
   const salt = bcrypt.genSaltSync(10)
@@ -21,5 +20,5 @@ exports.middleware = function authMiddleware(req, res, next) {
     }
     next()
   }
-  Promise.resolve(authMiddleware(req, res, next)).catch(next)
+  Promise.resolve(asyncFn(req, res, next)).catch(next)
 }

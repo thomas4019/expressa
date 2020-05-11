@@ -10,8 +10,8 @@ global.Promise = Bluebird
 
 const dbTypeNames = ['cached', 'file', 'memory', 'postgres', 'mongo']
 const dbTypes = dbTypeNames.reduce((obj, name) => {
-  obj[name] = require('./db/' + name);
-  return obj;
+  obj[name] = require('./db/' + name)
+  return obj
 }, {})
 dbTypes['mongodb'] = dbTypes['mongo'] // alias
 const auth = require('./auth')
@@ -151,7 +151,7 @@ module.exports.api = function (settings) {
     listener.priority = listener.priority || 0
     listener.collections = collections
     if (!listener.name) {
-      throw new Error("Listeners must be named");
+      throw new Error('Listeners must be named')
     }
     events.forEach(function (event) {
       router.addSingleCollectionListener(event, listener)
@@ -165,7 +165,7 @@ module.exports.api = function (settings) {
       priority = 0
     }
     if (!listener.name) {
-      throw new Error("Listeners must be named");
+      throw new Error('Listeners must be named')
     }
     listener.priority = priority
     events.forEach(function (event) {
@@ -190,11 +190,11 @@ module.exports.api = function (settings) {
 
   // Allow CORS
   router.use(function addCorsHeaders(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
-    next();
-  });
+    res.header('Access-Control-Allow-Origin', '*')
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-access-token')
+    next()
+  })
 
   router.use(bodyParser.json({
     type: '*/*' // The wildcard type ensures it works even without the application/json header
@@ -215,11 +215,9 @@ module.exports.api = function (settings) {
   router.notify = util.notify
 
   router.get('/status', ph(function(req) {
-    const allListeners = [].concat.apply([], Object.values(router.eventListeners));
-    console.log(Object.keys(router));
-    console.log(router.stack);
+    const allListeners = [].concat.apply([], Object.values(router.eventListeners))
     const uniqueListeners = [...new Set(allListeners)]
-    const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted'];
+    const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted']
     const listeners = uniqueListeners.map(function (listener) {
       const o = {}
       o.name = listener.name
@@ -227,7 +225,7 @@ module.exports.api = function (settings) {
       o.collections = listener.collections
       for (const type of eventTypes) {
         if (router.eventListeners[type].includes(listener)) {
-          o[type] = true;
+          o[type] = true
         }
       }
       return o

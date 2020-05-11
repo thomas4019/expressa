@@ -16,7 +16,7 @@ describe('install flow', function () {
   })
 
   it('call install', async function () {
-    expect(api.db.collections).to.not.exist;
+    expect(api.db.collections).to.not.exist
 
     await request(app)
       .post('/install')
@@ -33,7 +33,7 @@ describe('install flow', function () {
 
     expect(api.db.collection).to.exist
     expect(api.db.role).to.exist
-    expect(api.db.users).to.exist;
+    expect(api.db.users).to.exist
   })
 
   it('can create admin account', async function() {

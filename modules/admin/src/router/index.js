@@ -153,7 +153,6 @@ export const constantRouterMap = [
     ]
   },
 
-
   {
     path: 'external-link',
     component: Layout,

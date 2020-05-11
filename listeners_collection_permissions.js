@@ -2,10 +2,10 @@ const util = require('./util')
 const debug = require('debug')('expressa')
 
 const eventToPermissionMapping = {
-  'get': 'view',
-  'put': 'edit',
-  'post': 'create',
-  'delete': 'delete'
+  get: 'view',
+  put: 'edit',
+  post: 'create',
+  delete: 'delete'
 }
 
 module.exports = function (api) {

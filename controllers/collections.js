@@ -45,7 +45,7 @@ exports.get = async function (req) {
   if (req.query.query) {
     query = JSON.parse(req.query.query)
   } else {
-    const { skip, offset, limit, page, orderby, ...params } = req.query
+    const { skip, offset, limit, page, orderby, ...params } = req.query // eslint-disable-line no-unused-vars
     query = queryStringParser.parse(params)
   }
   if (req.query.skip) {

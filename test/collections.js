@@ -133,7 +133,7 @@ describe('basic collections', function () {
     expect(res.body.properties.meta.properties).to.have.property('created')
 
     const token2 = await testutils.getUserWithPermissions(api, ['testdoc: view', 'collection: view relevant'])
-    const res2 = await request(app)
+    await request(app)
       .get('/collection/testdoc')
       .set('x-access-token', token2)
       .expect(200)
