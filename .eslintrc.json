@@ -1,6 +1,6 @@
 {
     "extends": "eslint:recommended",
-    "ignorePatterns": ["node_modules/**/*.js", "**/build/"],
+    "ignorePatterns": ["node_modules/**/*.js", "**/build/", "cypress"],
     "rules": {
         "no-var": "error",
         "prefer-const": "error",

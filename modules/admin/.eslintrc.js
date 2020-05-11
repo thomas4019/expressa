@@ -9,7 +9,7 @@ module.exports = {
     node: true,
     es6: true,
   },
-  ignorePatterns: ["node_modules/**/*.js", "**/build/"],
+  ignorePatterns: ['node_modules/**/*.js', '**/build/'],
   extends: ['plugin:vue/recommended', 'eslint:recommended'],
 
   // add your custom rules here
