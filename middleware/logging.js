@@ -2,7 +2,7 @@ const onFinished = require('on-finished')
 
 const util = require('../util')
 
-module.exports = function logger (req, res, next) {
+module.exports = function logRequests(req, res, next) {
   if (req.db.log) {
     onFinished(res, async function (err) {
       if (err) {

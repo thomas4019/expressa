@@ -1,7 +1,12 @@
 <template>
   <div class="app-container">
+   <span>Filter by Collection</span>
+   <select v-model="selectedCollection">
+     <option value="">Any collection</option>
+     <option v-for="c in collections">{{ c }}</option>
+   </select>
     <el-table
-      :data="listeners"
+      :data="filterListeners(listeners)"
       element-loading-text="Loading"
       border
       fit
@@ -9,6 +14,11 @@
       <el-table-column align="left" label="Listener Name" width="250">
         <template slot-scope="scope">
           {{ scope.row.name }}
+        </template>
+      </el-table-column>
+      <el-table-column align="left" label="Collections" width="150">
+        <template slot-scope="scope">
+          {{ scope.row.collections }}
         </template>
       </el-table-column>
       <el-table-column v-for="column in columns" :key="column" :label="column" align="center">
@@ -27,15 +37,24 @@ export default {
   name: 'ManagePermissions',
   data: () => ({
     listeners: [],
-    columns: ['collections', 'get', 'post', 'put', 'delete', 'changed', 'deleted', 'priority'],
+    columns: ['get', 'post', 'put', 'delete', 'changed', 'deleted', 'priority'],
+    collections: [],
+    selectedCollection: '',
   }),
   mounted() {
     this.update()
   },
   methods: {
+    filterListeners(data) {
+      console.log(data);
+      const filtered = data.filter((l) => !this.selectedCollection || !l.collections || l.collections.includes(this.selectedCollection))
+      console.log(filtered);
+      return filtered
+    },
     async update() {
       const statusInfo = (await request({ url: `/status` })).data
       this.listeners = statusInfo.listeners;
+      this.collections = statusInfo.collections;
       console.log(this.listeners)
     },
   }

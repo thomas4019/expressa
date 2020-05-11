@@ -189,7 +189,7 @@ module.exports.api = function (settings) {
   }
 
   // Allow CORS
-  router.use(function(req, res, next) {
+  router.use(function addCorsHeaders(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
@@ -200,7 +200,7 @@ module.exports.api = function (settings) {
     type: '*/*' // The wildcard type ensures it works even without the application/json header
   }))
 
-  router.use(function (req, res, next) {
+  router.use(function attachVariablesToReq(req, res, next) {
     req.settings = router.settings
     req.eventListeners = router.eventListeners
     req.db = router.db
@@ -216,6 +216,8 @@ module.exports.api = function (settings) {
 
   router.get('/status', ph(function(req) {
     const allListeners = [].concat.apply([], Object.values(router.eventListeners));
+    console.log(Object.keys(router));
+    console.log(router.stack);
     const uniqueListeners = [...new Set(allListeners)]
     const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted'];
     const listeners = uniqueListeners.map(function (listener) {
@@ -260,7 +262,7 @@ module.exports.api = function (settings) {
 
   // Error handler, log and send to user
   // eslint-disable-next-line no-unused-vars
-  router.use(function (err, req, res, next) {
+  router.use(function safeErrorHandler(err, req, res, next) {
     console.error('my err handler')
     console.error(err.stack)
     res.status(res.errCode || 500)

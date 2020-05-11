@@ -18,18 +18,15 @@ module.exports = function (api) {
     Object.assign(req.settings, data)
   })
 
-  api.addListener('post', function updateMetadata (req, collection, data) {
+  api.addListener(['put', 'post'], function updateMetadata (req, collection, data, { event }) {
     data.meta = data.meta || {}
-    data.meta.created = new Date().toISOString()
     data.meta.updated = new Date().toISOString()
-    if (req.user) {
-      data.meta.owner = req.user._id
+    if (event === 'post') {
+      data.meta.created = new Date().toISOString()
+      if (req.user) {
+        data.meta.owner = req.user._id
+      }
     }
-  })
-
-  api.addListener('put', function updateMetadata (req, collection, data) {
-    data.meta = data.meta || {}
-    data.meta.updated = new Date().toISOString()
   })
 
   api.addCollectionListener('get', 'schemas', function addMetaToSchema (req, collection, data) {

@@ -13,10 +13,13 @@ exports.isValidPassword = function (password, hashedPassword) {
 
 exports.doLogin = handler.doLogin
 
-exports.middleware = util.asyncMiddleware(async (req, res, next) => {
-  const user = await handler.isLoggedIn(req)
-  if (user) {
-    req.uid = user._id
+exports.middleware = function authMiddleware(req, res, next) {
+  const asyncFn = async (req, res, next) => {
+    const user = await handler.isLoggedIn(req)
+    if (user) {
+      req.uid = user._id
+    }
+    next()
   }
-  next()
-})
+  Promise.resolve(authMiddleware(req, res, next)).catch(next)
+}

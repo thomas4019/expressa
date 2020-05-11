@@ -10,8 +10,8 @@ app.use('/api', api)
 app.use('/admin', expressa.admin())
 
 api.addListener('ready', function onStart() {
-  app.listen(3000, function () {
+  app.listen(3001, function () {
     // eslint-disable-next-line no-console
-    console.log('Test server listening on port 3000!')
+    console.log('Test server listening on port 3001!')
   })
 })
