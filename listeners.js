@@ -68,7 +68,7 @@ module.exports = function (api) {
   })
 
   api.addListener('post', function userUniquenessCheck (req, collection, data) {
-    if (collection === 'users') {
+    if (collection === 'users' && req.settings.enforce_permissions) {
       return new Promise(function (resolve, reject) {
         api.db.users.find({
           'email': data.email
@@ -156,7 +156,7 @@ module.exports = function (api) {
   })
 
   api.addListener(['post'], function allowFirstAdmin (req, collection, data) {
-    if (api.db.users) {
+    if (api.db.users && req.settings.enforce_permissions) {
       return api.db.users.find()
         .then(function (users) {
           const userCount = users.length;
