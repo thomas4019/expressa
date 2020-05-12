@@ -37,6 +37,9 @@ const capitalize = (s) => {
     icon: 'svg-name'             the icon show in the sidebar,
   }
 **/
+
+const NO_INSERT = ['settings', 'log']
+
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
   { path: '/install', component: () => import('@/views/Install'), hidden: true },
@@ -83,7 +86,7 @@ export const constantRouterMap = [
     component: Layout,
     name: 'Insert',
     meta: { title: 'Insert', icon: 'table' },
-    children: collections.map((name) => ({
+    children: collections.filter((name) => !NO_INSERT.includes(name)).map((name) => ({
       path: name + '/create',
       name: name,
       component: () => import('@/views/ListDocuments'),

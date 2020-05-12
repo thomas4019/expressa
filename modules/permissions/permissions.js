@@ -25,6 +25,7 @@ exports.collections = [{
       }
     },
     required: [
+      '_id',
       'permissions'
     ]
   },

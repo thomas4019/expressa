@@ -236,6 +236,8 @@ module.exports.api = function (settings) {
     })
     listeners.sort((a,b) => a.priority - b.priority)
     return {
+      nodeVersion: process.version,
+      uptime: util.friendlyDuration(process.uptime()),
       env: process.env.NODE_ENV,
       installed: req.settings.installed || false,
       middleware,

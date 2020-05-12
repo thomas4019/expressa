@@ -179,3 +179,16 @@ exports.getFunctionParamNames = function getFunctionParamNames (func) {
     result = []
   return result
 }
+
+exports.friendlyDuration = function friendlyDuration (seconds) {
+  if (seconds > 86400) {
+    return Math.round(seconds / 86400) + ' hours'
+  }
+  if (seconds > 3600) {
+    return Math.round(seconds / 3600) + ' hours'
+  }
+  if (seconds > 60) {
+    return Math.round(seconds / 60) + ' minutes'
+  }
+  return Math.round(seconds) + ' seconds'
+}

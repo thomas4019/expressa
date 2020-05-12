@@ -51,5 +51,16 @@ exports.install = async (req, api) => {
 exports.getSettingsSchema = async (req, api) => {
   const colls = await util.resolve(api.modules.core.collections, api)
   const settings = colls.find((m) => m._id === 'settings')
+  settings.schema.properties.email = {
+    type: 'string',
+    description: 'Administrator Email'
+  }
+  settings.schema.properties.password = {
+    type: 'string',
+    description: 'Administrator Password'
+  }
+  settings.schema.required = settings.schema.required || ['postgresql_uri', 'mongodb_uri']
+  settings.schema.required.push('email');
+  settings.schema.required.push('password');
   return settings
 }

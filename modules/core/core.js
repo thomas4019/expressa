@@ -132,6 +132,7 @@ exports.collections = async function(app) {
         }
       },
       required: [
+        '_id',
         'storage',
         'documentsHaveOwners',
         'schema'

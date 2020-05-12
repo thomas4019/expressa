@@ -17,6 +17,7 @@
 <script>
 import request from '@/utils/request'
 import JSONEditor from '@/components/JSONEditor'
+import login from '@/api/login'
 
 export default {
   name: 'Install',
@@ -38,7 +39,6 @@ export default {
   methods: {
     async update() {
       this.schema = (await request({ url: `/install/settings/schema` })).data.schema
-      this.schema.required = ['postgresql_uri', 'mongodb_uri']
       console.log(this.schema)
       this.ready = true
     },
@@ -49,15 +49,27 @@ export default {
         modules: ['collections', 'core', 'logging', 'permissions'],
       }})
 
+      const email = 'a@example.com'
+      const password = '123'
+
       await request({
         method: 'post',
         url: '/user/register',
         data: {
-          email: 'a@example.com',
+          email,
           roles: ['Admin'],
-          password: '123'
+          password,
         },
       })
+
+      this.$store.dispatch('Login', { username: email, password }).then(() => {
+        this.loading = false
+        this.$router.push({ path: this.redirect || '/' })
+      }).catch(() => {
+        this.loading = false
+      })
+
+      // login.login(email, password)
     },
   }
 }
