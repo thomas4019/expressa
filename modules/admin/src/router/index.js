@@ -38,7 +38,7 @@ const capitalize = (s) => {
   }
 **/
 
-const NO_INSERT = ['settings', 'log']
+const CORE_COLLECTIONS = ['users', 'log', 'role', 'settings']
 
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
@@ -50,10 +50,10 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/home',
     name: 'Dashboard',
-    meta: { title: 'Home' },
+    meta: { title: 'Home', icon: 'home-alt' },
     children: [{
       path: 'home',
-      meta: { title: 'Home' },
+      meta: { title: 'Home', icon: 'home-alt' },
       component: () => import('@/views/home')
     }, {
       path: '/edit/:collectionName/:id',
@@ -63,69 +63,39 @@ export const constantRouterMap = [
   },
 
   {
+    path: '/users',
+    redirect: '/users',
+    component: Layout,
+    name: 'Users',
+    meta: { title: 'People', icon: 'users-alt' },
+    children: [{
+      path: 'list',
+      meta: { title: 'Users', icon: 'users-alt' },
+      name: 'users2',
+      component: () => import('@/views/ListDocuments2'),
+      props: { collectionName: 'users' },
+    }, {
+      path: 'role',
+      meta: { title: 'Roles', icon: 'shield-check' },
+      name: 'role',
+      component: () => import('@/views/ListDocuments2'),
+      props: { collectionName: 'role' },
+    }],
+  },
+
+  {
     path: '/list',
     component: Layout,
     name: 'Data',
-    meta: { title: 'Data', icon: 'table' },
-    children: collections.map((name) => ({
+    meta: { title: 'Data', icon: 'database' },
+    children: collections.filter((name) => !CORE_COLLECTIONS.includes(name)).map((name) => ({
       path: name,
       name: name,
       component: () => import('@/views/ListDocuments2'),
       props: { collectionName: name },
       meta: { title: capitalize(name) }
-      /* children: [{
-        path: 'amNia6HA',
-        component: () => import('@/views/EditDocument'),
-        hidden: true
-      }] */
     }))
   },
-
-  {
-    path: '/edit',
-    component: Layout,
-    name: 'Insert',
-    meta: { title: 'Insert', icon: 'table' },
-    children: collections.filter((name) => !NO_INSERT.includes(name)).map((name) => ({
-      path: name + '/create',
-      name: name,
-      component: () => import('@/views/ListDocuments'),
-      props: { collectionName: name },
-      meta: { title: capitalize(name) }
-      /* children: [{
-        path: 'amNia6HA',
-        component: () => import('@/views/EditDocument'),
-        hidden: true
-      }] */
-    }))
-  },
-
-  {
-    path: '/edit/collection',
-    component: Layout,
-    name: 'Schema',
-    meta: { title: 'Schemas', icon: 'nested' },
-    children: collections.map((name) => ({
-      path: name,
-      name: name,
-      meta: { title: capitalize(name) }
-    }))
-  },
-
-  /* {
-    path: '/edit/collection/create',
-    component: Layout,
-    name: 'createcollection',
-    meta: { title: 'Create Collection' },
-    children: [
-      {
-        path: '',
-        name: 'permissions',
-        component: () => import('@/views/ManagePermissions'),
-        meta: { title: 'Create Collection' }
-      }
-    ]
-  }, */
 
   {
     path: '/manage/permissions',
@@ -145,21 +115,38 @@ export const constantRouterMap = [
   {
     path: '/dev',
     component: Layout,
-    meta: { title: 'Dev', icon: 'table' },
+    meta: {title: 'Dev', icon: 'flask' },
     children: [
       {
         path: '/listeners',
         name: 'listeners',
         component: () => import('@/views/ManageListeners'),
-        meta: { title: 'Listeners' }
+        meta: {title: 'Listeners'}
       },
       {
         path: '/middleware',
         name: 'middleware',
         component: () => import('@/views/ManageMiddleware'),
-        meta: { title: 'Middleware' }
-      }
-    ]
+        meta: {title: 'Middleware'}
+      }, {
+        path: 'requestlogs',
+        meta: {title: 'Request Logs', icon: 'diary'},
+        name: 'requestlogs',
+        component: () => import('@/views/ListDocuments2'),
+        props: {collectionName: 'log', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length']},
+      },
+      {
+        path: '/edit/collection',
+        component: Layout,
+        name: 'Schema',
+        meta: { title: 'Schemas', icon: 'cog' },
+        children: collections.map((name) => ({
+          path: name,
+          name: name,
+          meta: { title: capitalize(name) }
+        }))
+      },
+]
   },
 
   {
