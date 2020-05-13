@@ -121,7 +121,7 @@ module.exports.api = function (settings) {
       router.db[collection._id] = dbTypes['cached'](router.db[collection._id])
       debug('initializing ' + collection._id + ' as a memory cached collection')
     }
-    return router.db[collection._id].init()
+    return Promise.resolve(router.db[collection._id].init())
   }
 
   router.addSingleCollectionListener = function (event, listener) {

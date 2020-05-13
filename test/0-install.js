@@ -25,7 +25,7 @@ describe('install flow', function () {
         settings: {
           jwt_secret: 'testing 123',
           mongodb_uri: 'mongodb://localhost:27017/test',
-          postgresql_uri: 'postgresql://localhost/pgtest',
+          postgresql_uri: 'postgresql://postgres:expressa@localhost/pgtest',
           enforce_permissions: true
         }
       })

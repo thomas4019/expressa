@@ -6,7 +6,12 @@ const testutils = require('./testutils')
 const { app, api } = testutils
 
 const collectionNames = ['memorytest', 'filetest']
-// const collectionNames = ['filetest', 'memorytest', 'mongotest', 'postgrestest']
+if (process.env.TEST_MONGO) {
+  collectionNames.push('mongotest');
+}
+if (process.env.TEST_POSTGRES) {
+  collectionNames.push('postgrestest');
+}
 
 collectionNames.forEach(function (collection) {
   describe(`${collection} basic functionality`, function () {
