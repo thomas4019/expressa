@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-pagination
+      v-if="count > pageSize"
       :page-size="pageSize"
       :total="count"
       :current-page.sync="page"
@@ -20,7 +21,7 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      v-if="showPaginateOnBottom"
+      v-if="count > pageSize && showPaginateOnBottom"
       :page-size="pageSize"
       :total="count"
       :current-page.sync="page"
@@ -62,7 +63,7 @@ export default {
   },
   data: () => ({
     start: 0,
-    page: 0,
+    page: 1,
     pageSize: 25,
     count: 0,
     data: [],
@@ -111,4 +112,9 @@ export default {
 </script>
 
 <style scoped>
+.el-table >>> th {
+ background-color: #343a40 !important;
+ border-color: #454d55;
+ color: #fff;
+}
 </style>
