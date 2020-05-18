@@ -23,9 +23,9 @@ import '@/permission' // permission control
 import { VuePlugin } from 'vuera'
 
 import Unicon from 'vue-unicons'
-import { uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog } from 'vue-unicons/src/icons'
+import { uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog, uniPlus } from 'vue-unicons/src/icons'
 
-Unicon.add([uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog])
+Unicon.add([uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog, uniPlus])
 Vue.use(Unicon)
 
 Vue.use(ElementUI, { locale })

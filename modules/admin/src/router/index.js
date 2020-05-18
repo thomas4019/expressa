@@ -69,6 +69,12 @@ export const constantRouterMap = [
     name: 'Users',
     meta: { title: 'People', icon: 'users-alt' },
     children: [{
+      path: 'add',
+      meta: { title: 'Add', icon: 'plus' },
+      name: 'newuser',
+      component: () => import('@/views/EditDocument'),
+      props: { collectionName: 'users', id: 'create' },
+    }, {
       path: 'list',
       meta: { title: 'Users', icon: 'users-alt' },
       name: 'users2',

@@ -50,7 +50,7 @@ module.exports = function (api) {
           {
             rel: '» view owner user',
             href: '/admin/#/edit/users/{{self}}',
-            class: 'comment-link open-in-modal primary-text'
+            class: 'comment-link'
           }
         ]
       }

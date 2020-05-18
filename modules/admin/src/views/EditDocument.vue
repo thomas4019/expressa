@@ -25,6 +25,12 @@ export default {
     JSONEditor
   },
   props: {
+    collectionName: {
+      type: String
+    },
+    id: {
+      type: String
+    }
   },
   data: () => ({
     data: {},
@@ -72,7 +78,12 @@ export default {
       } else {
         await request({ method: 'put', url: `/${this.collectionName}/${this.id}`, data: this.data })
       }
-      this.$router.push(`/list/${this.collectionName}/`)
+      if (this.collectionName == 'users') {
+        this.$router.push(`/users/list`)
+      } else {
+        this.$router.push(`/list/${this.collectionName}/`)
+      }
+      // this.$router.go(-1);
     },
     async del() {
       await request({ method: 'delete', url: `/${this.collectionName}/${this.id}` })

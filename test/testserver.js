@@ -7,7 +7,7 @@ const api = expressa.api({
 const express = require('express')
 const app = express()
 app.use('/api', api)
-app.use('/admin', expressa.admin())
+app.use('/admin', expressa.admin({ apiurl: 'http://localhost:3001/api/' }))
 
 api.addListener('ready', function onStart() {
   app.listen(3001, function () {
