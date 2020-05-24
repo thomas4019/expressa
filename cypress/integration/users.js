@@ -12,6 +12,7 @@ describe('User Management', function() {
     cy.get('button').click();
     // cy.visit('#/users/list')
     cy.get('.hamburger-container').click();
+    cy.wait(100)
     cy.get('span').contains('People').click();
     cy.get('span').contains('Users').click();
     cy.wait('@users')
@@ -37,6 +38,7 @@ describe('User Management', function() {
     cy.get('button').click();
     cy.get('.hamburger-container').click();
     cy.get('span').contains('People').click();
+    cy.wait(100)
     cy.get('span').contains('Add').click();
     let id = randomId();
     cy.get('input[name="root[email]"]').type(`${id}@example.com`)
