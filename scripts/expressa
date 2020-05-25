@@ -1,0 +1,14 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var express = require('express');
+var app = express();
+
+var expressa = require('../');
+app.use('/api', expressa.api());            // optionally pass in settings
+app.use('/admin', expressa.admin({ apiurl: '/api/' }));
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
+});
