@@ -14,7 +14,7 @@
     "body-parser": "^1.19.0",
     "debug": "^2.6.1",
     "express": "^4.17.1",
-    "jfs": "0.2.6",
+    "jfs": "^0.3.0",
     "jsonwebtoken": "5.7.0",
     "mongo-query": "^0.5.7",
     "mongo-query-to-postgres-jsonb": "^0.2.3",
@@ -28,9 +28,9 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "cypress": "^3.8.3",
+    "cypress": "^4.6.0",
     "eslint": "^7.1.0",
-    "mocha": "^5.2.0",
+    "mocha": "^7.2.0",
     "mocha-junit-reporter": "^1.23.3",
     "nodemon": "^2.0.4",
     "supertest": "^3.4.2"
@@ -49,6 +49,7 @@
     "fixlint": "eslint . --fix",
     "testserver": "rm -rf testdata && nodemon test/testserver.js",
     "cypress": "cypress open",
+    "testdbs": "./scripts/run_db_tests.sh",
     "testcypress": "./scripts/run_cypress_tests.sh"
   },
   "license": "MIT"
