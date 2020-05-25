@@ -33,3 +33,18 @@ Cypress.Commands.add('randomId', (length) => {
 
     return text;
 })
+
+Cypress.Commands.add('login', () => {
+    cy.request({
+        method: 'POST',
+        url: 'http://localhost:3001/api/user/login',
+        body: {
+            email: 'a@example.com',
+            password: '123',
+        }
+    })
+        .then((resp) => {
+            cy.setCookie('Admin-Token', resp.body.token);
+        })
+
+})
