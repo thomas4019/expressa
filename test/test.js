@@ -52,6 +52,14 @@ describe('General Tests:', () => {
       .expect(200)
   })
 
+  it('Sets headers', async function () {
+    const res = await request(app)
+        .get('/collection')
+        .expect(200)
+    expect(res.headers).to.have.property('x-request-id')
+    expect(res.headers['x-request-id']).to.have.length(12)
+  })
+
   it('allows custom endpoints', async function () {
     // Add a custom endpoint which returns the current user
     api.custom.get('/test', function (req, res) {

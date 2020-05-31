@@ -3,6 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const debug = require('debug')('expressa')
 const Bluebird = require('bluebird')
+const randomstring = require('randomstring')
 Bluebird.config({
   longStackTraces: true
 })
@@ -207,6 +208,8 @@ module.exports.api = function (settings) {
     req.modules = router.modules
     req.setupCollectionDb = router.setupCollectionDb
     req.getSetting = router.getSetting
+    req.requestId = randomstring.generate(12)
+    res.header('X-Request-ID', req.requestId)
     next()
   })
 

@@ -6,13 +6,15 @@ const { app, api } = testutils
 
 describe('request logging', function () {
   it('logs 404', async function () {
-    await request(app)
+    const actualRes = await request(app)
       .post('/user/login2')
       .send()
       .expect(404)
+    const requestId = actualRes.headers['x-request-id']
     const logs = await api.db.requestlog.find({ url: '/user/login2' })
     const log = logs[0]
     expect(log.res.statusCode).to.equal(404)
+    expect(log.res.requestId).to.equal(requestId)
   })
 
   it('respects logging severity level', async function () {

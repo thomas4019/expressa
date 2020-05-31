@@ -117,6 +117,7 @@ exports.createLogEntry = function (req, res) {
     },
     res: {
       statusCode: res.statusCode,
+      requestId: res._headers['x-request-id'],
       headers: res._headers
     },
     meta: {
