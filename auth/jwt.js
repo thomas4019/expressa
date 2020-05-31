@@ -20,6 +20,9 @@ exports.doLogin = function (user, req) {
 
 // Returns the user id, or false if not logged in.
 exports.isLoggedIn = async function (req) {
+  if (!req.settings.jwt_secret) {
+    return false
+  }
   req.query = req.query || {}
   const token = req.query.token || req.headers['x-access-token']
   delete req.query.token
