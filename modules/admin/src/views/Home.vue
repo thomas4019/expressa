@@ -17,7 +17,7 @@
       :show-add-button="false"
       :filter="{ limit: 5, query: { method: { $ne: 'OPTIONS' } } }"
       :columns="['method', 'url', 'user', 'res.statusCode']"
-      collection-name="log" />
+      collection-name="requestlog" />
   </div>
 </template>
 

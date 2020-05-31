@@ -12,7 +12,7 @@ exports.settingSchema = {
 }
 
 exports.collections = [{
-  _id: 'log',
+  _id: 'requestlog',
   schema: {
     type: 'object',
     properties: {

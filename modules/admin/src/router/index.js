@@ -38,7 +38,7 @@ const capitalize = (s) => {
   }
 **/
 
-const CORE_COLLECTIONS = ['users', 'log', 'role', 'settings']
+const CORE_COLLECTIONS = ['users', 'requestlog', 'role', 'settings']
 
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
@@ -139,7 +139,7 @@ export const constantRouterMap = [
         meta: {title: 'Request Logs', icon: 'diary'},
         name: 'requestlogs',
         component: () => import('@/views/ListDocuments2'),
-        props: {collectionName: 'log', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length']},
+        props: {collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length']},
       },
       {
         path: '/edit/collection',

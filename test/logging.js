@@ -10,7 +10,7 @@ describe('request logging', function () {
       .post('/user/login2')
       .send()
       .expect(404)
-    const logs = await api.db.log.find({ url: '/user/login2' })
+    const logs = await api.db.requestlog.find({ url: '/user/login2' })
     const log = logs[0]
     expect(log.res.statusCode).to.equal(404)
   })
@@ -21,7 +21,7 @@ describe('request logging', function () {
       .post('/user/login3')
       .send()
       .expect(404)
-    const logs = await api.db.log.find({ url: '/user/login3' })
+    const logs = await api.db.requestlog.find({ url: '/user/login3' })
     expect(logs).have.lengthOf(0)
   })
 })

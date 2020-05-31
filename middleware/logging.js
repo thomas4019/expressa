@@ -3,7 +3,7 @@ const onFinished = require('on-finished')
 const util = require('../util')
 
 module.exports = function logRequests(req, res, next) {
-  if (req.db.log) {
+  if (req.db.requestlog) {
     onFinished(res, async function (err) {
       if (err) {
         console.error('error found while logging.')
@@ -12,7 +12,7 @@ module.exports = function logRequests(req, res, next) {
       }
       if (util.shouldLogRequest(req, res)) {
         const entry = util.createLogEntry(req, res)
-        await req.db.log.create(entry)
+        await req.db.requestlog.create(entry)
       }
     })
   }
