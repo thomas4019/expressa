@@ -34,6 +34,10 @@ Cypress.Commands.add('randomId', (length) => {
     return text;
 })
 
+Cypress.Commands.add('fillValue', (path, value) => {
+    cy.get(`input[name="root[${path}]"]`).type(value)
+})
+
 Cypress.Commands.add('login', () => {
     cy.request({
         method: 'POST',

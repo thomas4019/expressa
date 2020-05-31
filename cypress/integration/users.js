@@ -5,11 +5,9 @@ describe('User Management', function() {
     cy.server()
     cy.route('/api/users/schema').as('userschema')
     cy.route('/api/collection/users').as('users')
+    cy.login()
     cy.visit('/')
 
-    cy.get('input[name="username"]').type('a@example.com')
-    cy.get('input[name="password"]').type('123')
-    cy.get('button').click();
     // cy.visit('#/users/list')
     cy.get('.hamburger-container').click();
     cy.wait(100)
@@ -31,11 +29,9 @@ describe('User Management', function() {
     cy.server()
     cy.route('/api/users/schema').as('userschema')
     cy.route('/api/collection/users').as('users')
+    cy.login()
     cy.visit('/')
 
-    cy.get('input[name="username"]').type('a@example.com')
-    cy.get('input[name="password"]').type('123')
-    cy.get('button').click();
     cy.get('.hamburger-container').click();
     cy.get('span').contains('People').click();
     cy.wait(100)
