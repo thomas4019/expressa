@@ -15,7 +15,8 @@
       highlight-current-row>
       <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
         <template slot-scope="scope">
-          <router-link v-if="i === 0" :to="'/edit/'+collectionName+'/'+scope.row._id">{{ getPath(scope.row, name) }}</router-link>
+          <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">{{ getPath(scope.row, name) }}</router-link>
+          <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">{{ getPath(scope.row, name) }}</router-link>
           <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
         </template>
       </el-table-column>

@@ -103,6 +103,17 @@ exports.shouldLogRequest = function (req, res) {
   return severityIndex <= severityLoggingIndex
 }
 
+function filterHeaders(req) {
+  const headers = req.headers || {};
+  return {
+    'user-agent': headers['user-agent'],
+    'origin': headers['origin'],
+    'referer': headers['referer'],
+    'x-access-token': req.headers['x-access-token'] ?
+        req.headers['x-access-token'].substring(0, 8) + '...' : ''
+  }
+}
+
 exports.createLogEntry = function (req, res) {
   const severity = exports.getLogSeverity(res.statusCode)
   return {
@@ -113,7 +124,7 @@ exports.createLogEntry = function (req, res) {
     referer: req.headers['referer'],
     req: {
       ip: req.ip,
-      headers: req.headers
+      headers: filterHeaders(req),
     },
     res: {
       statusCode: res.statusCode,

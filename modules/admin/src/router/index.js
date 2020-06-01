@@ -140,8 +140,12 @@ export const constantRouterMap = [
         name: 'requestlogs',
         component: () => import('@/views/ListDocuments2'),
         props: {collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length']},
-      },
-      {
+      }, {
+        path: 'viewrequest/:requestId',
+        meta: {title: 'View Request', icon: 'diary'},
+        name: 'viewrequest',
+        component: () => import('@/views/ViewRequest'),
+      }, {
         path: '/edit/collection',
         component: Layout,
         name: 'Schema',
