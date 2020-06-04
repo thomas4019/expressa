@@ -26,7 +26,8 @@ describe('install flow', function () {
           jwt_secret: 'testing 123',
           mongodb_uri: 'mongodb://localhost:27017/test',
           postgresql_uri: 'postgresql://postgres:expressa@localhost/pgtest',
-          enforce_permissions: true
+          enforce_permissions: true,
+          user_storage: 'mongo'
         }
       })
       .expect(200)
@@ -34,6 +35,16 @@ describe('install flow', function () {
     expect(api.db.collection).to.exist
     expect(api.db.role).to.exist
     expect(api.db.users).to.exist
+
+    // Check storage of users set correctly and then restore to 'file'
+    const userCollection = (await api.db.collection.find({ _id: 'users' }))[0]
+    expect(userCollection.storage).to.eql('mongo')
+    userCollection.storage = 'file'
+    await api.db.collection.update(null, userCollection)
+    api.setupCollectionDb(userCollection)
+
+    const userCollection2 = (await api.db.collection.find({ _id: 'users' }))[0]
+    console.log(userCollection2)
   })
 
   it('can create admin account', async function() {

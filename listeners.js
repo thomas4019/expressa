@@ -3,13 +3,13 @@ const util = require('./util')
 
 module.exports = function (api) {
   /* Listeners to avoid the need for a server restart */
-  api.addCollectionListener('changed', 'collection', async function setupNewCollections (req, collection, data) {
+  api.addCollectionListener('changed', 'collection', async function setupCollectionStorage (req, collection, data) {
     if (!(data.storage === 'memory' && util.getPath(api.db[data._id], 'type') === 'memory')) {
       await api.setupCollectionDb(data)
     }
     debug('updated ' + data._id + ' collection storage')
   })
-  api.addCollectionListener('delete', 'collection', function cleanupCollections (req, collection, data) {
+  api.addCollectionListener('delete', 'collection', function cleanupCollectionStorage (req, collection, data) {
     delete api.db[data._id]
     debug('removed ' + data._id + ' collection storage')
   })

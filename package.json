@@ -43,7 +43,7 @@
     "test": "NODE_ENV=local_test_suite mocha --exit",
     "testlint": "NODE_ENV=local_test_suite mocha --exit && npm run lint",
     "testdebug": "NODE_ENV=local_test_suite DEBUG=expressa mocha -b --exit && npm run lint",
-    "ci-test": "mocha test --reporter mocha-junit-reporter --exit",
+    "ci-test": "NODE_ENV=local_test_suite mocha test --reporter mocha-junit-reporter --exit",
     "clean": "rm -rf node_modules;",
     "lint": "eslint .",
     "fixlint": "eslint . --fix",
