@@ -90,8 +90,6 @@ export default {
       if (this.$route.params.collectionName) {
         this.collectionName = this.$route.params.collectionName
       }
-      console.log(this.page)
-      console.log(this.filter)
       const params = {
         page: this.page,
         limit: this.pageSize,
@@ -101,11 +99,10 @@ export default {
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = info.data
-      if (!this.collection) {
+      if (!this.collection || this.collection._id !== this.collectionName) {
         this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
         this.schema = this.collection.schema
       }
-
       this.listedProperties = this.columns || (this.collection.admin && this.collection.admin.columns) || Object.keys(this.schema.properties)
     }
   }

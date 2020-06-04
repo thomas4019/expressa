@@ -70,7 +70,7 @@ export const constantRouterMap = [
     meta: { title: 'People', icon: 'users-alt' },
     children: [{
       path: 'add',
-      meta: { title: 'Add', icon: 'plus' },
+      meta: { title: 'Add User', icon: 'plus' },
       name: 'newuser',
       component: () => import('@/views/EditDocument'),
       props: { collectionName: 'users', id: 'create' },
@@ -142,6 +142,7 @@ export const constantRouterMap = [
         props: {collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length']},
       }, {
         path: 'viewrequest/:requestId',
+        hidden: true,
         meta: {title: 'View Request', icon: 'diary'},
         name: 'viewrequest',
         component: () => import('@/views/ViewRequest'),

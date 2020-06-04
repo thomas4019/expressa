@@ -83,8 +83,11 @@ exports.collections = async function(app) {
       },
       required: [
         'email',
-        'password'
+        'password',
       ]
+    },
+    admin: {
+      columns: ['email', 'roles']
     },
     storage: 'file',
     documentsHaveOwners: true
@@ -129,14 +132,32 @@ exports.collections = async function(app) {
           type: 'boolean',
           format: 'checkbox',
           description: 'If unset, headers will be sent to prevent caching'
+        },
+        admin: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            columns: {
+              items: {
+                type: 'string'
+              },
+              type: 'array'
+            }
+          },
+          required: [
+            'columns'
+          ]
         }
       },
       required: [
         '_id',
         'storage',
         'documentsHaveOwners',
-        'schema'
+        'schema',
       ]
+    },
+    admin: {
+      columns: ['_id', 'storage', 'documentsHaveOwners']
     },
     storage: 'file',
     cacheInMemory: false, // TODO: figure out why tests fail when this is true

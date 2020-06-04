@@ -40,6 +40,7 @@ describe('basic collections', function () {
           'title'
         ]
       },
+      admin: { columns: ['_id', 'title'] },
       storage: 'memory',
       documentsHaveOwners: false,
     }
