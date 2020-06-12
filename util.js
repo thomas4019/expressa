@@ -104,13 +104,13 @@ exports.shouldLogRequest = function (req, res) {
 }
 
 function filterHeaders(req) {
-  const headers = req.headers || {};
+  const headers = req.headers || {}
   return {
     'user-agent': headers['user-agent'],
-    'origin': headers['origin'],
-    'referer': headers['referer'],
+    origin: headers['origin'],
+    referer: headers['referer'],
     'x-access-token': req.headers['x-access-token'] ?
-        req.headers['x-access-token'].substring(0, 8) + '...' : ''
+      req.headers['x-access-token'].substring(0, 8) + '...' : ''
   }
 }
 

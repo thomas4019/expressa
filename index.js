@@ -54,7 +54,7 @@ async function initCollections (db, router) {
       console.error(err.stack)
     }
   }
-  console.log('Starting expressa server using environment: ' + process.env.NODE_ENV)
+  console.log('Starting expressa server using environment: ' + process.env.NODE_ENV) // eslint-disable-line no-console
   db.collection = dbTypes[router.settings.collection_db_type || 'file'](router.settings, 'collection')
   await bootstrapCollections(router)
   debug('collections loaded.')

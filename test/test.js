@@ -54,8 +54,8 @@ describe('General Tests:', () => {
 
   it('Sets headers', async function () {
     const res = await request(app)
-        .get('/collection')
-        .expect(200)
+      .get('/collection')
+      .expect(200)
     expect(res.headers).to.have.property('x-request-id')
     expect(res.headers['x-request-id']).to.have.length(12)
   })

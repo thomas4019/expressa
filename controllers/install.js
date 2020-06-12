@@ -76,8 +76,8 @@ exports.getSettingsSchema = async (req, api) => {
     ...settings.schema.properties
   }
   settings.schema.required = settings.schema.required || ['postgresql_uri', 'mongodb_uri']
-  settings.schema.required.push('email');
-  settings.schema.required.push('password');
-  settings.schema.required.push('user_storage');
+  settings.schema.required.push('email')
+  settings.schema.required.push('password')
+  settings.schema.required.push('user_storage')
   return settings
 }

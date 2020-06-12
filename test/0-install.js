@@ -44,7 +44,7 @@ describe('install flow', function () {
     api.setupCollectionDb(userCollection)
 
     const userCollection2 = (await api.db.collection.find({ _id: 'users' }))[0]
-    console.log(userCollection2)
+    expect(userCollection2.storage).to.eql('file')
   })
 
   it('can create admin account', async function() {

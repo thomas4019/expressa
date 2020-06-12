@@ -31,5 +31,5 @@ exports.app.use(exports.api)
 exports.getUserWithPermissions = util.getUserWithPermissions
 exports.clone = util.clone
 exports.sleep = function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms))
 }

@@ -7,10 +7,10 @@ const { app, api } = testutils
 
 const collectionNames = ['memorytest', 'filetest']
 if (process.env.TEST_MONGO) {
-  collectionNames.push('mongotest');
+  collectionNames.push('mongotest')
 }
 if (process.env.TEST_POSTGRES) {
-  collectionNames.push('postgrestest');
+  collectionNames.push('postgrestest')
 }
 
 collectionNames.forEach(function (collection) {
