@@ -10,7 +10,7 @@ Here's what the UI looks like for adding this new custom collection type.
 
 ### Creating a post
 
-After creating the blog post collection, here's what adding a documnent of that type looks like using the built in editor.
+After creating the blog post collection, here's what adding a document of that type looks like using the built in editor.
 
 ![create post 3](https://cloud.githubusercontent.com/assets/406149/15308188/c361368c-1b97-11e6-869a-ac40ba838dde.png)
 

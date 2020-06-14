@@ -1,6 +1,6 @@
 ## Permissions
 
-Expressa lets you easliy manage CRUD permissions for each type of action on collections using admin interface. Users can have one or more roles and each role is given ability to create, read, update, delete, etc.
+Expressa lets you easily manage CRUD permissions for each type of action on collections using admin interface. Users can have one or more roles and each role is given ability to create, read, update, delete, etc.
 
 By default you start with the following roles (but you can add your own):
 
