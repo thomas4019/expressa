@@ -78,8 +78,8 @@ export default {
       } else {
         await request({ method: 'put', url: `/${this.collectionName}/${this.id}`, data: this.data })
       }
-      if (this.collectionNam == 'collection') {
-        localStorage.clear()
+      if (this.collectionName == 'collection') {
+        localStorage.collections = '';
       }
       if (this.collectionName == 'users') {
         this.$router.push(`/users/list`)

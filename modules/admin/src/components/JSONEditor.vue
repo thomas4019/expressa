@@ -147,4 +147,8 @@ if (JsonEditor) {
   .jsoneditor-vue .form-control-label, label {
     font-weight: bold;
   }
+  .jsoneditor-vue input[type="checkbox"] {
+    margin-right: 5px;
+    margin-top: 3px;
+  }
 </style>
