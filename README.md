@@ -116,6 +116,7 @@ Expressa is not primarily built for simple blog websites or mostly static conten
 
 | Version | Important Changes                                                  |
 |---------|--------------------------------------------------------------------|
+| 0.5.0   | Migrates server to use async/await. New Admin UI built with Vue.js. Adds request-id headers |
 | 0.4.6   | Fix some errors in the install process when choosing to store users in mongo or postgres |
 | 0.4.5   | Security update |
 | 0.4.1   | db.create (postgres) now returns the id instead of the full document. |
