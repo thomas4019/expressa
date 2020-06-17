@@ -26,7 +26,7 @@ It's very easy to install expressa in your project directory:
     mkdir myapp
     cd myapp
     npm init
-    npm install expressa expressa-admin express
+    npm install expressa express
 
 Create a file `app.js` with the following code (or just copy the middle 3 lines into your existing express app)
 
@@ -116,6 +116,7 @@ Expressa is not primarily built for simple blog websites or mostly static conten
 
 | Version | Important Changes                                                  |
 |---------|--------------------------------------------------------------------|
+| 0.5.1   | Includes built Admin UI in npm package |
 | 0.5.0   | Migrates server to use async/await. New Admin UI built with Vue.js. Adds request-id headers |
 | 0.4.6   | Fix some errors in the install process when choosing to store users in mongo or postgres |
 | 0.4.5   | Security update |
