@@ -4,6 +4,6 @@ describe('Install', function() {
     cy.get('input[name="root[email]"]').type('test@example.com')
     cy.get('input[name="root[password]"]').type('expressa')
     cy.get('.btn-primary').click()
-    cy.contains('Welcome: a@example.com')
+    cy.contains('Welcome: test@example.com')
   })
 })

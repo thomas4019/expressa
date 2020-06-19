@@ -39,18 +39,16 @@ export default {
   methods: {
     async update() {
       this.schema = (await request({ url: `/install/settings/schema` })).data.schema
-      console.log(this.schema)
       this.ready = true
     },
     async install() {
-      console.log(this.data)
       await request({ method: 'post', url: `/install`, data: {
         settings: this.data,
         modules: ['collections', 'core', 'logging', 'permissions'],
       }})
 
-      const email = 'a@example.com'
-      const password = '123'
+      const email = this.data.email
+      const password = this.data.password
 
       await request({
         method: 'post',
@@ -68,8 +66,6 @@ export default {
       }).catch(() => {
         this.loading = false
       })
-
-      // login.login(email, password)
     },
   }
 }
