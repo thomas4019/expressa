@@ -20,9 +20,13 @@ exports.install = async (req, api) => {
 
   const modules = selectedModules.map((name) => req.modules[name])
 
-  const settings = req.body.settings
+  const settings = JSON.parse(JSON.stringify(req.body.settings))
   settings._id = process.env.NODE_ENV
   settings.jwt_secret = '123423'
+  // Remove fields that are not real settings
+  delete settings.email
+  delete settings.user_storage
+  delete settings.password
   Object.assign(req.settings, settings)
   await req.db.settings.create(settings)
 
@@ -49,6 +53,8 @@ exports.install = async (req, api) => {
   await exports.updateAdminPermissions(api)
 
   settings.installed = true
+  settings.enforce_permissions = true
+  Object.assign(req.settings, settings)
   await req.db.settings.update(settings._id, settings)
   return { }
 }

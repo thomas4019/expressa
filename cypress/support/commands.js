@@ -38,13 +38,13 @@ Cypress.Commands.add('fillValue', (path, value) => {
     cy.get(`input[name="root[${path}]"]`).type(value)
 })
 
-Cypress.Commands.add('login', () => {
+Cypress.Commands.add('login', (email, password) => {
     cy.request({
         method: 'POST',
         url: 'http://localhost:3001/api/user/login',
         body: {
-            email: 'a@example.com',
-            password: '123',
+            email: email || 'test@example.com',
+            password: password || 'expressa',
         }
     })
         .then((resp) => {

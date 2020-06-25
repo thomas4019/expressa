@@ -97,6 +97,10 @@ exports.init = async function (api) {
 
   // TODO (updates that are really inserting should trigger a post, not a put)
   api.addCollectionListener('post', 'users', async function allowFirstUserAsAdmin (req, collection, data) {
+    if (!data.roles) {
+      data.roles = [];
+    }
+
     const userCount = (await api.db.users.find()).length
     if (userCount === 0 && !data.roles.includes('Admin')) {
       throw new util.ApiError(400, 'first user must have role Admin')
