@@ -37,6 +37,8 @@
 
 <script>
 import request from '@/utils/request'
+import saveAs from 'file-saver'
+import objectPath from 'object-path'
 
 export default {
   name: 'ListDocuments',
@@ -104,7 +106,19 @@ export default {
         this.schema = this.collection.schema
       }
       this.listedProperties = this.columns || (this.collection.admin && this.collection.admin.columns) || Object.keys(this.schema.properties)
-    }
+    },
+    downloadCSV() {
+      const collection = this.collectionName
+      let text = this.listedProperties.map((name) => '"' + name + '"').join(',') + '\n'
+      if (this.data) {
+        text += this.data.map((row) =>
+          this.listedProperties.map((key) => '"' + String(objectPath.get(row, key) || '').replace(/"/g, '""') + '"')
+        ).join('\n')
+        console.log(text)
+        const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+        saveAs(blob, collection + '.csv');
+      }
+    },
   }
 }
 </script>
