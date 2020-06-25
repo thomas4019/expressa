@@ -116,6 +116,7 @@ Expressa is not primarily built for simple blog websites or mostly static conten
 
 | Version | Important Changes                                                  |
 |---------|--------------------------------------------------------------------|
+| 0.5.3   | Fixes bug in install where enforce permissions wasn't activated. Fixes CSV download. |
 | 0.5.2   | Fixes bug when installing super user in Admin tool |
 | 0.5.1   | Includes built Admin UI in npm package |
 | 0.5.0   | Migrates server to use async/await. New Admin UI built with Vue.js. Adds request-id headers |
