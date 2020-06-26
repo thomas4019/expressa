@@ -34,8 +34,8 @@ export default {
         }
       })
       const first = matched[0]
-      if (first && first.name !== 'dashboard') {
-        matched = [{ path: '/dashboard', meta: { title: 'Dashboard' }}].concat(matched)
+      if (first && first.name !== 'home') {
+        matched = [{ path: '/home', meta: { title: 'Home' }}].concat(matched)
       }
       this.levelList = matched
     },
@@ -47,6 +47,9 @@ export default {
     },
     handleLink(item) {
       const { redirect, path } = item
+      console.log('handleLink');
+      console.log(redirect);
+      console.log(path);
       if (redirect) {
         this.$router.push(redirect)
         return

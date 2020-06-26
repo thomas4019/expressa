@@ -49,7 +49,7 @@ export const constantRouterMap = [
     path: '/',
     component: Layout,
     redirect: '/home',
-    name: 'Dashboard',
+    name: 'Home',
     meta: { title: 'Home', icon: 'home-alt' },
     children: [{
       path: 'home',
@@ -64,7 +64,7 @@ export const constantRouterMap = [
 
   {
     path: '/users',
-    redirect: '/users',
+    redirect: '/users/list',
     component: Layout,
     name: 'Users',
     meta: { title: 'People', icon: 'users-alt' },
@@ -122,15 +122,23 @@ export const constantRouterMap = [
     path: '/dev',
     component: Layout,
     meta: {title: 'Dev', icon: 'flask' },
+    name: 'Dev',
     children: [
       {
-        path: '/listeners',
+        path: '',
+        name: '',
+        component: () => import('@/views/Dev'),
+        meta: {title: ''},
+        hidden: true,
+      },
+      {
+        path: 'listeners',
         name: 'listeners',
         component: () => import('@/views/ManageListeners'),
         meta: {title: 'Listeners'}
       },
       {
-        path: '/middleware',
+        path: 'middleware',
         name: 'middleware',
         component: () => import('@/views/ManageMiddleware'),
         meta: {title: 'Middleware'}
