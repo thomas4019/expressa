@@ -83,6 +83,8 @@ export default {
       }
       if (this.collectionName == 'users') {
         this.$router.push(`/users/list`)
+      } else if (this.collectionName == 'settings') {
+        this.$router.push(`/home`)
       } else {
         this.$router.push(`/list/${this.collectionName}/`)
       }

@@ -19,7 +19,7 @@ module.exports = function addRolePermissionsMiddleware (req, res, next) {
       req.hasPermission = () => true
       return next()
     }
-    req.hasPermission = (permission) => req.user.permissions[permission]
+    req.hasPermission = (permission) => req.user && req.user.permissions[permission]
     let roles = ['Anonymous']
     if (req.uid) {
       try {

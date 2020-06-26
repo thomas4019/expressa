@@ -1,7 +1,8 @@
 exports.settingSchema = {
   print_400_errors: {
     type: 'boolean',
-    description: 'Print messages to console for each request with a 4xx response code.'
+    description: 'Print messages to console for each request with a 4xx response code.',
+    format: 'checkbox',
   },
   logging_level: {
     type: 'string',

@@ -17,6 +17,11 @@ exports.settingSchema = {
     type: 'string',
     description: 'The full path to your mongo database.'
   },
+  installed: {
+    type: 'boolean',
+    description: 'Whether the site has gone through the install process',
+    format: 'checkbox',
+  },
   installed_modules: {
     type: 'array',
     description: 'List of installed modules with relevant info',

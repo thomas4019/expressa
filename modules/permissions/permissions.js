@@ -4,7 +4,8 @@ exports.settingSchema = {
   enforce_permissions: {
     type: 'boolean',
     description: 'Whether permissions should be checked. Only turn off if needed for testing.',
-    default: true
+    default: true,
+    format: 'checkbox',
   }
 }
 
