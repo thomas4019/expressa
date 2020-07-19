@@ -176,18 +176,22 @@ module.exports.api = function (settings) {
 
   router.getSetting = function (name) {
     return util.getPath(router.settings, name)
-  }
+  };
 
-  initCollections(router.db, router)
+  (async function setup() {
+    await initCollections(router.db, router)
 
-  const modules = ['collections', 'core', 'logging', 'permissions']
-  router.modules = {}
-  for (const module of modules) {
-    router.modules[module] = require(`./modules/${module}/${module}`)
-    if (router.modules[module].init) {
-      router.modules[module].init(router)
+    const modules = ['collections', 'core', 'logging', 'permissions']
+    router.modules = {}
+    for (const module of modules) {
+      router.modules[module] = require(`./modules/${module}/${module}`)
+      if (router.modules[module].init) {
+        router.modules[module].init(router)
+      }
     }
-  }
+
+    installApi.updateAdminPermissions(router)
+  })();
 
   // Allow CORS
   router.use(function addCorsHeaders(req, res, next) {

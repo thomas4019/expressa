@@ -57,7 +57,15 @@ exports.install = async function (app) {
   })
 }
 
-exports.permissions = ['users: modify roles']
+exports.permissions = function getCorePermissions(api) {
+  const routes = api.custom.stack
+  const perms = routes.map(entry => entry.route.path)
+  console.log(perms)
+  const regex = routes.map(entry => entry.route)
+  console.log(regex)
+  console.log(routes[2])
+  return ['users: modify roles', 'custom endpoint: /test']
+}
 
 function collectionPermissions (name) {
   return ['create', 'view', 'edit', 'delete'].map((action) => `${name}: ${action}`)
