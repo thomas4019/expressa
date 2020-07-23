@@ -1,5 +1,6 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { Message } from 'element-ui'
 
 const user = {
   state: {
@@ -35,6 +36,11 @@ const user = {
       return new Promise((resolve, reject) => {
         login(username, userInfo.password).then(response => {
           const data = response.data
+          if (!data.canUseAdmin) {
+            Message.error('This user is not authorized to use this tool')
+            resolve()
+            return
+          }
           setToken(data.token)
           commit('SET_TOKEN', data.token)
           resolve()

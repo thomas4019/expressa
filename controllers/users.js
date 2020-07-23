@@ -1,6 +1,7 @@
 const auth = require('../auth')
 const util = require('../util')
 const collectionsApi = require('./collections')
+const userPermissions = require('../middleware/users_permissions')
 
 exports.login = async (req) => {
   const password = req.body.password
@@ -20,7 +21,11 @@ exports.login = async (req) => {
   if (!auth.isValidPassword(password, user.password)) {
     throw new util.ApiError(401, 'Incorrect password')
   }
-  return auth.doLogin(user, req)
+  const payload = auth.doLogin(user, req)
+  req.uid = user._id
+  await userPermissions.addRolePermissionsAsync(req)
+  payload.canUseAdmin = req.hasPermission('login to admin')
+  return payload
 }
 
 exports.register = function (req) {

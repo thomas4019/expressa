@@ -12,28 +12,28 @@ async function addRolePermissions (req, user, roles) {
   })
 }
 
-module.exports = function addRolePermissionsMiddleware (req, res, next) {
-  async function addRolePermissionsMiddlewareAsync() {
-    if (!req.settings || !req.settings.enforce_permissions) {
-      // Use a dummy permission getter
-      req.hasPermission = () => true
-      return next()
-    }
-    req.hasPermission = (permission) => req.user && req.user.permissions[permission]
-    let roles = ['Anonymous']
-    if (req.uid) {
-      try {
-        const user = await req.db.users.get(req.uid)
-        req.user = user
-        roles = (user.roles || []).concat(['Authenticated'])
-      } catch (e) {
-        throw new util.ApiError('User no longer exists')
-      }
-    } else {
-      req.user = { permissions: {} }
-    }
-    await addRolePermissions(req, req.user, roles)
-    next()
+module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddlewareAsync(req) {
+  if (!req.settings || !req.settings.enforce_permissions) {
+    // Use a dummy permission getter
+    req.hasPermission = () => true
+    return
   }
-  Promise.resolve(addRolePermissionsMiddlewareAsync(req, res, next)).catch(next)
+  req.hasPermission = (permission) => req.user && req.user.permissions[permission]
+  let roles = ['Anonymous']
+  if (req.uid) {
+    try {
+      const user = await req.db.users.get(req.uid)
+      req.user = user
+      roles = (user.roles || []).concat(['Authenticated'])
+    } catch (e) {
+      throw new util.ApiError('User no longer exists')
+    }
+  } else {
+    req.user = { permissions: {} }
+  }
+  await addRolePermissions(req, req.user, roles)
+}
+
+module.exports.middleware = function addRolePermissionsMiddleware (req, res, next) {
+  module.exports.addRolePermissionsAsync(req).then(next).catch(next)
 }

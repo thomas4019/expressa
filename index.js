@@ -21,7 +21,7 @@ const util = require('./util')
 const collectionsApi = require('./controllers/collections')
 const usersApi = require('./controllers/users')
 const installApi = require('./controllers/install')
-const userPermissionsMiddleware = require('./middleware/users_permissions')
+const userPermissions = require('./middleware/users_permissions')
 const loggingMiddleware = require('./middleware/logging')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -263,7 +263,7 @@ module.exports.api = function (settings) {
   router.post('/user/login', ph(usersApi.login))
 
   router.use(auth.middleware) // Add user id to request
-  router.use(userPermissionsMiddleware) // Add user and permissions to request
+  router.use(userPermissions.middleware) // Add user and permissions to request
 
   router.use(router.custom) // Externally added middleware
 
