@@ -42,7 +42,7 @@ describe('basic collections', function () {
       },
       admin: { columns: ['_id', 'title'] },
       storage: 'memory',
-      documentsHaveOwners: false,
+      documentsHaveOwners: true,
     }
 
     const token = await testutils.getUserWithPermissions(api, 'collection: create')
@@ -80,6 +80,9 @@ describe('basic collections', function () {
         id: 'test123',
         status: 'OK'
       })
+
+    const owner = (await api.db.testdoc.get('test123')).meta.owner;
+    expect(owner).to.not.be.undefined;
   })
 
   it('fail to create without permission', async function () {
@@ -264,6 +267,9 @@ describe('basic collections', function () {
         id: 'test123',
         status: 'OK'
       })
+
+    const owner = (await api.db.testdoc.get('test123')).meta.owner;
+    expect(owner).to.not.be.undefined;
   })
 
   it('update document by id', async function () {
@@ -282,6 +288,9 @@ describe('basic collections', function () {
       .expect(200)
     expect(res.body.title).to.equal('cool')
     expect(res.body.data).to.equal(undefined)
+
+    const owner = (await api.db.testdoc.get('test123')).meta.owner;
+    expect(owner).to.not.be.undefined;
   })
 
   it('fail to edit a document without permission', async function () {
