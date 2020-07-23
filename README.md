@@ -34,8 +34,8 @@ Create a file `app.js` with the following code (or just copy the middle 3 lines 
     var app = express();
 
     var expressa = require('expressa');
-    app.use('/api', expressa.api());            // optionally pass in settings
     app.use('/admin', expressa.admin({ apiurl: '/api/' }));
+    app.use('/api', expressa.api());
 
     app.listen(3000, function () {
       console.log('Example app listening on port 3000!');
