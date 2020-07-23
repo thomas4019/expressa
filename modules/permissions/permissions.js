@@ -107,11 +107,11 @@ exports.init = async function (api) {
       data.roles = []
     }
 
-    const userCount = (await api.db.users.find()).length
-    if (userCount === 0 && !data.roles.includes('Admin')) {
+    const hasUsers = (await api.db.users.find({}, 0, 1)).length === 1
+    if (!hasUsers && !data.roles.includes('Admin')) {
       throw new util.ApiError(400, 'first user must have role Admin')
     }
-    if (userCount > 0 && !req.hasPermission('users: modify roles')) {
+    if (hasUsers && !req.hasPermission('users: modify roles')) {
       if (data.roles && data.roles.length > 0) {
         throw new util.ApiError(400, 'insufficient permissions to create user with roles')
       }
