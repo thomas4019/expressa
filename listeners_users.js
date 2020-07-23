@@ -3,7 +3,13 @@ const util = require('./util.js')
 const debug = require('debug')('expressa')
 
 module.exports = function (api) {
-  api.addCollectionListener(['post', 'put'], 'users', function updatePassword (req, collection, data) {
+  api.addCollectionListener(['post', 'put'], 'users', async function updatePassword (req, collection, data) {
+    if (req.method === 'PUT') {
+      const oldData = await api.db.users.get(data._id)
+      if (!data.password) {
+        data.password = oldData.password // preserve password if not explicitly set
+      }
+    }
     if (data.password && data.password.length !== 60 && data.password[0] !== '$') {
       debug('hashing and replacing password in the user document.')
       data.password = auth.createHash(data.password)
