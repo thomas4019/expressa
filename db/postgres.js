@@ -7,6 +7,7 @@ module.exports = function (settings, collection) {
   const pool = new pg.Pool({ connectionString: settings.postgresql_uri })
 
   return {
+    pgpool: pool,
     init: async function () {
       await pool.query('CREATE TABLE IF NOT EXISTS ' + collection + ' (id text primary key, data jsonb)')
     },

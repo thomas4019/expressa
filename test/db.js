@@ -146,6 +146,13 @@ collectionNames.forEach(function (collection) {
       expect(doc._id).to.equal('5bfd9a1311771c805d161498')
     })
 
+    if (collection === 'postgrestest') {
+      it('use pool to do query', async function () {
+        const res = await db.pgpool.query('SELECT $1::text as message', ['Hello world!'])
+        expect(res.rows[0].message).to.equal('Hello world!')
+      })
+    }
+
     after(async function () {
       await db.delete('5bfd9a1311771c805d161498')
       await db.delete(id)
