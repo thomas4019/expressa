@@ -1,0 +1,25 @@
+{
+  "_id": "role",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "type": "string"
+      },
+      "permissions": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {},
+        "description": "list of permissions this role has"
+      }
+    },
+    "required": [
+      "_id",
+      "permissions"
+    ]
+  },
+  "cacheInMemory": true,
+  "documentsHaveOwners": false,
+  "storage": "file"
+}

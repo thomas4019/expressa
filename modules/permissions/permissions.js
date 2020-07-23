@@ -57,7 +57,7 @@ exports.install = async function (app) {
   })
 }
 
-exports.permissions = ['users: modify roles']
+exports.permissions = ['users: modify roles', 'login to admin']
 
 function collectionPermissions (name) {
   return ['create', 'view', 'edit', 'delete'].map((action) => `${name}: ${action}`)
@@ -70,17 +70,22 @@ function collectionOwnerPermissions (name) {
 exports.init = async function (api) {
   api.addCollectionListener(['changed'], 'collection', async function addCollectionPerms (req, collection, data) {
     if (api.db.role) {
-      const admin = await api.db.role.get('Admin')
-      collectionPermissions(data._id).forEach(function (permission) {
-        admin.permissions[permission] = true
-      })
-      collectionOwnerPermissions(data._id).forEach(function (permission) {
-        delete admin.permissions[permission]
-        if (data.documentsHaveOwners) {
+      try {
+        const admin = await api.db.role.get('Admin')
+        collectionPermissions(data._id).forEach(function (permission) {
           admin.permissions[permission] = true
-        }
-      })
-      await api.db.role.update('Admin', admin)
+        })
+        collectionOwnerPermissions(data._id).forEach(function (permission) {
+          delete admin.permissions[permission]
+          if (data.documentsHaveOwners) {
+            admin.permissions[permission] = true
+          }
+        })
+        await api.db.role.update('Admin', admin)
+      } catch (e) {
+        console.error('Error updating admin role with permissions')
+        console.error(e)
+      }
     }
   })
 
@@ -99,7 +104,7 @@ exports.init = async function (api) {
   // TODO (updates that are really inserting should trigger a post, not a put)
   api.addCollectionListener('post', 'users', async function allowFirstUserAsAdmin (req, collection, data) {
     if (!data.roles) {
-      data.roles = [];
+      data.roles = []
     }
 
     const userCount = (await api.db.users.find()).length

@@ -1,0 +1,45 @@
+{
+  "_id": "users",
+  "schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "email": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string",
+        "description": "hashed password and salt"
+      },
+      "fullName": {
+        "type": "string"
+      },
+      "roles": {
+        "items": {
+          "type": "string",
+          "enum": [
+            "Admin",
+            "Anonymous",
+            "Authenticated",
+            "Test"
+          ]
+        },
+        "uniqueItems": true,
+        "type": "array",
+        "format": "checkbox"
+      }
+    },
+    "required": [
+      "email",
+      "password"
+    ]
+  },
+  "admin": {
+    "columns": [
+      "email",
+      "roles"
+    ]
+  },
+  "storage": "mongo",
+  "documentsHaveOwners": true
+}

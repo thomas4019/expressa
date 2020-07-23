@@ -66,9 +66,6 @@ async function initCollections (db, router) {
     require('./listeners_users')(router),
   ])
   debug('added standard listeners')
-
-  initialized = true
-  await util.notify('ready', router)
 }
 
 function ph (requestHandler) {
@@ -176,18 +173,30 @@ module.exports.api = function (settings) {
 
   router.getSetting = function (name) {
     return util.getPath(router.settings, name)
-  }
+  };
 
-  initCollections(router.db, router)
+  (async function setup() {
+    await initCollections(router.db, router)
 
-  const modules = ['collections', 'core', 'logging', 'permissions']
-  router.modules = {}
-  for (const module of modules) {
-    router.modules[module] = require(`./modules/${module}/${module}`)
-    if (router.modules[module].init) {
-      router.modules[module].init(router)
+    const modules = ['collections', 'core', 'logging', 'permissions']
+    router.modules = {}
+    for (const module of modules) {
+      router.modules[module] = require(`./modules/${module}/${module}`)
+      if (router.modules[module].init) {
+        router.modules[module].init(router)
+      }
     }
-  }
+
+    try {
+      await installApi.updateAdminPermissions(router)
+    } catch (e) {
+      console.error('Error while attempting to update admin permissions')
+      console.error(e)
+    }
+
+    initialized = true
+    await util.notify('ready', router)
+  })()
 
   // Allow CORS
   router.use(function addCorsHeaders(req, res, next) {

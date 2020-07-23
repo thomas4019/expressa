@@ -3,11 +3,20 @@ const Bluebird = require('bluebird')
 const util = require('../util')
 
 exports.updateAdminPermissions = async function (api) {
+  if (!api.db.role) {
+    return // not installed yet
+  }
   const modules = Object.values(api.modules)
-  const permissions = [].concat(...await Bluebird.map(modules, (m) => util.resolve(m.permissions, api)))
-  await api.db.role.update('Admin', {
-    permissions: permissions.reduce((obj, p) => { obj[p] = 1; return obj }, {})
-  })
+  const permissions = [].concat(...await Bluebird.map(modules, (m) => util.resolve(m.permissions, api))).filter(x => x !== undefined)
+  let adminRole = { permissions: {} }
+  try {
+    adminRole = await api.db.role.get('Admin')
+  } catch (e) {
+    // expected if not installed
+  }
+  const neededPermissions = permissions.reduce((obj, p) => { obj[p] = 1; return obj }, {})
+  Object.assign(adminRole.permissions, neededPermissions)
+  await api.db.role.update('Admin', adminRole)
 }
 
 exports.install = async (req, api) => {
