@@ -83,8 +83,12 @@ exports.init = async function (api) {
         })
         await api.db.role.update('Admin', admin)
       } catch (e) {
-        console.error('Error updating admin role with permissions')
-        console.error(e)
+        // This error is expected if install is not complete
+        if (api.installed || e.message !== 'document not found') {
+          console.error('Error updating admin role with permissions')
+          console.error(e)
+          console.error(e.message)
+        }
       }
     }
   })
