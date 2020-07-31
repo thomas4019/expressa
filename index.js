@@ -2,12 +2,7 @@ const fs = require('fs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const debug = require('debug')('expressa')
-const Bluebird = require('bluebird')
 const randomstring = require('randomstring')
-Bluebird.config({
-  longStackTraces: true
-})
-global.Promise = Bluebird
 
 const dbTypeNames = ['cached', 'file', 'memory', 'postgres', 'mongo']
 const dbTypes = dbTypeNames.reduce((obj, name) => {
