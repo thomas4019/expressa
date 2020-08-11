@@ -5,7 +5,8 @@
       element-loading-text="Loading"
       border
       fit
-      highlight-current-row>
+      highlight-current-row
+    >
       <el-table-column align="left" label="Middlware Name" width="250">
         <template slot-scope="scope">
           {{ scope.row.name }}

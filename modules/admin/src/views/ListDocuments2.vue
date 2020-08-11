@@ -6,17 +6,23 @@
       :total="count"
       :current-page.sync="page"
       layout="prev, pager, next"
-      @current-change="update()"/>
+      @current-change="update()"
+    />
     <el-table
       :data="data"
       element-loading-text="Loading"
       border
       fit
-      highlight-current-row>
+      highlight-current-row
+    >
       <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
         <template slot-scope="scope">
-          <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">{{ getPath(scope.row, name) }}</router-link>
-          <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">{{ getPath(scope.row, name) }}</router-link>
+          <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
+            {{ getPath(scope.row, name) }}
+          </router-link>
+          <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
+            {{ getPath(scope.row, name) }}
+          </router-link>
           <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
         </template>
       </el-table-column>
@@ -27,11 +33,16 @@
       :total="count"
       :current-page.sync="page"
       layout="prev, pager, next"
-      @current-change="update()"/>
+      @current-change="update()"
+    />
     <router-link v-if="showAddButton" :to="'/edit/' + collectionName + '/create'">
-      <button class="btn btn-primary">Add</button>
+      <button class="btn btn-primary">
+        Add
+      </button>
     </router-link>
-    <button class="btn btn-secondary download-button" @click="downloadCSV()">Download All</button>
+    <button class="btn btn-secondary download-button" @click="downloadCSV()">
+      Download All
+    </button>
   </div>
 </template>
 
@@ -115,8 +126,8 @@ export default {
           this.listedProperties.map((key) => '"' + String(objectPath.get(row, key) || '').replace(/"/g, '""') + '"')
         ).join('\n')
         console.log(text)
-        const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
-        saveAs(blob, collection + '.csv');
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+        saveAs(blob, collection + '.csv')
       }
     },
   }

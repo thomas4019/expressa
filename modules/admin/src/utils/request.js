@@ -4,7 +4,7 @@ import store from '../store'
 import { getToken } from '@/utils/auth'
 
 const service = axios.create({
-  baseURL: (settings || {}).apiurl || process.env.BASE_API,
+  baseURL: (typeof settings !== 'undefined' ? settings.apiurl : process.env.BASE_API),
   timeout: 5000 // 请求超时时间
 })
 

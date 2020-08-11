@@ -17,7 +17,7 @@ export default {
     const vnodes = []
 
     if (icon) {
-      vnodes.push(<unicon name={icon} fill="#DDDDDD"></unicon>)
+      vnodes.push(<unicon name={icon} fill='#DDDDDD'></unicon>)
     }
 
     if (title) {

@@ -47,9 +47,9 @@ export default {
     },
     handleLink(item) {
       const { redirect, path } = item
-      console.log('handleLink');
-      console.log(redirect);
-      console.log(path);
+      console.log('handleLink')
+      console.log(redirect)
+      console.log(path)
       if (redirect) {
         this.$router.push(redirect)
         return

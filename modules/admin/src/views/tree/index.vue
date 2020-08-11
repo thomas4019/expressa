@@ -10,7 +10,6 @@
       class="filter-tree"
       default-expand-all
     />
-
   </div>
 </template>
 

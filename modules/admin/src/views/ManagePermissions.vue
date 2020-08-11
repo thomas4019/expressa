@@ -5,7 +5,8 @@
       element-loading-text="Loading"
       border
       fit
-      highlight-current-row>
+      highlight-current-row
+    >
       <el-table-column align="left" label="Permission Name" width="250">
         <template slot-scope="scope">
           {{ scope.row.name }}
@@ -13,7 +14,7 @@
       </el-table-column>
       <el-table-column v-for="role in roles" :key="role._id" :label="role._id" align="center">
         <template slot-scope="scope">
-          <input :name="scope.row.role" :disabled="role._id=='Admin'" v-model="scope.row[role._id]" type="checkbox" @change="save" >
+          <input v-model="scope.row[role._id]" :name="scope.row.role" :disabled="role._id=='Admin'" type="checkbox" @change="save">
         </template>
       </el-table-column>
     </el-table>

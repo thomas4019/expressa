@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="jsoneditor-vue"/>
+    <div class="jsoneditor-vue" />
   </div>
 </template>
 

@@ -121,37 +121,37 @@ export const constantRouterMap = [
   {
     path: '/dev',
     component: Layout,
-    meta: {title: 'Dev', icon: 'flask' },
+    meta: { title: 'Dev', icon: 'flask' },
     name: 'Dev',
     children: [
       {
         path: '',
         name: '',
         component: () => import('@/views/Dev'),
-        meta: {title: ''},
+        meta: { title: '' },
         hidden: true,
       },
       {
         path: 'listeners',
         name: 'listeners',
         component: () => import('@/views/ManageListeners'),
-        meta: {title: 'Listeners'}
+        meta: { title: 'Listeners' }
       },
       {
         path: 'middleware',
         name: 'middleware',
         component: () => import('@/views/ManageMiddleware'),
-        meta: {title: 'Middleware'}
+        meta: { title: 'Middleware' }
       }, {
         path: 'requestlogs',
-        meta: {title: 'Request Logs', icon: 'diary'},
+        meta: { title: 'Request Logs', icon: 'diary' },
         name: 'requestlogs',
         component: () => import('@/views/ListDocuments2'),
-        props: {collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length']},
+        props: { collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length'] },
       }, {
         path: 'viewrequest/:requestId',
         hidden: true,
-        meta: {title: 'View Request', icon: 'diary'},
+        meta: { title: 'View Request', icon: 'diary' },
         name: 'viewrequest',
         component: () => import('@/views/ViewRequest'),
       }, {
@@ -165,7 +165,7 @@ export const constantRouterMap = [
           meta: { title: capitalize(name) }
         }))
       },
-]
+    ]
   },
 
   {

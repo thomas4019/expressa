@@ -7,8 +7,12 @@
       <template v-if="ready">
         <JSONEditor v-if="ready" v-model="data" :schema="schema" />
         <div>
-          <button class="btn btn-primary" @click="save">Save</button>
-          <button class="btn btn-danger" @click="del">Delete</button>
+          <button class="btn btn-primary" @click="save">
+            Save
+          </button>
+          <button class="btn btn-danger" @click="del">
+            Delete
+          </button>
         </div>
       </template>
     </div>
@@ -79,7 +83,7 @@ export default {
         await request({ method: 'put', url: `/${this.collectionName}/${this.id}`, data: this.data })
       }
       if (this.collectionName == 'collection') {
-        localStorage.collections = '';
+        localStorage.collections = ''
       }
       if (this.collectionName == 'users') {
         this.$router.push(`/users/list`)

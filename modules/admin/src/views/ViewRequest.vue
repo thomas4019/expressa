@@ -53,8 +53,8 @@ export default {
   methods: {
     async update() {
       const id = this.$route.params.requestId
-      console.log('id');
-      console.log(id);
+      console.log('id')
+      console.log(id)
       const log = (await request({ url: `/requestlog/${id}` })).data
       this.log = log
       this.req = log.req

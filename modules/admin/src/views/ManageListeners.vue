@@ -2,15 +2,20 @@
   <div class="app-container">
     <span>Filter by Collection</span>
     <select v-model="selectedCollection">
-      <option value="">Any collection</option>
-      <option v-for="c in collections" :key="c">{{ c }}</option>
+      <option value="">
+        Any collection
+      </option>
+      <option v-for="c in collections" :key="c">
+        {{ c }}
+      </option>
     </select>
     <el-table
       :data="filterListeners(listeners)"
       element-loading-text="Loading"
       border
       fit
-      highlight-current-row>
+      highlight-current-row
+    >
       <el-table-column align="left" label="Listener Name" width="250">
         <template slot-scope="scope">
           {{ scope.row.name }}

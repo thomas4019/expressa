@@ -3,22 +3,30 @@
     <table class="table">
       <thead class="thead-dark">
         <tr>
-          <th v-for="name in listedProperties" :key="name">{{ name }}</th>
+          <th v-for="name in listedProperties" :key="name">
+            {{ name }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="record in data" :key="record._id">
           <td v-for="(name, i) in listedProperties" :key="name">
-            <router-link v-if="i === 0" :to="'/edit/'+collectionName+'/'+record._id">{{ record[name] }}</router-link>
+            <router-link v-if="i === 0" :to="'/edit/'+collectionName+'/'+record._id">
+              {{ record[name] }}
+            </router-link>
             <span v-if="i !== 0">{{ record[name] }}</span>
           </td>
         </tr>
       </tbody>
     </table>
     <router-link :to="'/edit/' + collectionName + '/create'">
-      <button class="btn btn-primary">Add</button>
+      <button class="btn btn-primary">
+        Add
+      </button>
     </router-link>
-    <button class="btn btn-secondary download-button" @click="downloadCSV()">Download All</button>
+    <button class="btn btn-secondary download-button" @click="downloadCSV()">
+      Download All
+    </button>
   </div>
 </template>
 

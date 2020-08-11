@@ -1,13 +1,26 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">Welcome: {{ email }}</div>
-    <div class="dashboard-text">roles: <span v-for="role in roles" :key="role">{{ role }}</span></div>
-    <div class="dashboard-text">listeners: {{ statusInfo.listeners.length }} active</div>
+    <div class="dashboard-text">
+      Welcome: {{ email }}
+    </div>
+    <div class="dashboard-text">
+      roles: <span v-for="role in roles" :key="role">{{ role }}</span>
+    </div>
+    <div class="dashboard-text">
+      listeners: {{ statusInfo.listeners.length }} active
+    </div>
     <br>
-    <div class="dashboard-text">uptime: {{ statusInfo.uptime }}</div>
-    <div class="dashboard-text">Node.js version: {{ statusInfo.nodeVersion }}</div>
-    <div class="dashboard-text">enviroment: {{ statusInfo.env }}
-      <router-link :to="'/edit/settings/' + statusInfo.env">(edit settings)</router-link>
+    <div class="dashboard-text">
+      uptime: {{ statusInfo.uptime }}
+    </div>
+    <div class="dashboard-text">
+      Node.js version: {{ statusInfo.nodeVersion }}
+    </div>
+    <div class="dashboard-text">
+      enviroment: {{ statusInfo.env }}
+      <router-link :to="'/edit/settings/' + statusInfo.env">
+        (edit settings)
+      </router-link>
     </div>
     <br>
     <br>
@@ -17,7 +30,8 @@
       :show-add-button="false"
       :filter="{ limit: 5, query: { method: { $ne: 'OPTIONS' } } }"
       :columns="['method', 'url', 'user', 'res.statusCode']"
-      collection-name="requestlog" />
+      collection-name="requestlog"
+    />
   </div>
 </template>
 

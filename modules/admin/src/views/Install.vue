@@ -7,7 +7,9 @@
       <template v-if="ready">
         <JSONEditor v-if="ready" v-model="data" :schema="schema" />
         <div>
-          <button class="btn btn-primary" @click="install">Install</button>
+          <button class="btn btn-primary" @click="install">
+            Install
+          </button>
         </div>
       </template>
     </div>
