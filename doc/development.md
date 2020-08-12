@@ -10,3 +10,21 @@
 In another folder, create a project using app.js from the readme.
 1. npm link expressa
 1. node app.js
+
+## Developing admin UI locally
+* npm run testserver
+* (cd modules/admin && npm run dev)
+* npm run cypress (to manually run specific tests)
+
+## Before committing/releasing
+* npm run test
+* npm run testdbs (if changing Postgres or Mongo code)
+* npm run testcypress (if changing admin UI or related)
+* npm run fixlint
+* (cd modules/admin && npm run lint) (if changing admin UI)
+
+## To release
+* Update version in package.json
+* (cd modules/admin && npm run build)
+* npm publish
+* Create release on GitHub
