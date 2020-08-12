@@ -9,12 +9,24 @@
 </template>
 
 <script>
+import store from '../../../store'
+import request from '@/utils/request'
+
 export default {
   name: 'AppMain',
   computed: {
     // key() {
     //   return this.$route.name !== undefined ? this.$route.name + +new Date() : this.$route + +new Date()
     // }
+  },
+  created() {
+    this.update()
+  },
+  methods: {
+    async update() {
+      this.statusInfo = (await request({ url: `/status/` })).data
+      store.dispatch('StatusInfo', this.statusInfo)
+    }
   }
 }
 </script>

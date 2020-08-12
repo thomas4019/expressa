@@ -8,17 +8,6 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '../views/layout/Layout'
-import request from '@/utils/request'
-import { getToken } from '@/utils/auth'
-
-const collections = localStorage.collections ? JSON.parse(localStorage.collections) : ['collection', 'role', 'users']
-if (getToken() && !localStorage.collections) {
-  request({ url: '/collection' }).then((res) => {
-    const colls = res.data.map((coll) => coll._id)
-    localStorage.collections = JSON.stringify(colls)
-    window.location.reload()
-  })
-}
 
 const capitalize = (s) => {
   if (typeof s !== 'string') return ''
@@ -37,8 +26,6 @@ const capitalize = (s) => {
     icon: 'svg-name'             the icon show in the sidebar,
   }
 **/
-
-const CORE_COLLECTIONS = ['users', 'requestlog', 'role', 'settings']
 
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
@@ -90,17 +77,18 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/list',
+    path: '/list/:collectionName',
     component: Layout,
+    hidden: true,
     name: 'Data',
     meta: { title: 'Data', icon: 'database' },
-    children: collections.filter((name) => !CORE_COLLECTIONS.includes(name)).map((name) => ({
-      path: name,
-      name: name,
+    children: [{
+      path: '',
+      name: ':collectionName',
       component: () => import('@/views/ListDocuments2'),
-      props: { collectionName: name },
+      props: route => ({ collectionName: route.params.collectionName }),
       meta: { title: capitalize(name) }
-    }))
+    }]
   },
 
   {
@@ -158,12 +146,14 @@ export const constantRouterMap = [
         path: '/edit/collection',
         component: Layout,
         name: 'Schema',
+        hidden: true,
         meta: { title: 'Schemas', icon: 'cog' },
-        children: collections.map((name) => ({
-          path: name,
+        children: [{
+          hidden: true,
+          path: '/:collectionName',
           name: name,
           meta: { title: capitalize(name) }
-        }))
+        }]
       },
     ]
   },

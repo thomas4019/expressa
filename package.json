@@ -46,7 +46,8 @@
     "clean": "rm -rf node_modules;",
     "lint": "eslint .",
     "fixlint": "eslint . --fix",
-    "testserver": "rm -rf testdata && nodemon test/testserver.js",
+    "testserver": "rm -rf testdata && node test/testserver.js",
+    "testserver-watch": "rm -rf testdata && nodemon test/testserver.js",
     "cypress": "cypress open",
     "testdbs": "./scripts/run_db_tests.sh",
     "testcypress": "./scripts/run_cypress_tests.sh"

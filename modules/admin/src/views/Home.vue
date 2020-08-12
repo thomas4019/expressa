@@ -62,7 +62,6 @@ export default {
   methods: {
     async update() {
       this.statusInfo = (await request({ url: `/status/` })).data
-      console.log(this.statusInfo)
     }
   },
 }

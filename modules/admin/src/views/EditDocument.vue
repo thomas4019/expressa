@@ -22,6 +22,7 @@
 <script>
 import request from '@/utils/request'
 import JSONEditor from '@/components/JSONEditor'
+import store from '../store'
 
 export default {
   name: 'CollectionTable',
@@ -30,10 +31,12 @@ export default {
   },
   props: {
     collectionName: {
-      type: String
+      type: String,
+      default: ''
     },
     id: {
-      type: String
+      type: String,
+      default: ''
     }
   },
   data: () => ({
@@ -82,12 +85,13 @@ export default {
       } else {
         await request({ method: 'put', url: `/${this.collectionName}/${this.id}`, data: this.data })
       }
-      if (this.collectionName == 'collection') {
-        localStorage.collections = ''
+      if (this.collectionName === 'collection') {
+        this.statusInfo = (await request({ url: `/status/` })).data
+        store.dispatch('StatusInfo', this.statusInfo)
       }
-      if (this.collectionName == 'users') {
+      if (this.collectionName === 'users') {
         this.$router.push(`/users/list`)
-      } else if (this.collectionName == 'settings') {
+      } else if (this.collectionName === 'settings') {
         this.$router.push(`/home`)
       } else {
         this.$router.push(`/list/${this.collectionName}/`)

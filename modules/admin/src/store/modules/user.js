@@ -4,6 +4,9 @@ import { Message } from 'element-ui'
 
 const user = {
   state: {
+    statusInfo: {
+      collections: []
+    },
     token: getToken(),
     name: '',
     email: '',
@@ -21,6 +24,9 @@ const user = {
     SET_EMAIL: (state, email) => {
       state.email = email
     },
+    SET_STATUS_INFO: (state, statusInfo) => {
+      state.statusInfo = statusInfo
+    },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
@@ -30,7 +36,6 @@ const user = {
   },
 
   actions: {
-    // 登录
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
@@ -50,7 +55,10 @@ const user = {
       })
     },
 
-    // 获取用户信息
+    StatusInfo({ commit, state }, statusInfo) {
+      commit('SET_STATUS_INFO', statusInfo)
+    },
+
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
@@ -70,7 +78,6 @@ const user = {
       })
     },
 
-    // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
@@ -84,7 +91,6 @@ const user = {
       })
     },
 
-    // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')

@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     async update() {
-      this.roles = (await request({ url: `/role/` })).data
+      this.roles = (await request({ url: '/role/' })).data
 
       const Admin = this.roles.find((r) => r._id === 'Admin')
       const permissions = Object.keys(Admin.permissions)
@@ -53,6 +53,7 @@ export default {
       this.data = permissionData.sort((a, b) => (a.name < b.name) ? -1 : 1)
     },
     async save() {
+      // eslint-disable-next-line
       for (const role of this.roles) {
         role.permissions = {}
         this.data.forEach((row) => {

@@ -19,7 +19,6 @@
 <script>
 import request from '@/utils/request'
 import JSONEditor from '@/components/JSONEditor'
-import login from '@/api/login'
 
 export default {
   name: 'Install',

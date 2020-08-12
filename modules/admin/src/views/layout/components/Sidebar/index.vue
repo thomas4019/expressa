@@ -18,15 +18,32 @@
 <script>
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
+const CORE_COLLECTIONS = ['users', 'requestlog', 'role', 'settings']
+
+const capitalize = (s) => {
+  if (typeof s !== 'string') return ''
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
 
 export default {
   components: { SidebarItem },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+      'statusInfo'
     ]),
     routes() {
-      return this.$router.options.routes
+      const routes = [...this.$router.options.routes]
+      routes.push({
+        name: 'Data',
+        meta: { title: 'Data', icon: 'database' },
+        path: '/list',
+        children: this.statusInfo.collections.filter((name) => !CORE_COLLECTIONS.includes(name)).map((coll) => ({
+          meta: { title: capitalize(coll) },
+          path: coll
+        }))
+      })
+      return routes
     },
     isCollapse() {
       return !this.sidebar.opened
