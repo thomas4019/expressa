@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "cross-env": "^7.0.2",
     "cypress": "^4.11.0",
     "eslint": "^7.1.0",
     "mocha": "^7.2.0",
@@ -39,10 +40,10 @@
   },
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
-    "test": "NODE_ENV=local_test_suite mocha --exit",
-    "testlint": "NODE_ENV=local_test_suite mocha --exit && npm run lint",
-    "testdebug": "NODE_ENV=local_test_suite DEBUG=expressa mocha -b --exit && npm run lint",
-    "ci-test": "NODE_ENV=local_test_suite mocha test --reporter mocha-junit-reporter --exit",
+    "test": "cross-env NODE_ENV=local_test_suite mocha --exit",
+    "testlint": "cross-env NODE_ENV=local_test_suite mocha --exit && npm run lint",
+    "testdebug": "cross-env NODE_ENV=local_test_suite DEBUG=expressa mocha -b --exit && npm run lint",
+    "ci-test": "cross-env NODE_ENV=local_test_suite mocha test --reporter mocha-junit-reporter --exit",
     "clean": "rm -rf node_modules;",
     "lint": "eslint .",
     "fixlint": "eslint . --fix",
