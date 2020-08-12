@@ -81,8 +81,8 @@ describe('basic collections', function () {
         status: 'OK'
       })
 
-    const owner = (await api.db.testdoc.get('test123')).meta.owner;
-    expect(owner).to.not.be.undefined;
+    const owner = (await api.db.testdoc.get('test123')).meta.owner
+    expect(owner).to.not.be.undefined
   })
 
   it('fail to create without permission', async function () {
@@ -268,8 +268,8 @@ describe('basic collections', function () {
         status: 'OK'
       })
 
-    const owner = (await api.db.testdoc.get('test123')).meta.owner;
-    expect(owner).to.not.be.undefined;
+    const owner = (await api.db.testdoc.get('test123')).meta.owner
+    expect(owner).to.not.be.undefined
   })
 
   it('update document by id', async function () {
@@ -289,8 +289,8 @@ describe('basic collections', function () {
     expect(res.body.title).to.equal('cool')
     expect(res.body.data).to.equal(undefined)
 
-    const owner = (await api.db.testdoc.get('test123')).meta.owner;
-    expect(owner).to.not.be.undefined;
+    const owner = (await api.db.testdoc.get('test123')).meta.owner
+    expect(owner).to.not.be.undefined
   })
 
   it('fail to edit a document without permission', async function () {

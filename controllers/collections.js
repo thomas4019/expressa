@@ -111,15 +111,15 @@ exports.replaceById = async function (req) {
   let oldDoc = {}
   try {
     oldDoc = await req.db[req.params.collection].get(req.params.id)
-  } catch {
+  } catch (error) {
     // happens when new documents are created via a PUT
     oldDoc = { meta: { owner: req.user._id } }
   }
   const data = req.body
   data._id = req.params.id
-  data.meta = data.meta || {};
-  data.meta.created = (oldDoc.meta || {}).created;
-  data.meta.owner = (oldDoc.meta || {}).owner;
+  data.meta = data.meta || {}
+  data.meta.created = (oldDoc.meta || {}).created
+  data.meta.owner = (oldDoc.meta || {}).owner
   await util.notify('put', req, req.params.collection, data)
   await req.db[req.params.collection].update(req.params.id, req.body)
   await util.notify('changed', req, req.params.collection, req.body)
