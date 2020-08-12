@@ -33,6 +33,7 @@
     "mocha": "^7.2.0",
     "mocha-junit-reporter": "^1.23.3",
     "nodemon": "^2.0.4",
+    "rimraf": "^3.0.2",
     "supertest": "^3.4.2"
   },
   "engines": {
@@ -44,11 +45,11 @@
     "testlint": "cross-env NODE_ENV=local_test_suite mocha --exit && npm run lint",
     "testdebug": "cross-env NODE_ENV=local_test_suite DEBUG=expressa mocha -b --exit && npm run lint",
     "ci-test": "cross-env NODE_ENV=local_test_suite mocha test --reporter mocha-junit-reporter --exit",
-    "clean": "rm -rf node_modules;",
+    "clean": "rimraf node_modules",
     "lint": "eslint .",
     "fixlint": "eslint . --fix",
-    "testserver": "rm -rf testdata && node test/testserver.js",
-    "testserver-watch": "rm -rf testdata && nodemon test/testserver.js",
+    "testserver": "rimraf testdata && node test/testserver.js",
+    "testserver-watch": "rimraf testdata && nodemon test/testserver.js",
     "cypress": "cypress open",
     "testdbs": "./scripts/run_db_tests.sh",
     "testcypress": "./scripts/run_cypress_tests.sh"
