@@ -17,8 +17,8 @@
       Node.js version: {{ statusInfo.nodeVersion }}
     </div>
     <div class="dashboard-text">
-      enviroment: {{ statusInfo.env }}
-      <router-link :to="'/edit/settings/' + statusInfo.env">
+      environment: {{ statusInfo.env }}
+      <router-link id="settings-link" :to="'/edit/settings/' + statusInfo.env">
         (edit settings)
       </router-link>
     </div>
@@ -76,5 +76,9 @@ export default {
     font-size: 30px;
     line-height: 46px;
   }
+}
+a#settings-link {
+  color: #35A;
+  padding-left: 25px;
 }
 </style>

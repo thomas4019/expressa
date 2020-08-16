@@ -18,7 +18,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
-const CORE_COLLECTIONS = ['users', 'requestlog', 'role', 'settings']
+const CORE_COLLECTIONS = ['users', 'requestlog', 'role']
 
 const capitalize = (s) => {
   if (typeof s !== 'string') return ''
@@ -34,6 +34,15 @@ export default {
     ]),
     routes() {
       const routes = [...this.$router.options.routes]
+      routes.push({
+        name: 'Data',
+        meta: { title: 'Schemas', icon: 'database' },
+        path: '/edit/collection/',
+        children: this.statusInfo.collections.map((coll) => ({
+          meta: { title: capitalize(coll) },
+          path: coll
+        }))
+      })
       routes.push({
         name: 'Data',
         meta: { title: 'Data', icon: 'database' },

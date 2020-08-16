@@ -73,12 +73,12 @@ exports.init = async function (api) {
       try {
         const admin = await api.db.role.get('Admin')
         collectionPermissions(data._id).forEach(function (permission) {
-          admin.permissions[permission] = true
+          admin.permissions[permission] = 1
         })
         collectionOwnerPermissions(data._id).forEach(function (permission) {
           delete admin.permissions[permission]
           if (data.documentsHaveOwners) {
-            admin.permissions[permission] = true
+            admin.permissions[permission] = 1
           }
         })
         await api.db.role.update('Admin', admin)
