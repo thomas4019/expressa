@@ -28,3 +28,6 @@ In another folder, create a project using app.js from the readme.
 * (cd modules/admin && npm run build)
 * npm publish
 * Create release on GitHub
+
+## More info
+[Modules](doc/modules.md)

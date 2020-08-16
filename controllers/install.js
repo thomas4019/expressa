@@ -54,7 +54,6 @@ exports.install = async (req, api) => {
     }
 
     await util.resolve(m.install, api)
-    await util.resolve(m.init, api)
   }
 
   await exports.updateAdminPermissions(api)
