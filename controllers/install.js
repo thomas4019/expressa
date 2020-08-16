@@ -29,7 +29,7 @@ exports.install = async (req, api) => {
 
   const settings = JSON.parse(JSON.stringify(req.body.settings))
   settings._id = process.env.NODE_ENV
-  settings.jwt_secret = '123423'
+  settings.jwt_secret = util.createSecureRandomId()
   // Remove fields that are not real settings
   delete settings.email
   delete settings.user_storage

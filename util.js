@@ -1,6 +1,7 @@
 const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken')
 const debug = require('debug')('expressa')
+const crypto = require('crypto')
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
@@ -58,6 +59,10 @@ exports.clone = function (obj) {
     return obj
   }
   return JSON.parse(JSON.stringify(obj))
+}
+
+exports.createSecureRandomId = function() {
+  return crypto.randomBytes(24).toString('hex')
 }
 
 exports.getUserWithPermissions = async function (api, permissions) {

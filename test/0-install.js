@@ -35,6 +35,7 @@ describe('install flow', function () {
     expect(api.db.collection).to.exist
     expect(api.db.role).to.exist
     expect(api.db.users).to.exist
+    expect(api.settings.jwt_secret.length).to.be.greaterThan(20)
 
     // Check storage of users set correctly and then restore to 'file'
     const userCollection = (await api.db.collection.find({ _id: 'users' }))[0]
