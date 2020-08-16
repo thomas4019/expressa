@@ -37,7 +37,7 @@
     "supertest": "^3.4.2"
   },
   "engines": {
-    "node": ">=0.10.3 <0.12"
+    "node": ">= 8.1.4"
   },
   "author": "Thomas Hansen <th4019@example.com> (http://thomashansen.me)",
   "scripts": {
