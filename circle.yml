@@ -1,13 +1,13 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/node:11.3.0
+      - image: cypress/browsers:node12.16.2-chrome81-ff75
     steps:
       - checkout
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@latest'
+          command: 'npm install -g npm@latest'
       - run:
           name: install-npm
           command: npm install
@@ -18,4 +18,9 @@ jobs:
       - store_test_results:
           path: ~/junit
       - store_artifacts:
+          path: ~/junit
+      - run:
+          name: cypress-test
+          command: npm run testcypress
+      - store_test_results:
           path: ~/junit
