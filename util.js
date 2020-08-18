@@ -212,7 +212,7 @@ exports.friendlyDuration = function friendlyDuration (seconds) {
   return Math.round(seconds) + ' seconds'
 }
 
-exports.getPgPool = function(connectionString) {
+exports.getPgPool = function getPgPool(connectionString) {
   if (!pgPools[connectionString]) {
     pgPools[connectionString] = new pg.Pool({ connectionString: connectionString })
   }
