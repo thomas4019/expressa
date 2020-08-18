@@ -2,6 +2,8 @@ const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
+const pg = require('pg')
+const pools = {}
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
@@ -208,4 +210,11 @@ exports.friendlyDuration = function friendlyDuration (seconds) {
     return Math.round(seconds / 60) + ' minutes'
   }
   return Math.round(seconds) + ' seconds'
+}
+
+exports.getPgPool = function(connectionString) {
+  if (!pools[connectionString]) {
+    pools[connectionString] = new pg.Pool({ connectionString: connectionString })
+  }
+  return pools[connectionString]
 }
