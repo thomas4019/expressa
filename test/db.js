@@ -67,6 +67,7 @@ collectionNames.forEach(function (collection) {
     })
 
     let id
+    const id2 = '6c4b9d57-4c89-4ad8-90e2-9a5337c1572c'
 
     it('create without id', async function () {
       id = await db.create({ title: 'first', data: { field: '123' } })
@@ -74,29 +75,29 @@ collectionNames.forEach(function (collection) {
     })
 
     it('create with id', async function () {
-      const id = await db.create({ _id: '5bfd9a1311771c805d161498', title: 'second' })
-      expect(id).to.equal('5bfd9a1311771c805d161498')
+      const id = await db.create({ _id: id2, title: 'second' })
+      expect(id).to.equal(id2)
     })
 
     it('create with duplicate id returns 409', async function () {
-      await assert.rejects(async () => db.create({ _id: '5bfd9a1311771c805d161498' }), { name: 'ApiError' })
+      await assert.rejects(async () => db.create({ _id: id2 }), { name: 'ApiError' })
     })
 
     it('get by id', async function () {
-      const doc = await db.get('5bfd9a1311771c805d161498')
+      const doc = await db.get(id2)
       expect(doc.title).to.equal('second')
     })
 
     it('get by missing id returns 404 error', async function () {
-      await assert.rejects(async () => db.get('111d9a1311771c805d161555'), { name: 'ApiError', message: 'document not found' })
+      await assert.rejects(async () => db.get('7c6f4426-f99f-4764-bebc-3b61c6710488'), { name: 'ApiError', message: 'document not found' })
     })
 
     xit('update missing id returns 404 error', async function () {
-      await assert.rejects(async () => db.update('111d9a1311771c805d161555'), { name: 'ApiError', message: 'document not found' })
+      await assert.rejects(async () => db.update('7c6f4426-f99f-4764-bebc-3b61c6710488'), { name: 'ApiError', message: 'document not found' })
     })
 
     it('delete missing id returns 404 error', async function () {
-      await assert.rejects(async () => db.delete('111d9a1311771c805d161555'), { name: 'ApiError', message: 'document not found' })
+      await assert.rejects(async () => db.delete('7c6f4426-f99f-4764-bebc-3b61c6710488'), { name: 'ApiError', message: 'document not found' })
     })
 
     it('find all', async function () {
@@ -122,7 +123,7 @@ collectionNames.forEach(function (collection) {
     })
 
     it('find by id', async function () {
-      const docs = await db.find({ _id: '5bfd9a1311771c805d161498' })
+      const docs = await db.find({ _id: id2 })
       expect(docs.length).to.equal(1)
     })
 
@@ -142,8 +143,8 @@ collectionNames.forEach(function (collection) {
     })
 
     it('update with id', async function () {
-      const doc = await db.update('5bfd9a1311771c805d161498', { title: 'second-updated', data: { more: true } })
-      expect(doc._id).to.equal('5bfd9a1311771c805d161498')
+      const doc = await db.update(id2, { title: 'second-updated', data: { more: true } })
+      expect(doc._id).to.equal(id2)
     })
 
     if (collection === 'postgrestest') {
@@ -154,7 +155,7 @@ collectionNames.forEach(function (collection) {
     }
 
     after(async function () {
-      await db.delete('5bfd9a1311771c805d161498')
+      await db.delete(id2)
       await db.delete(id)
       await api.db.collection.delete(collection)
     })
