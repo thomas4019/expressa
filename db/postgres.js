@@ -1,13 +1,11 @@
-const pg = require('pg')
 const uuid = require('node-uuid')
 const mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 const util = require('../util')
 
 module.exports = function (settings, collection) {
-  const pool = new pg.Pool({ connectionString: settings.postgresql_uri })
+  const pool = util.getPgPool(settings.postgresql_uri)
 
   return {
-    pgpool: pool,
     init: async function () {
       await pool.query('CREATE TABLE IF NOT EXISTS ' + collection + ' (id text primary key, data jsonb)')
     },

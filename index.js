@@ -109,6 +109,9 @@ module.exports.api = function (settings) {
 
   router.setupCollectionDb = async function(collection) {
     debug(`init collection db ${collection._id} ${collection.storage}`)
+    if (collection.storage === 'postgres') {
+      router.db.pgpool = util.getPgPool(router.settings.postgresql_uri)
+    }
     router.db[collection._id] = dbTypes[collection.storage](router.settings, collection._id)
     if (collection.cacheInMemory) {
       router.db[collection._id] = dbTypes['cached'](router.db[collection._id])
