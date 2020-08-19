@@ -5,7 +5,6 @@ Store.prototype.allAsync = promisify(Store.prototype.all)
 Store.prototype.getAsync = promisify(Store.prototype.get)
 Store.prototype.saveAsync = promisify(Store.prototype.save)
 
-const randomstring = require('randomstring')
 const sift = require('sift')
 
 const util = require('../util')
@@ -65,7 +64,8 @@ module.exports = function (settings, collection) {
       }
     },
     create: async function (data) {
-      const id = typeof data._id === 'undefined' ? randomstring.generate(8) : data._id
+      util.addIdIfMissing(data)
+      const id = data._id
       const existing = await this.exists(id)
       if (existing) {
         throw new util.ApiError(409, 'document already exists')

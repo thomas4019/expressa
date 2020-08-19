@@ -1,5 +1,4 @@
 const mongo = require('mongodb')
-const randomstring = require('randomstring')
 const MongoClient = mongo.MongoClient
 const util = require('../util')
 
@@ -43,8 +42,7 @@ module.exports = function (settings, collection) {
       return doc
     },
     create: async function (data) {
-      const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
-      data['_id'] = id
+      util.addIdIfMissing(data)
 
       const db = await this.getClient()
       try {

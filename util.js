@@ -218,3 +218,9 @@ exports.getPgPool = function getPgPool(connectionString) {
   }
   return pgPools[connectionString]
 }
+
+exports.addIdIfMissing = function addIdIfMissing (document) {
+  if (!document._id) {
+    document._id = randomstring.generate(12)
+  }
+}

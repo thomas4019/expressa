@@ -1,4 +1,3 @@
-const uuid = require('node-uuid')
 const mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 const util = require('../util')
 
@@ -38,9 +37,7 @@ module.exports = function (settings, collection) {
       return result.rows[0].data
     },
     create: async function (data) {
-      if (typeof data._id === 'undefined') {
-        data._id = uuid.v4()
-      }
+      util.addIdIfMissing(data)
       try {
         await pool.query('INSERT INTO ' + collection + ' (id, data) VALUES ($1, $2)', [data._id, data])
       } catch (e) {
