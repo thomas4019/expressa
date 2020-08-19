@@ -209,3 +209,9 @@ exports.friendlyDuration = function friendlyDuration (seconds) {
   }
   return Math.round(seconds) + ' seconds'
 }
+
+exports.addIdIfMissing = function addIdIfMissing (document) {
+  if (!document._id) {
+    document._id = randomstring.generate(12)
+  }
+}
