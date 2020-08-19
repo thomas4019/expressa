@@ -1,5 +1,6 @@
 const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken')
+const uuid = require('node-uuid')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
 
@@ -210,8 +211,12 @@ exports.friendlyDuration = function friendlyDuration (seconds) {
   return Math.round(seconds) + ' seconds'
 }
 
+exports.generateDocumentId = function generateDocumentId() {
+  return uuid.v4()
+}
+
 exports.addIdIfMissing = function addIdIfMissing (document) {
   if (!document._id) {
-    document._id = randomstring.generate(12)
+    document._id = exports.generateDocumentId()
   }
 }
