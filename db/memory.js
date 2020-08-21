@@ -1,5 +1,4 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
-const randomstring = require('randomstring')
 const sift = require('sift')
 
 const util = require('../util')
@@ -37,8 +36,8 @@ module.exports = function (settings, collection) {
       return util.clone(store[id])
     },
     create: async function (data) {
-      const id = typeof data._id === 'undefined' ? randomstring.generate(12) : data._id
-      data['_id'] = id
+      util.addIdIfMissing(data)
+      const id = data._id
       if (store[id]) {
         throw new util.ApiError(409, 'document already exists')
       }
