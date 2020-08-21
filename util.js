@@ -1,6 +1,6 @@
 const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken')
-const uuid = require('node-uuid')
+const {v4} = require('uuid')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
 const pg = require('pg')
@@ -221,7 +221,7 @@ exports.getPgPool = function getPgPool(connectionString) {
 }
 
 exports.generateDocumentId = function generateDocumentId() {
-  return uuid.v4()
+  return v4()
 }
 
 exports.addIdIfMissing = function addIdIfMissing (document) {
