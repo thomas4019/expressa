@@ -245,6 +245,7 @@ module.exports.api = function (settings) {
       return o
     })
     listeners.sort((a,b) => a.priority - b.priority)
+    const collections = Object.keys(router.db).filter((col) => col.toLocaleLowerCase() !== 'pgpool')
     return {
       nodeVersion: process.version,
       uptime: util.friendlyDuration(process.uptime()),
@@ -252,7 +253,7 @@ module.exports.api = function (settings) {
       installed: req.settings.installed || false,
       middleware,
       listeners,
-      collections: Object.keys(router.db),
+      collections,
     }
   }))
   router.post('/install', ph(async (req) => installApi.install(req, router)))
