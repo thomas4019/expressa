@@ -245,7 +245,7 @@ module.exports.api = function (settings) {
       return o
     })
     listeners.sort((a,b) => a.priority - b.priority)
-    const collections = Object.keys(router.db).filter((col) => col.toLocaleLowerCase() !== 'pgpool')
+    const collections = Object.keys(router.db).filter((col) => col !== 'pgpool')
     return {
       nodeVersion: process.version,
       uptime: util.friendlyDuration(process.uptime()),
