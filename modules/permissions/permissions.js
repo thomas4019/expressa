@@ -43,16 +43,16 @@ exports.install = async function (app) {
   app.db.role.create({
     _id: 'Authenticated',
     permissions: {
-      'users: view own': true,
-      'users: edit own': true,
-      'users: delete own': true,
+      'users: view own': 1,
+      'users: edit own': 1,
+      'users: delete own': 1,
     }
   })
 
   app.db.role.create({
     _id: 'Anonymous',
     permissions: {
-      'users: create': true
+      'users: create': 1
     }
   })
 }
