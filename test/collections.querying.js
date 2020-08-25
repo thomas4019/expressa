@@ -50,8 +50,10 @@ describe('querying collections', function () {
       .expect(200)
   })
 
+  let token
+
   it('read doc by id', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc/testid123')
       .set('x-access-token', token)
@@ -60,7 +62,6 @@ describe('querying collections', function () {
   })
 
   it('read doc by missing id returns 404', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc/missingdoc')
       .set('x-access-token', token)
@@ -69,7 +70,6 @@ describe('querying collections', function () {
   })
 
   it('read entire collection', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc')
       .set('x-access-token', token)
@@ -78,7 +78,6 @@ describe('querying collections', function () {
   })
 
   it('return docs matching deep field', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc?query={"data.field":"test"}')
       .set('x-access-token', token)
@@ -97,12 +96,14 @@ describe('querying collections', function () {
   it('page 0 returns an error', async function () {
     await request(app)
       .get('/testdoc?limit=2&page=0')
+      .set('x-access-token', token)
       .expect(400)
   })
 
   it('returns page 1 correctly', async function () {
     const res = await request(app)
       .get('/testdoc?limit=2&page=1')
+      .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
     expect(res.body.itemsPerPage).to.equal(2)
@@ -118,6 +119,7 @@ describe('querying collections', function () {
   it('returns page 2 correctly', async function () {
     const res = await request(app)
       .get('/testdoc?limit=2&page=2')
+      .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
     expect(res.body.itemsPerPage).to.equal(2)
@@ -132,6 +134,7 @@ describe('querying collections', function () {
   it('page 3 is empty', async function () {
     const res = await request(app)
       .get('/testdoc?limit=2&page=3')
+      .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
     expect(res.body.itemsPerPage).to.equal(2)
@@ -144,6 +147,7 @@ describe('querying collections', function () {
   it('page 4 is empty', async function () {
     const res = await request(app)
       .get('/testdoc?limit=2&page=3')
+      .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
     expect(res.body.itemsPerPage).to.equal(2)
@@ -156,6 +160,7 @@ describe('querying collections', function () {
   it('pagination works with query', async function () {
     const res = await request(app)
       .get('/testdoc?query={"data.number":2}&limit=2&page=1')
+      .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(1)
     expect(res.body.itemsPerPage).to.equal(2)

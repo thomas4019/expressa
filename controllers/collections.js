@@ -79,7 +79,7 @@ exports.get = async function (req) {
     if (req.query.page <= 0) {
       throw new util.ApiError(400, 'invalid page number')
     }
-    result = createPagination(data, req, limit)
+    result = createPagination(result, req, limit)
   }
   await util.notify('getpresend', req, req.params.collection, result)
   return result
