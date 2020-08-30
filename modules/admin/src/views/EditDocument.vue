@@ -106,7 +106,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+  .comment-link {
+    margin-top: -15px;
+  }
   .error-message {
     color: red;
   }
