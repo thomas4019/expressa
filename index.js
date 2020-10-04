@@ -185,6 +185,8 @@ module.exports.api = function (settings) {
       }
     }
 
+    addRoutesAndMiddleware()
+
     try {
       await installApi.updateAdminPermissions(router)
     } catch (e) {
@@ -196,103 +198,106 @@ module.exports.api = function (settings) {
     await util.notify('ready', router)
   })()
 
-  // Allow CORS
-  router.use(function addCorsHeaders(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-access-token')
-    next()
-  })
-
-  router.use(bodyParser.json({
-    type: '*/*' // The wildcard type ensures it works even without the application/json header
-  }))
-
-  router.use(function attachVariablesToReq(req, res, next) {
-    req.settings = router.settings
-    req.eventListeners = router.eventListeners
-    req.db = router.db
-    req.modules = router.modules
-    req.setupCollectionDb = router.setupCollectionDb
-    req.getSetting = router.getSetting
-    req.requestId = randomstring.generate(12)
-    res.header('X-Request-ID', req.requestId)
-    next()
-  })
-
-  router.use(loggingMiddleware)
-
-  router.notify = util.notify
-
-  router.get('/status', ph(function(req) {
-    const allListeners = [].concat.apply([], Object.values(router.eventListeners))
-    const middleware = router.stack.filter((item) => !item.route).map((item) => ({
-      name: item.name,
-      params: util.getFunctionParamNames(item.handle),
-    }))
-    const uniqueListeners = [...new Set(allListeners)]
-    const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted']
-    const listeners = uniqueListeners.map(function (listener) {
-      const o = {}
-      o.name = listener.name
-      o.priority = listener.priority
-      o.collections = listener.collections
-      for (const type of eventTypes) {
-        if (router.eventListeners[type].includes(listener)) {
-          o[type] = true
-        }
-      }
-      return o
+  function addRoutesAndMiddleware() {
+    // Allow CORS
+    router.use(function addCorsHeaders(req, res, next) {
+      res.header('Access-Control-Allow-Origin', '*')
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-access-token')
+      next()
     })
-    listeners.sort((a,b) => a.priority - b.priority)
-    const collections = Object.keys(router.db).filter((col) => col !== 'pgpool')
-    return {
-      nodeVersion: process.version,
-      uptime: util.friendlyDuration(process.uptime()),
-      env: process.env.NODE_ENV,
-      installed: req.settings.installed || false,
-      middleware,
-      listeners,
-      collections,
-    }
-  }))
-  router.post('/install', ph(async (req) => installApi.install(req, router)))
-  router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
 
-  router.post('/user/login', ph(usersApi.login))
+    router.use(bodyParser.json({
+      type: '*/*', // The wildcard type ensures it works even without the application/json header
+      limit: router.settings.body_limit || '1mb',
+    }))
 
-  router.use(auth.middleware) // Add user id to request
-  router.use(userPermissions.middleware) // Add user and permissions to request
+    router.use(function attachVariablesToReq(req, res, next) {
+      req.settings = router.settings
+      req.eventListeners = router.eventListeners
+      req.db = router.db
+      req.modules = router.modules
+      req.setupCollectionDb = router.setupCollectionDb
+      req.getSetting = router.getSetting
+      req.requestId = randomstring.generate(12)
+      res.header('X-Request-ID', req.requestId)
+      next()
+    })
 
-  router.use(router.custom) // Externally added middleware
+    router.use(loggingMiddleware)
 
-  router.post('/user/register', ph(usersApi.register))
-  router.get('/users?/me', ph(usersApi.getMe))
+    router.notify = util.notify
 
-  router.get('/:collection/schema', ph(collectionsApi.getSchema))
-  router.get('/:collection', ph(collectionsApi.get))
-  router.post('/:collection', ph(collectionsApi.insert))
-  router.get('/:collection/:id', ph(collectionsApi.getById))
-  router.put('/:collection/:id', ph(collectionsApi.replaceById))
-  router.post('/:collection/:id/update', ph(collectionsApi.updateById))
-  router.delete('/:collection/:id', ph(collectionsApi.deleteById))
-
-  // Error handler, log and send to user
-  // eslint-disable-next-line no-unused-vars
-  router.use(function safeErrorHandler(err, req, res, next) {
-    console.error('my err handler')
-    console.error(err.stack)
-    res.status(res.errCode || 500)
-    if (process.env.DEBUG || (req.hasPermission && req.hasPermission('view errors'))) {
-      res.send({
-        error: err
+    router.get('/status', ph(function (req) {
+      const allListeners = [].concat.apply([], Object.values(router.eventListeners))
+      const middleware = router.stack.filter((item) => !item.route).map((item) => ({
+        name: item.name,
+        params: util.getFunctionParamNames(item.handle),
+      }))
+      const uniqueListeners = [...new Set(allListeners)]
+      const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted']
+      const listeners = uniqueListeners.map(function (listener) {
+        const o = {}
+        o.name = listener.name
+        o.priority = listener.priority
+        o.collections = listener.collections
+        for (const type of eventTypes) {
+          if (router.eventListeners[type].includes(listener)) {
+            o[type] = true
+          }
+        }
+        return o
       })
-    } else {
-      res.send({
-        error: 'something wrong happened'
-      })
-    }
-  })
+      listeners.sort((a, b) => a.priority - b.priority)
+      const collections = Object.keys(router.db).filter((col) => col !== 'pgpool')
+      return {
+        nodeVersion: process.version,
+        uptime: util.friendlyDuration(process.uptime()),
+        env: process.env.NODE_ENV,
+        installed: req.settings.installed || false,
+        middleware,
+        listeners,
+        collections,
+      }
+    }))
+    router.post('/install', ph(async (req) => installApi.install(req, router)))
+    router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
+
+    router.post('/user/login', ph(usersApi.login))
+
+    router.use(auth.middleware) // Add user id to request
+    router.use(userPermissions.middleware) // Add user and permissions to request
+
+    router.use(router.custom) // Externally added middleware
+
+    router.post('/user/register', ph(usersApi.register))
+    router.get('/users?/me', ph(usersApi.getMe))
+
+    router.get('/:collection/schema', ph(collectionsApi.getSchema))
+    router.get('/:collection', ph(collectionsApi.get))
+    router.post('/:collection', ph(collectionsApi.insert))
+    router.get('/:collection/:id', ph(collectionsApi.getById))
+    router.put('/:collection/:id', ph(collectionsApi.replaceById))
+    router.post('/:collection/:id/update', ph(collectionsApi.updateById))
+    router.delete('/:collection/:id', ph(collectionsApi.deleteById))
+
+    // Error handler, log and send to user
+    // eslint-disable-next-line no-unused-vars
+    router.use(function safeErrorHandler(err, req, res, next) {
+      console.error('my err handler')
+      console.error(err.stack)
+      res.status(res.errCode || 500)
+      if (process.env.DEBUG || (req.hasPermission && req.hasPermission('view errors'))) {
+        res.send({
+          error: err
+        })
+      } else {
+        res.send({
+          error: 'something wrong happened'
+        })
+      }
+    })
+  }
 
   return router
 }

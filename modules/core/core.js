@@ -34,6 +34,11 @@ exports.settingSchema = {
       }
     }
   },
+  body_limit: {
+    type: 'string',
+    description: 'Max incoming body size for requests, defaults to 1mb.',
+    default: '1mb',
+  }
 }
 
 exports.collections = async function(app) {
