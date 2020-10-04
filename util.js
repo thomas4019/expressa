@@ -229,3 +229,16 @@ exports.addIdIfMissing = function addIdIfMissing (document) {
     document._id = exports.generateDocumentId()
   }
 }
+
+exports.sortObjectKeys = function sortObjectKeys(object) {
+  if (typeof object != 'object' || object instanceof Array) { // Do not sort the array
+    return object
+  }
+  const keys = Object.keys(object)
+  keys.sort()
+  const newObject = {}
+  for (let i = 0; i < keys.length; i++){
+    newObject[keys[i]] = exports.sortObjectKeys(object[keys[i]])
+  }
+  return newObject
+}

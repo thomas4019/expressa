@@ -237,7 +237,7 @@ module.exports.api = function (settings) {
     router.use(auth.middleware) // Add user id to request
     router.use(userPermissions.middleware) // Add user and permissions to request
 
-    router.get('/status', ph(statusApi.getStatus(router)));
+    router.get('/status', ph(statusApi.getStatus(router)))
 
     router.use(router.custom) // Externally added middleware
 

@@ -64,6 +64,7 @@ module.exports = function (settings, collection) {
       }
     },
     create: async function (data) {
+      data = util.sortObjectKeys(data)
       util.addIdIfMissing(data)
       const id = data._id
       const existing = await this.exists(id)
@@ -75,6 +76,7 @@ module.exports = function (settings, collection) {
     },
     update: async function (id, data) {
       data._id = data._id || id
+      data = util.sortObjectKeys(data)
       await store.saveAsync(data._id, data)
       if (data._id !== id) {
         await store.delete(id)
