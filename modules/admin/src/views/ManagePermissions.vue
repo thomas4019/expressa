@@ -58,7 +58,7 @@ export default {
         role.permissions = {}
         this.data.forEach((row) => {
           if (row[role._id]) {
-            role.permissions[row.name] = true
+            role.permissions[row.name] = 1
           }
         })
         await request({ method: 'put', url: `/role/${role._id}`, data: role })
