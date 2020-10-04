@@ -1,7 +1,7 @@
 const util = require('../../util')
 
 exports.permissions = function () {
-  return ['view errors', 'schemas: view']
+  return ['view errors', 'schemas: view', 'view server details']
 }
 
 exports.settingSchema = {

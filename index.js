@@ -16,6 +16,7 @@ const util = require('./util')
 const collectionsApi = require('./controllers/collections')
 const usersApi = require('./controllers/users')
 const installApi = require('./controllers/install')
+const statusApi = require('./controllers/status')
 const userPermissions = require('./middleware/users_permissions')
 const loggingMiddleware = require('./middleware/logging')
 
@@ -228,38 +229,6 @@ module.exports.api = function (settings) {
 
     router.notify = util.notify
 
-    router.get('/status', ph(function (req) {
-      const allListeners = [].concat.apply([], Object.values(router.eventListeners))
-      const middleware = router.stack.filter((item) => !item.route).map((item) => ({
-        name: item.name,
-        params: util.getFunctionParamNames(item.handle),
-      }))
-      const uniqueListeners = [...new Set(allListeners)]
-      const eventTypes = ['get', 'post', 'put', 'delete', 'changed', 'deleted']
-      const listeners = uniqueListeners.map(function (listener) {
-        const o = {}
-        o.name = listener.name
-        o.priority = listener.priority
-        o.collections = listener.collections
-        for (const type of eventTypes) {
-          if (router.eventListeners[type].includes(listener)) {
-            o[type] = true
-          }
-        }
-        return o
-      })
-      listeners.sort((a, b) => a.priority - b.priority)
-      const collections = Object.keys(router.db).filter((col) => col !== 'pgpool')
-      return {
-        nodeVersion: process.version,
-        uptime: util.friendlyDuration(process.uptime()),
-        env: process.env.NODE_ENV,
-        installed: req.settings.installed || false,
-        middleware,
-        listeners,
-        collections,
-      }
-    }))
     router.post('/install', ph(async (req) => installApi.install(req, router)))
     router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
 
@@ -267,6 +236,8 @@ module.exports.api = function (settings) {
 
     router.use(auth.middleware) // Add user id to request
     router.use(userPermissions.middleware) // Add user and permissions to request
+
+    router.get('/status', ph(statusApi.getStatus(router)));
 
     router.use(router.custom) // Externally added middleware
 
