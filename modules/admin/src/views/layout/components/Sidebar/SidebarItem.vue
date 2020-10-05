@@ -13,7 +13,7 @@
         <item v-if="item.meta" :icon="item.meta.icon" :title="item.meta.title" />
       </template>
 
-      <template v-for="child in item.children" v-if="!child.hidden">
+      <template v-for="child in filterOutHidden(item.children)">
         <sidebar-item
           v-if="child.children&&child.children.length>0"
           :key="child.path"
@@ -62,6 +62,9 @@ export default {
     }
   },
   methods: {
+    filterOutHidden(children) {
+      return children.filter(child => !child.hidden)
+    },
     hasOneShowingChild(children, parent) {
       const showingChildren = children.filter(item => {
         if (item.hidden) {
