@@ -152,13 +152,10 @@ exports.updateById = async function (req) {
 
 exports.deleteById = async function (req) {
   assertValidCollection(req)
-  await util.notify('delete', req, req.params.collection, {
-    _id: req.params.id
-  })
+  const doc = await req.db[req.params.collection].get(req.params.id)
+  await util.notify('delete', req, req.params.collection, doc)
 
   await req.db[req.params.collection].delete(req.params.id)
-  await util.notify('deleted', req, req.params.collection, {
-    _id: req.params.id
-  })
+  await util.notify('deleted', req, req.params.collection, doc)
   return { status: 'OK' }
 }

@@ -331,6 +331,27 @@ describe('basic collections', function () {
       })
   })
 
+  it('delete a document with own permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['testdoc: edit', 'testdoc: delete own'])
+
+    const updatedDoc = {
+      title: 'doc1-updated',
+    }
+    await request(app)
+      .put('/testdoc/test123')
+      .set('x-access-token', token)
+      .send(updatedDoc)
+      .expect(200)
+
+    await request(app)
+      .delete('/testdoc/test123')
+      .set('x-access-token', token)
+      .expect(200)
+      .expect({
+        status: 'OK'
+      })
+  })
+
   it('fail to delete a non-existent document', async function () {
     const token = await testutils.getUserWithPermissions(api, 'testdoc: delete')
     await request(app)
