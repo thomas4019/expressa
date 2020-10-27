@@ -26,7 +26,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
       req.user = user
       roles = (user.roles || []).concat(['Authenticated'])
     } catch (e) {
-      throw new util.ApiError('User no longer exists')
+      throw new util.ApiError(404, 'User no longer exists')
     }
   } else {
     req.user = { permissions: {} }
