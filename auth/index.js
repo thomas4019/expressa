@@ -20,5 +20,8 @@ exports.middleware = function authMiddleware(req, res, next) {
     }
     next()
   }
-  Promise.resolve(asyncFn(req, res, next)).catch(next)
+  Promise.resolve(asyncFn(req, res, next)).catch((e) => {
+    const error = e.message = 'jwt expired' ? 'expired token' : 'jwt error'
+    res.status(400).send({ error })
+  })
 }
