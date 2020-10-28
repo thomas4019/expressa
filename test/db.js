@@ -149,7 +149,7 @@ collectionNames.forEach(function (collection) {
 
     if (collection === 'postgrestest') {
       it('use pool to do query', async function () {
-        const res = await api.db.pgpool.query('SELECT $1::text as message', ['Hello world!'])
+        const res = await api.util.pgpool.query('SELECT $1::text as message', ['Hello world!'])
         expect(res.rows[0].message).to.equal('Hello world!')
       })
     }
