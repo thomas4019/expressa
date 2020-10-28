@@ -106,6 +106,11 @@ module.exports.api = function (settings) {
   router.db = {
     settings: dbTypes[router.settings.settings_db_type || 'file'](router.settings, 'settings')
   }
+  router.util = {
+    ApiError: util.ApiError,
+    generateDocumentId: util.generateDocumentId,
+    doLogin: auth.doLogin
+  }
   router.eventListeners = {}
 
   router.setupCollectionDb = async function(collection) {
