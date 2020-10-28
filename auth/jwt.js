@@ -4,14 +4,14 @@ const util = require('../util')
 
 // User document already validated, created, and saved to database
 // The id of that document is given.
-exports.doLogin = function (user, req) {
+exports.doLogin = function (user, req, options = {}) {
   if (!req.settings.jwt_secret) {
     throw new util.ApiError(500, 'missing jwt_secret in settings')
   }
   const token = jwt.sign({
     _id: user._id,
     email: user.email
-  }, req.settings.jwt_secret, {})
+  }, req.settings.jwt_secret, options)
   return {
     token: token,
     uid: user._id
