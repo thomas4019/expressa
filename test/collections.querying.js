@@ -14,7 +14,8 @@ describe('querying collections', function () {
       .send({
         title: 'doc1',
         data: {
-          number: 0
+          number: 0,
+          field: 'test111'
         }
       })
       .expect(200)
@@ -193,5 +194,37 @@ describe('querying collections', function () {
     expect(res.body[0].title).to.equal('doc3')
     expect(res.body[1].title).to.equal('doc2')
     expect(res.body[2].title).to.equal('doc1')
+  })
+
+  it('project a specific field', async function () {
+    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const res = await request(app)
+      .get('/testdoc?fields={"title":1}')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body).to.have.lengthOf(3)
+    expect(res.body[0].title).to.equal('doc1')
+    expect(res.body[0].data).to.be.undefined
+  })
+
+  it('project deep fields', async function() {
+    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const res = await request(app)
+      .get('/testdoc?fields={"data":1}')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body).to.have.lengthOf(3)
+    expect(res.body[0].title).to.be.undefined
+    expect(res.body[0].data.number).to.equal(0)
+    expect(res.body[0].data.field).to.equal('test111')
+
+    const res2 = await request(app)
+      .get('/testdoc?fields={"data.number":1}')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res2.body).to.have.lengthOf(3)
+    expect(res2.body[0].title).to.be.undefined
+    expect(res2.body[0].data.number).to.equal(0)
+    expect(res2.body[0].data.field).to.be.undefined
   })
 })

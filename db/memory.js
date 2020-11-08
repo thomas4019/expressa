@@ -12,7 +12,7 @@ module.exports = function (settings, collection) {
     all: async function () {
       return this.find({})
     },
-    find: async function (query, offset, limit, orderby) {
+    find: async function (query, offset, limit, orderby, fields) {
       const arr = Object.keys(store).map(function (id) {
         return store[id]
       })
@@ -26,6 +26,9 @@ module.exports = function (settings, collection) {
         matches = matches.slice(offset)
       } else if (typeof limit !== 'undefined') {
         matches = matches.slice(0, limit)
+      }
+      if (fields) {
+        matches = matches.map((doc) => util.mongoProject(doc, fields))
       }
       return matches
     },

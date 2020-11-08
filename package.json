@@ -12,6 +12,7 @@
     "bcryptjs": "2.4.3",
     "body-parser": "^1.19.0",
     "debug": "^2.6.1",
+    "dot-object": "^2.1.4",
     "express": "^4.17.1",
     "jfs": "^0.3.0",
     "jsonwebtoken": "^8.5.1",
