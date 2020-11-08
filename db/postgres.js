@@ -25,10 +25,11 @@ module.exports = function (settings, collectionId, collection) {
     all: async function () {
       return this.find({})
     },
-    find: async function (rawQuery, offset, limit, orderby) {
+    find: async function (rawQuery, offset, limit, orderby, fields) {
       const arrayFields = getArrayPaths('', collection.schema)
       const pgQuery = mongoToPostgres('data', rawQuery || {}, arrayFields)
-      let query = 'SELECT * FROM ' + collectionId + (pgQuery ? ' WHERE ' + pgQuery : '')
+      const select = fields ? mongoToPostgres.convertSelect('data', fields) : '*'
+      let query = 'SELECT ' + select + ' FROM ' + collectionId + (pgQuery ? ' WHERE ' + pgQuery : '')
       if (typeof orderby !== 'undefined') {
         query += ' ORDER BY '
         query += orderby.map((ordering) => {

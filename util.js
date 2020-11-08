@@ -5,6 +5,7 @@ const debug = require('debug')('expressa')
 const crypto = require('crypto')
 const pg = require('pg')
 const pgPools = {}
+const dot = require('dot-object')
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
@@ -20,6 +21,74 @@ exports.orderBy = function (data, orderby) {
     return 0
   })
   return data
+}
+
+function isObject(obj) {
+  return typeof obj === 'object'
+}
+
+/**
+ * Returns an excerpt of the selected document based on an include projection.
+ *
+ * Note:
+ * It includes the fields listed in the projection with a value of 1. the
+ * unknown fields or the fields with a value other than 1 are ignored.
+ * @param {Object}          the selected document,
+ * @param {Object}          the projection to apply,
+ * @param {Object}          the initial value of the document excerpt,
+ */
+function _include(obj, source, data) {
+  for (const prop in source) {
+    if (typeof obj[prop] !== 'undefined') {
+      if (isObject(source[prop])) {
+        data[prop] = {}
+        _include(obj[prop], source[prop], data[prop])
+      } else if (source[prop] == 1) {
+        if (isObject(obj[prop])) {
+          data[prop] = exports.clone(obj[prop])
+        } else if (typeof obj[prop] !== 'undefined') {
+          data[prop] = obj[prop]
+        }
+      }
+    }
+  }
+  return data
+}
+
+/**
+ * Returns an excerpt of the selected document based on an exclude projection.
+ *
+ * Note:
+ * It excludes the fields listed in the projection with a value of 0. The
+ * unspecified fields are kept.
+ */
+function _exclude(obj, source, data) {
+  for (const prop in obj) {
+    if (source[prop] !== undefined && !source[prop]) {
+      if (isObject(source[prop])) {
+        data[prop] = {}
+        _exclude(obj[prop], source[prop], data[prop])
+      }
+    } else if (isObject(obj[prop])) {
+      data[prop] = exports.clone(obj[prop])
+    } else {
+      data[prop] = obj[prop]
+    }
+  }
+  return data
+}
+
+exports.mongoProject = function(record, projection) {
+  if (!projection || Object.keys(projection).length < 1) {
+    return record
+  }
+  const isInclude = projection[Object.keys(projection)[0]]
+  if (typeof projection._id === 'undefined') {
+    projection = {...projection, _id: 1}
+  }
+  const expanded = dot.object(projection)
+  const result = isInclude ? _include(record, expanded, {}) : _exclude(record, expanded, {})
+  return result
 }
 
 exports.normalizeOrderBy = function(orderby) {

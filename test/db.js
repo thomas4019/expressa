@@ -170,6 +170,26 @@ collectionNames.forEach(function (collection) {
       expect(doc._id).to.equal(id2)
     })
 
+    it('project field', async function () {
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 1 })
+      expect(docs[0]).to.eql( {data: { field: '123' }, _id: docs[0]._id })
+    })
+
+    it('project deep field', async function () {
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { 'data.field': 1 })
+      expect(docs[0]).to.eql( {data: { field: '123' }, _id: docs[0]._id })
+    })
+
+    it('project field exclude id', async function () {
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 1, _id: 0 })
+      expect(docs[0]).to.eql( {data: { field: '123' } })
+    })
+
+    it('project exclude field', async function () {
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 0 })
+      expect(docs[0]).to.eql( { title: 'first', _id: docs[0]._id })
+    })
+
     if (collection === 'postgrestest') {
       it('use pool to do query', async function () {
         const res = await api.util.pgpool.query('SELECT $1::text as message', ['Hello world!'])

@@ -41,11 +41,12 @@ exports.get = async function (req) {
   if (typeof req.db[req.params.collection] === 'undefined') {
     throw new util.ApiError(404, 'unknown collection')
   }
+  const fields = req.query.fields ? JSON.parse(req.query.fields) : null
   let query
   if (req.query.query) {
     query = JSON.parse(req.query.query)
   } else {
-    const { skip, offset, limit, page, orderby, ...params } = req.query // eslint-disable-line no-unused-vars
+    const { skip, offset, limit, page, orderby, fields, ...params } = req.query // eslint-disable-line no-unused-vars
     query = queryStringParser.parse(params)
   }
   if (req.query.skip) {
@@ -67,7 +68,8 @@ exports.get = async function (req) {
     orderby = util.normalizeOrderBy(orderby)
   }
 
-  const data = await req.db[req.params.collection].find(query, req.query.skip || req.query.offset, req.query.limit, orderby)
+  const data = await req.db[req.params.collection].find(query, req.query.skip || req.query.offset,
+    req.query.limit, orderby, fields)
   total = data.length
   const limit = req.query.pageitems || (total > 10 ? 10 : total)
   // calculate pagination in case `page`-queryarg was passed

@@ -17,9 +17,9 @@ module.exports = function (settings, collection) {
     all: async function () {
       return this.find({})
     },
-    find: async function (query, skip, limit, orderby) {
+    find: async function (query, skip, limit, orderby, fields) {
       const db = await this.getClient()
-      const cursor = db.collection(collection).find(query).sort(orderby)
+      const cursor = db.collection(collection).find(query, { fields }).sort(orderby)
       if (typeof skip !== 'undefined') {
         cursor.skip(skip)
       }
@@ -27,7 +27,11 @@ module.exports = function (settings, collection) {
         cursor.limit(limit)
       }
       const docs = await cursor.toArray()
-      docs.forEach((doc) => { doc._id = doc._id.toString() })
+      docs.forEach((doc) => {
+        if (doc._id) {
+          doc._id = doc._id.toString()
+        }
+      })
       return docs
     },
     get: async function (id) {

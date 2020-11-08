@@ -20,7 +20,7 @@ module.exports = function (settings, collection) {
     all: async function () {
       return this.find({})
     },
-    find: async function (query, offset, limit, orderby) {
+    find: async function (query, offset, limit, orderby, fields) {
       const data = await store.allAsync()
       const arr = Object.keys(data).map(function (id) {
         return data[id]
@@ -41,6 +41,9 @@ module.exports = function (settings, collection) {
           return util.clone(m)
         })
       } // prevent store from being modified
+      if (fields) {
+        matches = matches.map((doc) => util.mongoProject(doc, fields))
+      }
       return matches
     },
     get: async function (id) {
