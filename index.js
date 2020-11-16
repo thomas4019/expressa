@@ -118,7 +118,7 @@ module.exports.api = function (settings) {
 
   router.setupCollectionDb = async function(collection) {
     debug(`init collection db ${collection._id} ${collection.storage}`)
-    router.db[collection._id] = dbTypes[collection.storage](router.settings, collection._id)
+    router.db[collection._id] = dbTypes[collection.storage](router.settings, collection._id, collection)
     if (collection.cacheInMemory) {
       router.db[collection._id] = dbTypes['cached'](router.db[collection._id])
       debug('initializing ' + collection._id + ' as a memory cached collection')

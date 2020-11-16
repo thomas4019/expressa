@@ -33,7 +33,20 @@ collectionNames.forEach(function (collection) {
             data: {
               type: 'object',
               additionalProperties: true,
-              properties: {}
+              properties: {
+                nestedArr: {
+                  type: 'array',
+                  items: {
+                    type: 'string'
+                  }
+                },
+              }
+            },
+            arr: {
+              type: 'array',
+              items: {
+                type: 'string'
+              }
             },
             meta: {
               type: 'object',
@@ -44,7 +57,7 @@ collectionNames.forEach(function (collection) {
                 },
                 updated: {
                   type: 'string'
-                }
+                },
               }
             }
           },
@@ -75,7 +88,7 @@ collectionNames.forEach(function (collection) {
     })
 
     it('create with id', async function () {
-      const id = await db.create({ _id: id2, title: 'second' })
+      const id = await db.create({ _id: id2, title: 'second', arr: ['testing'], data: { nestedArr: ['abc'] } })
       expect(id).to.equal(id2)
     })
 
@@ -129,6 +142,16 @@ collectionNames.forEach(function (collection) {
 
     it('find using nested $exists', async function () {
       const docs = await db.find({ 'data.field': { $exists: true } })
+      expect(docs.length).to.equal(1)
+    })
+
+    it('find matching array field', async function () {
+      const docs = await db.find({ arr: 'testing' })
+      expect(docs.length).to.equal(1)
+    })
+
+    it('find matching deeper array field', async function () {
+      const docs = await db.find({ 'data.nestedArr': 'abc' })
       expect(docs.length).to.equal(1)
     })
 

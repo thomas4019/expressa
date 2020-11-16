@@ -15,6 +15,12 @@ describe('basic collections', function () {
           _id: {
             type: 'string'
           },
+          arr: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
+          },
           title: {
             type: 'string'
           },

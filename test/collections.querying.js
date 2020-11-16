@@ -5,6 +5,10 @@ const util = require('../util.js')
 const testutils = require('./testutils')
 const { app, api } = testutils
 
+/**
+ * Verify pagination
+ * Note: these tests are not for verifying db implemementations, see db.js
+ */
 describe('querying collections', function () {
   it('create doc 1', async function () {
     const token = await util.getUserWithPermissions(api, 'testdoc: create')
@@ -13,6 +17,7 @@ describe('querying collections', function () {
       .set('x-access-token', token)
       .send({
         title: 'doc1',
+        arr: ['testing'],
         data: {
           number: 0
         }
@@ -83,6 +88,15 @@ describe('querying collections', function () {
       .set('x-access-token', token)
       .expect(200)
     expect(res.body[0].title).to.equal('doc3')
+    expect(res.body).to.have.lengthOf(1)
+  })
+
+  it('return docs matching array field', async function () {
+    const res = await request(app)
+      .get('/testdoc?query={"arr": "testing"}')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body[0].title).to.equal('doc1')
     expect(res.body).to.have.lengthOf(1)
   })
 
