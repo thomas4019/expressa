@@ -4,20 +4,6 @@ const util = require('../util')
 module.exports = function (settings, collectionId, collection) {
   const pool = util.getPgPool(settings.postgresql_uri)
 
-  function getArrayPaths(key, value) {
-    if (!value)
-      return []
-    if (value.type === 'array')
-      return [key]
-    if (value.type === 'object') {
-      return Object.entries(value.properties)
-        .map(([key2, value]) => {
-          return getArrayPaths(key ? key + '.' + key2 : key2, value)
-        })
-        .flat()
-    }
-  }
-
   return {
     init: async function () {
       await pool.query('CREATE TABLE IF NOT EXISTS ' + collectionId + ' (id uuid primary key, data jsonb)')
@@ -26,9 +12,9 @@ module.exports = function (settings, collectionId, collection) {
       return this.find({})
     },
     find: async function (rawQuery, offset, limit, orderby, fields) {
-      const arrayFields = getArrayPaths('', collection.schema)
+      const arrayFields = util.getArrayPaths('', collection.schema)
       const pgQuery = mongoToPostgres('data', rawQuery || {}, arrayFields)
-      const select = fields ? mongoToPostgres.convertSelect('data', fields) : '*'
+      const select = fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
       let query = 'SELECT ' + select + ' FROM ' + collectionId + (pgQuery ? ' WHERE ' + pgQuery : '')
       if (typeof orderby !== 'undefined') {
         query += ' ORDER BY '

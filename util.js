@@ -23,6 +23,21 @@ exports.orderBy = function (data, orderby) {
   return data
 }
 
+exports.getArrayPaths = function (key, value) {
+  if (!value)
+    return []
+  if (value.type === 'array')
+    return [key].concat(exports.getArrayPaths(key, value.items)).filter(el => el)
+  if (value.type === 'object') {
+    return Object.entries(value.properties)
+      .map(([key2, value]) => {
+        return exports.getArrayPaths(key ? key + '.' + key2 : key2, value)
+      })
+      .flat()
+      .filter(el => el)
+  }
+}
+
 function isObject(obj) {
   return typeof obj === 'object'
 }
@@ -35,14 +50,17 @@ function isObject(obj) {
  * unknown fields or the fields with a value other than 1 are ignored.
  * @param {Object}          the selected document,
  * @param {Object}          the projection to apply,
- * @param {Object}          the initial value of the document excerpt,
  */
-function _include(obj, source, data) {
+function _include(obj, source) {
+  const data = {}
   for (const prop in source) {
     if (typeof obj[prop] !== 'undefined') {
       if (isObject(source[prop])) {
-        data[prop] = {}
-        _include(obj[prop], source[prop], data[prop])
+        if (Array.isArray(obj[prop])) {
+          data[prop] = obj[prop].map((element) => _include(element, source[prop]))
+        } else {
+          data[prop] = _include(obj[prop], source[prop])
+        }
       } else if (source[prop] == 1) {
         if (isObject(obj[prop])) {
           data[prop] = exports.clone(obj[prop])
@@ -62,7 +80,8 @@ function _include(obj, source, data) {
  * It excludes the fields listed in the projection with a value of 0. The
  * unspecified fields are kept.
  */
-function _exclude(obj, source, data) {
+function _exclude(obj, source) {
+  const data = {}
   for (const prop in obj) {
     if (source[prop] !== undefined && !source[prop]) {
       if (isObject(source[prop])) {
@@ -87,7 +106,7 @@ exports.mongoProject = function(record, projection) {
     projection = {...projection, _id: 1}
   }
   const expanded = dot.object(projection)
-  const result = isInclude ? _include(record, expanded, {}) : _exclude(record, expanded, {})
+  const result = isInclude ? _include(record, expanded) : _exclude(record, expanded)
   return result
 }
 

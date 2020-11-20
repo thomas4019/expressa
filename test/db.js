@@ -45,7 +45,26 @@ collectionNames.forEach(function (collection) {
             arr: {
               type: 'array',
               items: {
-                type: 'string'
+                type: 'object',
+                properties: {
+                  color: {
+                    type: 'string'
+                  },
+                  num: {
+                    type: 'number'
+                  },
+                  subarray: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        v: {
+                          type: 'string'
+                        }
+                      }
+                    }
+                  }
+                }
               }
             },
             meta: {
@@ -83,12 +102,21 @@ collectionNames.forEach(function (collection) {
     const id2 = '6c4b9d57-4c89-4ad8-90e2-9a5337c1572c'
 
     it('create without id', async function () {
-      id = await db.create({ title: 'first', data: { field: '123' } })
+      id = await db.create({
+        title: 'first',
+        data: { field: '123' },
+        arr: [{ color: 'red', subarray: [{ v: 'abc' }] }],
+      })
       expect(id.length).to.be.greaterThan(6)
     })
 
     it('create with id', async function () {
-      const id = await db.create({ _id: id2, title: 'second', arr: ['testing'], data: { nestedArr: ['abc'] } })
+      const id = await db.create({
+        _id: id2,
+        title: 'second',
+        arr: [ { color: 'blue', num: 1337 }],
+        data: { nestedArr: ['abc'] }
+      })
       expect(id).to.equal(id2)
     })
 
@@ -99,6 +127,7 @@ collectionNames.forEach(function (collection) {
     it('get by id', async function () {
       const doc = await db.get(id2)
       expect(doc.title).to.equal('second')
+      expect(doc.arr[0].color).to.equal('blue')
     })
 
     it('get by missing id returns 404 error', async function () {
@@ -146,7 +175,7 @@ collectionNames.forEach(function (collection) {
     })
 
     it('find matching array field', async function () {
-      const docs = await db.find({ arr: 'testing' })
+      const docs = await db.find({ arr: { color: 'blue', num: 1337 }  })
       expect(docs.length).to.equal(1)
     })
 
@@ -165,14 +194,19 @@ collectionNames.forEach(function (collection) {
       expect(docs.length).to.equal(0)
     })
 
-    it('update with id', async function () {
-      const doc = await db.update(id2, { title: 'second-updated', data: { more: true } })
-      expect(doc._id).to.equal(id2)
-    })
-
     it('project field', async function () {
       const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 1 })
       expect(docs[0]).to.eql( {data: { field: '123' }, _id: docs[0]._id })
+    })
+
+    it('project object field within array', async function () {
+      const docs = await db.find({ title: 'second' }, 0, 10, undefined, { 'arr.color': 1 })
+      expect(docs[0]).to.eql( {arr: [ { color: 'blue' }], _id: docs[0]._id })
+    })
+
+    it('project object field within nested arrays', async function () {
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { 'arr.subarray.v': 1 })
+      expect(docs[0]).to.eql( {arr: [ { subarray: [{ v: 'abc' }] }], _id: docs[0]._id })
     })
 
     it('project deep field', async function () {
@@ -186,8 +220,13 @@ collectionNames.forEach(function (collection) {
     })
 
     it('project exclude field', async function () {
-      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 0 })
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 0, arr: 0 })
       expect(docs[0]).to.eql( { title: 'first', _id: docs[0]._id })
+    })
+
+    it('update with id', async function () {
+      const doc = await db.update(id2, { title: 'second-updated', data: { more: true } })
+      expect(doc._id).to.equal(id2)
     })
 
     if (collection === 'postgrestest') {
