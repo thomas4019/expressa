@@ -102,7 +102,8 @@ exports.insert = async function (req) {
 
 exports.getById = async function (req) {
   assertValidCollection(req)
-  const data = await req.db[req.params.collection].get(req.params.id)
+  const fields = req.query.fields ? JSON.parse(req.query.fields) : null
+  const data = await req.db[req.params.collection].get(req.params.id, fields)
   await util.notify('get', req, req.params.collection, data)
   await util.notify('getpresend', req, req.params.collection, data)
   return data

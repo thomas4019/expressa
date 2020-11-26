@@ -14,6 +14,7 @@ You can access a collection's database using `expressa.db[collectionName].action
 * MongoDB
 * PostgreSQL (using [jsonb](http://www.postgresql.org/docs/9.4/static/datatype-json.html) and [mongo-query-to-postgres-jsonb](https://github.com/thomas4019/mongo-query-to-postgres-jsonb))
 * Text files (using [json-file-store](https://github.com/flosse/json-file-store) and [mongo-query](https://github.com/Automattic/mongo-query))
+* In-memory (useful for small/medium ephemeral datasets like logs)
 
 Other JSON capable databases can be added easily (pull requests welcome!) by writing a wrapper that supports each of the above methods.
 

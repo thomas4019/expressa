@@ -34,9 +34,9 @@ module.exports = function (settings, collection) {
       })
       return docs
     },
-    get: async function (id) {
+    get: async function (id, fields) {
       const db = await this.getClient()
-      const doc = await db.collection(collection).findOne({ _id: id })
+      const doc = await db.collection(collection).findOne({ _id: id }, { fields })
       if (doc) {
         doc._id = doc._id.toString()
       }

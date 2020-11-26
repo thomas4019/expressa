@@ -31,8 +31,10 @@ module.exports = function (settings, collectionId, collection) {
       const result = await pool.query(query)
       return result.rows.map((row) => row.data)
     },
-    get: async function (id) {
-      const result = await pool.query('SELECT * FROM ' + collectionId + ' WHERE id = $1', [id])
+    get: async function (id, fields) {
+      const arrayFields = util.getArrayPaths('', collection.schema)
+      const select = fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
+      const result = await pool.query(`SELECT ${select} FROM ${collectionId} WHERE id = $1`, [id])
       if (result.rowCount === 0) {
         throw new util.ApiError(404, 'document not found')
       }

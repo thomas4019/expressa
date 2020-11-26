@@ -14,8 +14,8 @@ module.exports = function (storage) {
     find: function (query, offset, limit, orderby, fields) {
       return cache.find(query, offset, limit, orderby, fields)
     },
-    get: function (id) {
-      return cache.get(id)
+    get: function (id, fields) {
+      return cache.get(id, fields)
     },
     create: async function (data) {
       await cache.create(data)

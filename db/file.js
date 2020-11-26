@@ -46,11 +46,14 @@ module.exports = function (settings, collection) {
       }
       return matches
     },
-    get: async function (id) {
+    get: async function (id, fields) {
       try {
         let data = await store.getAsync(id)
         if (data) {
           data = util.clone(data) // prevent store from getting modified
+        }
+        if (fields) {
+          data = util.mongoProject(data, fields)
         }
         return data
       } catch (err) {

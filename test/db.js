@@ -199,6 +199,11 @@ collectionNames.forEach(function (collection) {
       expect(docs[0]).to.eql( {data: { field: '123' }, _id: docs[0]._id })
     })
 
+    it('project field with get', async function () {
+      const doc = await db.get(id, { data: 1 })
+      expect(doc).to.eql( {data: { field: '123' }, _id: doc._id })
+    })
+
     it('project object field within array', async function () {
       const docs = await db.find({ title: 'second' }, 0, 10, undefined, { 'arr.color': 1 })
       expect(docs[0]).to.eql( {arr: [ { color: 'blue' }], _id: docs[0]._id })

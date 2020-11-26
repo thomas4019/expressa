@@ -16,6 +16,7 @@ describe('querying collections', function () {
       .post('/testdoc')
       .set('x-access-token', token)
       .send({
+        _id: 'test1',
         title: 'doc1',
         arr: ['testing'],
         data: {
@@ -219,6 +220,16 @@ describe('querying collections', function () {
     expect(res.body).to.have.lengthOf(3)
     expect(res.body[0].title).to.equal('doc1')
     expect(res.body[0].data).to.be.undefined
+  })
+
+  it('project a specific field on get', async function () {
+    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const res = await request(app)
+      .get('/testdoc/test1?fields={"title":1}')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body.title).to.equal('doc1')
+    expect(res.body.data).to.be.undefined
   })
 
   it('project deep fields', async function() {

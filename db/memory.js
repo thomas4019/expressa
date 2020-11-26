@@ -32,11 +32,15 @@ module.exports = function (settings, collection) {
       }
       return matches
     },
-    get: async function (id) {
+    get: async function (id, fields) {
       if (!store[id]) {
         throw new util.ApiError(404, 'document not found')
       }
-      return util.clone(store[id])
+      let doc = util.clone(store[id])
+      if (fields) {
+        doc = util.mongoProject(doc, fields)
+      }
+      return doc
     },
     create: async function (data) {
       util.addIdIfMissing(data)
