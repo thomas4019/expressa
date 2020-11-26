@@ -143,6 +143,11 @@ exports.collections = async function(app) {
           format: 'checkbox',
           description: 'If unset, headers will be sent to prevent caching'
         },
+        plainStringIds: {
+          type: 'boolean',
+          format: 'checkbox',
+          description: 'If set, collection will use a string id instead of PostgreSQL uuid'
+        },
         admin: {
           type: 'object',
           additionalProperties: false,

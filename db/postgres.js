@@ -6,7 +6,11 @@ module.exports = function (settings, collectionId, collection) {
 
   return {
     init: async function () {
-      await pool.query('CREATE TABLE IF NOT EXISTS ' + collectionId + ' (id uuid primary key, data jsonb)')
+      if (collection.plainStringIds) {
+        await pool.query('CREATE TABLE IF NOT EXISTS ' + collectionId + ' (id text primary key, data jsonb)')
+      } else {
+        await pool.query('CREATE TABLE IF NOT EXISTS ' + collectionId + ' (id uuid primary key, data jsonb)')
+      }
     },
     all: async function () {
       return this.find({})
