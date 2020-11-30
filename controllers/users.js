@@ -24,6 +24,7 @@ exports.login = async (req, collection) => {
   const jwt_options = req.settings.jwt_expires_in ? { expiresIn: req.settings.jwt_expires_in } : {}
   const payload = auth.doLogin(user, req, collection, jwt_options)
   req.uid = user._id
+  req.ucollection = collection
   await userPermissions.addRolePermissionsAsync(req)
   payload.canUseAdmin = req.hasPermission('login to admin')
   return payload

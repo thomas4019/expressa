@@ -10,7 +10,8 @@ exports.doLogin = function (user, req, collection, jwt_options = {}) {
   }
   const token = jwt.sign({
     _id: user._id,
-    email: user.email
+    email: user.email,
+    collection
   }, req.settings.jwt_secret, jwt_options)
   return {
     token: token,
