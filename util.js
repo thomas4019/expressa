@@ -330,3 +330,28 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
   }
   return newObject
 }
+
+exports.getUserCollectionAuthRoutes = function getUserCollectionAuthRoutes() {
+  return {
+    register: '/user/register',
+    login: '/user/login',
+    me: '/users?/me'
+  }
+}
+
+exports.getAuthCollections = async function(api) {
+  // all or nothing to pass the test
+  const colls = (await api.db.collection.all()).filter((coll) => coll.authRoutes &&
+    coll.authRoutes.register &&
+    coll.authRoutes.login &&
+    coll.authRoutes.me
+  )
+  // for case before expressa is installed
+  if (!colls.length) {
+    colls.push({
+      _id: 'users',
+      authRoutes: exports.getUserCollectionAuthRoutes()
+    })
+  }
+  return colls
+}
