@@ -21,7 +21,8 @@ exports.login = async (req) => {
   if (!auth.isValidPassword(password, user.password)) {
     throw new util.ApiError(401, 'Incorrect password')
   }
-  const payload = auth.doLogin(user, req)
+  const jwt_options = req.settings.jwt_expires_in ? { expiresIn: req.settings.jwt_expires_in }: {}
+  const payload = auth.doLogin(user, req, collection, jwt_options)
   req.uid = user._id
   await userPermissions.addRolePermissionsAsync(req)
   payload.canUseAdmin = req.hasPermission('login to admin')
