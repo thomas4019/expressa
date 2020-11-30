@@ -340,18 +340,27 @@ exports.getUserCollectionAuthRoutes = function getUserCollectionAuthRoutes() {
 }
 
 exports.getAuthCollections = async function(api) {
-  // all or nothing to pass the test
-  const colls = (await api.db.collection.all()).filter((coll) => coll.authRoutes &&
-    coll.authRoutes.register &&
-    coll.authRoutes.login &&
-    coll.authRoutes.me
-  )
-  // for case before expressa is installed
-  if (!colls.length) {
-    colls.push({
-      _id: 'users',
-      authRoutes: exports.getUserCollectionAuthRoutes()
-    })
-  }
+  const all = (await api.db.collection.all())
+  const colls = all.length > 0 ? all.filter((coll) => isValidAuthCollection(coll)) : [{
+    _id: 'users',
+    authRoutes: exports.getUserCollectionAuthRoutes()
+  }]
   return colls
+}
+
+// really being over cautious here to prevent collections
+// unkowingly creating insecure access to database
+function isValidAuthCollection(collection) {
+  const name = collection._id
+  const routes = collection.authRoutes
+  if(routes && routes.register && routes.login && routes.me) {
+    const required = collection.schema && collection.schema.required
+    if (required && required.includes('email') && required.includes('password')) {
+      return true
+    }
+    else {
+      console.error(`Auth Collection Failed: "${name}" needs email and password as required properties`)
+    }
+  }
+  return false
 }
