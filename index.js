@@ -191,7 +191,7 @@ module.exports.api = function (settings) {
       }
     }
 
-    addRoutesAndMiddleware()
+    await addRoutesAndMiddleware()
 
     try {
       await installApi.updateAdminPermissions(router)
@@ -204,7 +204,7 @@ module.exports.api = function (settings) {
     await util.notify('ready', router)
   })()
 
-  function addRoutesAndMiddleware() {
+  async function addRoutesAndMiddleware() {
     // Allow CORS
     router.use(function addCorsHeaders(req, res, next) {
       res.header('Access-Control-Allow-Origin', '*')
@@ -237,7 +237,11 @@ module.exports.api = function (settings) {
     router.post('/install', ph(async (req) => installApi.install(req, router)))
     router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
 
-    router.post('/user/login', ph(usersApi.login))
+    const authCollections = await util.getAuthCollections(router)
+
+    for (const coll of authCollections) {
+      router.post(coll.authRoutes.login, ph((req) => usersApi.login(req, coll._id)))
+    }
 
     router.use(auth.middleware) // Add user id to request
     router.use(userPermissions.middleware) // Add user and permissions to request
@@ -246,8 +250,10 @@ module.exports.api = function (settings) {
 
     router.use(router.custom) // Externally added middleware
 
-    router.post('/user/register', ph(usersApi.register))
-    router.get('/users?/me', ph(usersApi.getMe))
+    for (const coll of authCollections) {
+      router.post(coll.authRoutes.register, ph((req) => usersApi.register(req, coll._id)))
+      router.get(coll.authRoutes.me, ph((req) => usersApi.getMe(req, coll._id)))
+    }
 
     router.get('/:collection/schema', ph(collectionsApi.getSchema))
     router.get('/:collection', ph(collectionsApi.get))
