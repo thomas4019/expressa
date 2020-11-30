@@ -152,6 +152,25 @@ exports.collections = async function(app) {
           format: 'checkbox',
           description: 'If set, collection will use a string id instead of PostgreSQL uuid'
         },
+        authRoutes: {
+          type: 'object',
+          additionalProperties: false,
+          description: 'if collection is to allow authentication using its docs, all of these routes need to have value',
+          properties: {
+            login: {
+              description: 'route for login POST - if this value is set or changed, server must be restarted',
+              type: 'string',
+            },
+            register: {
+              description: 'route for register POST - if this value is set or changed, server must be restarted',
+              type: 'string'
+            },
+            me: {
+              description: 'route for me GET - if this value is set or changed, server must be restarted',
+              type: 'string'
+            },
+          }
+        },
         admin: {
           type: 'object',
           additionalProperties: false,
