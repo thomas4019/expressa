@@ -331,7 +331,7 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
   return newObject
 }
 
-exports.getUserCollectionAuthRoutes = function getUserCollectionAuthRoutes() {
+exports.getDefaultUserCollectionAuthRoutes = function getDefaultUserCollectionAuthRoutes() {
   return {
     register: '/user/register',
     login: '/user/login',
@@ -343,7 +343,7 @@ exports.getAuthCollections = async function(api) {
   const all = (await api.db.collection.all())
   const colls = all.length > 0 ? all.filter((coll) => isValidAuthCollection(coll)) : [{
     _id: 'users',
-    authRoutes: exports.getUserCollectionAuthRoutes()
+    authRoutes: exports.getDefaultUserCollectionAuthRoutes()
   }]
   return colls
 }
