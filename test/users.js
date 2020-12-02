@@ -61,7 +61,7 @@ describe('user functionality', function () {
       .post('/user/register')
       .send(validUser)
       .expect({
-        error: 'User with this email already registered.'
+        error: 'This email is already registered.'
       })
       .expect(409)
   })
