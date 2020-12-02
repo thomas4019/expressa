@@ -41,7 +41,7 @@ describe('user functionality', function () {
       .post('/user/login')
       .send(invalidEmailUser)
       .expect({
-        error: 'No user found with this email.'
+        error: 'No users found with this email.'
       })
       .expect(400)
   })
