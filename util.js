@@ -170,6 +170,7 @@ exports.getUserWithPermissions = async function (api, permissions) {
   const user = {
     email: 'test' + randId + '@example.com',
     password: '123',
+    collection: 'users',
     roles: [roleName]
   }
   await api.db.role.cache.create({
