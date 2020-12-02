@@ -96,6 +96,7 @@ describe('user functionality', function () {
   it('cannot change role by default', async function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit'])
     delete user.permissions
+    delete user.collection
     await request(app)
       .put(`/users/${user._id}`)
       .set('x-access-token', token)
