@@ -332,35 +332,26 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
   return newObject
 }
 
-exports.getDefaultUserCollectionAuthRoutes = function getDefaultUserCollectionAuthRoutes() {
-  return {
-    register: '/user/register',
-    login: '/user/login',
-    me: '/users?/me'
-  }
-}
-
-exports.getAuthCollections = async function(api) {
+exports.getLoginCollections = async function(api) {
   const all = (await api.db.collection.all())
-  const colls = all.length > 0 ? all.filter((coll) => isValidAuthCollection(coll)) : [{
+  const colls = all.length > 0 ? all.filter((coll) => isValidLoginCollection(coll)) : [{
     _id: 'users',
-    authRoutes: exports.getDefaultUserCollectionAuthRoutes()
+    enableLogin: true
   }]
   return colls
 }
 
 // really being over cautious here to prevent collections
 // unkowingly creating insecure access to database
-function isValidAuthCollection(collection) {
+function isValidLoginCollection(collection) {
   const name = collection._id
-  const routes = collection.authRoutes
-  if(routes && routes.register && routes.login && routes.me) {
+  if(collection.enableLogin === true) {
     const required = collection.schema && collection.schema.required
     if (required && required.includes('email') && required.includes('password')) {
       return true
     }
     else {
-      console.error(`Auth Collection Failed: "${name}" needs email and password as required properties`)
+      console.error(`Login Collection Failed: "${name}" needs email and password as required properties`)
     }
   }
   return false

@@ -46,7 +46,7 @@ exports.install = async (req, api) => {
         }
         if (coll._id == 'users' && req.body.settings.user_storage) {
           coll.storage = req.body.settings.user_storage
-          coll.authRoutes = util.getDefaultUserCollectionAuthRoutes()
+          coll.enableLogin = true
         }
         await req.db.collection.create(coll)
         await api.notify('changed', req, 'collection', coll)

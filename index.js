@@ -237,10 +237,13 @@ module.exports.api = function (settings) {
     router.post('/install', ph(async (req) => installApi.install(req, router)))
     router.get('/install/settings/schema', ph(async (req) => installApi.getSettingsSchema(req, router)))
 
-    const authCollections = await util.getAuthCollections(router)
+    const loginCollections = await util.getLoginCollections(router)
 
-    for (const coll of authCollections) {
-      router.post(coll.authRoutes.login, ph((req) => usersApi.login(req, coll._id)))
+    for (const { _id: name } of loginCollections) {
+      if (name === 'users') {
+        router.post('/user/login', ph((req) => usersApi.login(req, name)))
+      }
+      router.post(`/${name}/login`, ph((req) => usersApi.login(req, name)))
     }
 
     router.use(auth.middleware) // Add user id to request
@@ -250,9 +253,13 @@ module.exports.api = function (settings) {
 
     router.use(router.custom) // Externally added middleware
 
-    for (const coll of authCollections) {
-      router.post(coll.authRoutes.register, ph((req) => usersApi.register(req, coll._id)))
-      router.get(coll.authRoutes.me, ph((req) => usersApi.getMe(req, coll._id)))
+    for (const { _id: name } of loginCollections) {
+      if (name === 'users') {
+        router.post('/user/register', ph((req) => usersApi.register(req, name)))
+        router.get('/user/me', ph((req) => usersApi.getMe(req, name)))
+      }
+      router.post(`/${name}/register`, ph((req) => usersApi.register(req, name)))
+      router.get(`/${name}/me`, ph((req) => usersApi.getMe(req, name)))
     }
 
     router.get('/:collection/schema', ph(collectionsApi.getSchema))

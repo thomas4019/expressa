@@ -4,9 +4,9 @@ const debug = require('debug')('expressa')
 
 module.exports = async function(api) {
 
-  const authCollections = (await util.getAuthCollections(api)).map((coll) => coll._id)
+  const loginCollections = (await util.getLoginCollections(api)).map((coll) => coll._id)
 
-  api.addCollectionListener(['post', 'put'], authCollections, async function updatePassword(req, collection, data) {
+  api.addCollectionListener(['post', 'put'], loginCollections, async function updatePassword(req, collection, data) {
     if (req.method === 'PUT') {
       const oldData = await api.db[collection].get(data._id)
       if (!data.password) {
@@ -19,7 +19,7 @@ module.exports = async function(api) {
     }
   })
 
-  api.addLateCollectionListener('put', authCollections, async function roleChangeCheck(req, collection, data) {
+  api.addLateCollectionListener('put', loginCollections, async function roleChangeCheck(req, collection, data) {
     if (!req.hasPermission(`${collection}: modify roles`)) {
       const oldData = await api.db[collection].get(data._id)
       data.roles = oldData.roles
@@ -27,14 +27,14 @@ module.exports = async function(api) {
   })
 
   // TODO how to add back in the password on PUT?
-  api.addCollectionListenerWithPriority('get', authCollections, -100, function hidePasswordHashes(req, collection, data) {
+  api.addCollectionListenerWithPriority('get', loginCollections, -100, function hidePasswordHashes(req, collection, data) {
     if (!req.hasPermission(`${collection}: view hashed passwords`)) {
       debug(`deleting password because "${collection}: view hashed passwords"-permission is not set`)
       delete data.password
     }
   })
 
-  api.addCollectionListener('post', authCollections, async function userUniquenessCheck(req, collection, data) {
+  api.addCollectionListener('post', loginCollections, async function userUniquenessCheck(req, collection, data) {
     const result = await api.db[collection].find({email: data.email})
     if (result.length > 0) {
       throw new util.ApiError(409, 'This email is already registered.')
@@ -43,7 +43,7 @@ module.exports = async function(api) {
 
   /* Mantain users-roles reference */
   api.addCollectionListener('changed', 'role', async function addRoleToUserSchema(req, collection, data) {
-    for (const coll of authCollections) {
+    for (const coll of loginCollections) {
       const doc = await api.db.collection.get(coll)
       if (!doc.schema.properties.roles.items.enum.includes(data._id)) {
         doc.schema.properties.roles.items.enum.push(data._id)
@@ -54,7 +54,7 @@ module.exports = async function(api) {
   })
 
   api.addCollectionListener('deleted', 'role', async function removeRoleToUserSchema(req, collection, data) {
-    for (const coll of authCollections) {
+    for (const coll of loginCollections) {
       const doc = await api.db.collection.get(coll)
       const roles = doc.schema.properties.roles.items.enum
       if (roles.includes(data._id)) {
