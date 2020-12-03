@@ -12,8 +12,6 @@ exports.isValidPassword = function (password, hashedPassword) {
 
 exports.doLogin = handler.doLogin
 
-exports.isLoggedIn = handler.isLoggedIn
-
 exports.middleware = function authMiddleware(req, res, next) {
   const asyncFn = async (req, res, next) => {
     const user = await handler.isLoggedIn(req)

@@ -112,8 +112,7 @@ module.exports.api = function (settings) {
     },
     ApiError: util.ApiError,
     generateDocumentId: util.generateDocumentId,
-    doLogin: auth.doLogin,
-    isLoggedIn: auth.isLoggedIn
+    doLogin: auth.doLogin
   }
   router.eventListeners = {}
 
