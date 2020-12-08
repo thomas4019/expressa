@@ -44,8 +44,10 @@ exports.install = async (req, api) => {
         if (!coll.storage) {
           coll.storage = 'file'
         }
-        if (coll._id == 'users' && req.body.settings.user_storage) {
-          coll.storage = req.body.settings.user_storage
+        if (coll._id == 'users') {
+          if (req.body.settings.user_storage) {
+            coll.storage = req.body.settings.user_storage
+          }
           coll.enableLogin = true
         }
         await req.db.collection.create(coll)
