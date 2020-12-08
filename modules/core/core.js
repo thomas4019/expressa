@@ -155,7 +155,7 @@ exports.collections = async function(app) {
         enableLogin: {
           type: 'boolean',
           format: 'checkbox',
-          description: 'set true if collection is used to facilitate login, requires email and password properties'
+          description: 'set true if collection is used to facilitate login, requires collection to have email and password properties'
         },
         admin: {
           type: 'object',
