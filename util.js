@@ -333,7 +333,7 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
 }
 
 exports.getLoginCollections = async function(api) {
-  const all = (await api.db.collection.all())
+  const all = await api.db.collection.all()
   const colls = all.length > 0 ? all.filter((coll) => isValidLoginCollection(coll)) : [{
     _id: 'users',
     enableLogin: true
