@@ -345,12 +345,18 @@ exports.getLoginCollections = async function(api) {
 function isValidLoginCollection(collection) {
   const name = collection._id
   if(collection.enableLogin === true) {
-    const required = collection.schema && collection.schema.required
-    if (required && required.includes('email') && required.includes('password')) {
-      return true
+    const properties = collection.schema && collection.schema.properties
+    if (properties && properties.email && properties.password && properties.roles) {
+      const required = collection.schema && collection.schema.required
+      if (required && required.includes('email') && required.includes('password')) {
+        return true
+      }
+      else {
+        console.error(`Login Collection Failed: "${name}" schema properties email and password must be listed as 'required'`)
+      }
     }
     else {
-      console.error(`Login Collection Failed: "${name}" needs email and password as required properties`)
+      console.error(`Login Collection Failed: "${name}" email, password and roles are mandatory schema properties`)
     }
   }
   return false
