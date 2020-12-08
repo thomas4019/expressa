@@ -19,6 +19,27 @@ module.exports = async function(api) {
     }
   })
 
+  api.addCollectionListener('post', loginCollections, async function roleCreateCheck(req, collection, data) {
+    if (!data.roles) {
+      data.roles = []
+    }
+    // user special case to allow first user to be admin
+    if (collection === 'users') {
+      const hasUsers = (await api.db.users.find({}, 0, 1)).length === 1
+      if (!hasUsers && !data.roles.includes('Admin')) {
+        throw new util.ApiError(400, 'first user must have role Admin')
+      }
+      if (hasUsers && data.roles.length > 0 && !req.hasPermission('users: modify roles')) {
+        throw new util.ApiError(400, 'insufficient permissions to create user with roles')
+      }
+    }
+    else {
+      if (data.roles.length > 0 && !req.hasPermission(`${collection}: modify roles`)) {
+        throw new util.ApiError(400, `insufficient permissions to create ${collection} with roles`)
+      }
+    }
+  })
+
   api.addLateCollectionListener('put', loginCollections, async function roleChangeCheck(req, collection, data) {
     if (!req.hasPermission(`${collection}: modify roles`)) {
       const oldData = await api.db[collection].get(data._id)
