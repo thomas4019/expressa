@@ -113,7 +113,8 @@ module.exports.api = function (settings) {
     ApiError: util.ApiError,
     generateDocumentId: util.generateDocumentId,
     doLogin: auth.doLogin,
-    createPagination: util.createPagination
+    createPagination: util.createPagination,
+    normalizeOrderBy: util.normalizeOrderBy
   }
   router.eventListeners = {}
 
