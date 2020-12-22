@@ -5,24 +5,6 @@ const mongoQuery = require('mongo-query')
 const util = require('../util')
 const queryStringParser = new MongoQS({})
 
-function createPagination (data, req, limit) {
-  const pagination = {
-    page: parseInt(req.query.page),
-    itemsTotal: data.length,
-    itemsPerPage: limit,
-    pages: Math.ceil(data.length / limit)
-  }
-  pagination.page = pagination.page > pagination.pages ? pagination.pages + 1 : pagination.page
-  if (pagination.page < pagination.pages) {
-    pagination.pageNext = pagination.page + 1
-  }
-  if (pagination.page - 1 > 0) {
-    pagination.pagePrev = pagination.page - 1
-  }
-  pagination.data = data.splice((pagination.page - 1) * limit, limit)
-  return pagination
-}
-
 function assertValidCollection(req) {
   if (!req.db[req.params.collection]) {
     throw new util.ApiError(404, 'unknown collection')
@@ -81,7 +63,7 @@ exports.get = async function (req) {
     if (req.query.page <= 0) {
       throw new util.ApiError(400, 'invalid page number')
     }
-    result = createPagination(result, req, limit)
+    result = util.createPagination(result, req, limit)
   }
   await util.notify('getpresend', req, req.params.collection, result)
   return result

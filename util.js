@@ -330,3 +330,21 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
   }
   return newObject
 }
+
+exports.createPagination = function createPagination (data, req, limit) {
+  const pagination = {
+    page: parseInt(req.query.page),
+    itemsTotal: data.length,
+    itemsPerPage: limit,
+    pages: Math.ceil(data.length / limit)
+  }
+  pagination.page = pagination.page > pagination.pages ? pagination.pages + 1 : pagination.page
+  if (pagination.page < pagination.pages) {
+    pagination.pageNext = pagination.page + 1
+  }
+  if (pagination.page - 1 > 0) {
+    pagination.pagePrev = pagination.page - 1
+  }
+  pagination.data = data.splice((pagination.page - 1) * limit, limit)
+  return pagination
+}
