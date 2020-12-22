@@ -331,9 +331,9 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
   return newObject
 }
 
-exports.createPagination = function createPagination (data, req, limit) {
+exports.createPagination = function createPagination (data, page, limit) {
   const pagination = {
-    page: parseInt(req.query.page),
+    page: parseInt(page),
     itemsTotal: data.length,
     itemsPerPage: limit,
     pages: Math.ceil(data.length / limit)
