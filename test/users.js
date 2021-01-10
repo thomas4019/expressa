@@ -41,7 +41,7 @@ describe('user functionality', function () {
       .post('/user/login')
       .send(invalidEmailUser)
       .expect({
-        error: 'No user found with this email.'
+        error: 'No users found with this email.'
       })
       .expect(400)
   })
@@ -61,7 +61,7 @@ describe('user functionality', function () {
       .post('/user/register')
       .send(validUser)
       .expect({
-        error: 'User with this email already registered.'
+        error: 'This email is already registered.'
       })
       .expect(409)
   })
@@ -96,6 +96,7 @@ describe('user functionality', function () {
   it('cannot change role by default', async function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit'])
     delete user.permissions
+    delete user.collection
     await request(app)
       .put(`/users/${user._id}`)
       .set('x-access-token', token)

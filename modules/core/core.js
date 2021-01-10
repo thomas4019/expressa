@@ -9,6 +9,10 @@ exports.settingSchema = {
     type: 'string',
     description: 'The secret key used to encode your json web tokens. It\'s important this is kept unique and secret.'
   },
+  jwt_expires_in: {
+    type: 'string',
+    description: 'JWT expires after - expressed in seconds or a string describing a time span eg 60, "2 days", "10h", "7d", if undefined tokens wont expire'
+  },
   postgresql_uri: {
     type: 'string',
     description: 'The full path to your postgres database. E.g. postgres://username:password@host/db'
@@ -147,6 +151,11 @@ exports.collections = async function(app) {
           type: 'boolean',
           format: 'checkbox',
           description: 'If set, collection will use a string id instead of PostgreSQL uuid'
+        },
+        enableLogin: {
+          type: 'boolean',
+          format: 'checkbox',
+          description: 'set true if collection is used to facilitate login, requires collection to have email and password properties'
         },
         admin: {
           type: 'object',

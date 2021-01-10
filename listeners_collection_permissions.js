@@ -19,11 +19,11 @@ module.exports = function (api) {
 
   api.addListener(['get', 'put', 'post', 'delete'], function collectionPermissionCheck (req, collection, data, info) {
     const permission = eventToPermissionMapping[info.event]
-    const editingOwnUser = collection === 'users' && data._id === req.uid
+    const editingSelf = collection === req.ucollection && data._id === req.uid
     const editingOwnDoc = data.meta && data.meta.owner && data.meta.owner === req.uid
-    const editingOwn = ((editingOwnUser || editingOwnDoc) &&
+    const editingOwn = ((editingSelf || editingOwnDoc) &&
       req.hasPermission(collection + ': ' + permission + ' own'))
-    // console.log(editingOwn + ' ' + editingOwnUser + ' ' + editingOwnDoc);
+    // console.log(editingOwn + ' ' + editingSelf + ' ' + editingOwnDoc);
     if (!editingOwn && !req.hasPermission(collection + ': ' + permission)) {
       debug(`cancelling, missing permission "${collection}: ${permission}"`)
       throw new util.ApiError(401, 'You do not have permission to perform this action.')

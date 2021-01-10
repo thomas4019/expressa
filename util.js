@@ -170,6 +170,7 @@ exports.getUserWithPermissions = async function (api, permissions) {
   const user = {
     email: 'test' + randId + '@example.com',
     password: '123',
+    collection: 'users',
     roles: [roleName]
   }
   await api.db.role.cache.create({
@@ -329,6 +330,36 @@ exports.sortObjectKeys = function sortObjectKeys(object) {
     newObject[keys[i]] = exports.sortObjectKeys(object[keys[i]])
   }
   return newObject
+}
+
+exports.getLoginCollections = async function(api) {
+  const all = await api.db.collection.all()
+  return all.length > 0 ? all.filter((coll) => isValidLoginCollection(coll)) : [{
+    _id: 'users',
+    enableLogin: true
+  }]
+}
+
+// really being over cautious here to prevent collections
+// unkowingly creating insecure access to database
+function isValidLoginCollection(collection) {
+  const name = collection._id
+  if(collection.enableLogin === true) {
+    const properties = collection.schema && collection.schema.properties
+    if (properties && properties.email && properties.password && properties.roles) {
+      const required = collection.schema && collection.schema.required
+      if (required && required.includes('email') && required.includes('password')) {
+        return true
+      }
+      else {
+        console.error(`Login Collection Failed: "${name}" schema properties email and password must be listed as 'required'`)
+      }
+    }
+    else {
+      console.error(`Login Collection Failed: "${name}" email, password and roles are mandatory schema properties`)
+    }
+  }
+  return false
 }
 
 exports.createPagination = function createPagination (data, page, limit) {

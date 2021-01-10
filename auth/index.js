@@ -17,6 +17,7 @@ exports.middleware = function authMiddleware(req, res, next) {
     const user = await handler.isLoggedIn(req)
     if (user) {
       req.uid = user._id
+      req.ucollection = user.collection
     }
     next()
   }

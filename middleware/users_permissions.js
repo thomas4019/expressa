@@ -22,7 +22,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
   let roles = ['Anonymous']
   if (req.uid) {
     try {
-      const user = await req.db.users.get(req.uid)
+      const user = await req.db[req.ucollection].get(req.uid)
       req.user = user
       roles = (user.roles || []).concat(['Authenticated'])
     } catch (e) {
