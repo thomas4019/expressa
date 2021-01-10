@@ -243,6 +243,7 @@ module.exports.api = function (settings) {
 
     for (const { _id: name } of loginCollections) {
       if (name === 'users') {
+        console.log('  [DEPRECATION] route "/user/login" will be removed in future versions of Expressa, please use "/users/login"')
         router.post('/user/login', ph((req) => usersApi.login(req, name)))
       }
       router.post(`/${name}/login`, ph((req) => usersApi.login(req, name)))
@@ -257,7 +258,9 @@ module.exports.api = function (settings) {
 
     for (const { _id: name } of loginCollections) {
       if (name === 'users') {
+        console.log('  [DEPRECATION] route "/user/register" will be removed in future versions of Expressa, please use "/users/register"')
         router.post('/user/register', ph((req) => usersApi.register(req, name)))
+        console.log('  [DEPRECATION] route "/user/me" will be removed in future versions of Expressa, please use "/users/me"')
         router.get('/user/me', ph((req) => usersApi.getMe(req, name)))
       }
       router.post(`/${name}/register`, ph((req) => usersApi.register(req, name)))
