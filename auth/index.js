@@ -12,17 +12,16 @@ exports.isValidPassword = function (password, hashedPassword) {
 
 exports.doLogin = handler.doLogin
 
-exports.middleware = function authMiddleware(req, res, next) {
-  const asyncFn = async (req, res, next) => {
+exports.middleware = async function authMiddleware(req, res, next) {
+  try {
     const user = await handler.isLoggedIn(req)
     if (user) {
       req.uid = user._id
       req.ucollection = user.collection
     }
-    next()
   }
-  Promise.resolve(asyncFn(req, res, next)).catch((e) => {
-    const error = e.message === 'jwt expired' ? 'expired token' : 'jwt error'
-    res.status(400).send({ error })
-  })
+  catch(e) {
+    req.uerror = e.message === 'jwt expired' ? 'expired token' : 'jwt error'
+  }
+  next()
 }

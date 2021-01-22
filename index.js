@@ -89,11 +89,11 @@ function ph (requestHandler) {
       res.send(result)
     } catch (err) {
       err.status = err.status || 500
-      debug(`${err.status} ${req.method} ${req.url} ${err.stack}`)
+      debug(`${err.status} ${req.method} ${req.url} ${err.stack} ${req.uerror}`)
       if ((req.settings.print_400_errors) || err.status >= 500) {
-        console.error(err)
+        console.error(err + ' | ' + req.uerror)
       }
-      res.status(err.status).send({ error: err.result || err.message || err })
+      res.status(err.status).send({ error: err.result || err.message || err, authError: req.uerror })
     }
   }
 }
