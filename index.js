@@ -93,7 +93,7 @@ function ph (requestHandler) {
       if ((req.settings.print_400_errors) || err.status >= 500) {
         console.error(err + ' | ' + req.uerror)
       }
-      res.status(err.status).send({ error: err.result || err.message || err, authError: req.uerror })
+      res.status(err.status).send({ error: err.result || err.message || err, tokenError: req.uerror })
     }
   }
 }
