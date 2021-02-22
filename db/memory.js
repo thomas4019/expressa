@@ -13,9 +13,7 @@ module.exports = function (settings, collection) {
       return this.find({})
     },
     find: async function (query, offset, limit, orderby, fields) {
-      const arr = Object.keys(store).map(function (id) {
-        return store[id]
-      })
+      const arr = Object.values(store)
       let matches = sift(query || {}, arr)
       if (orderby) {
         matches = util.orderBy(matches, orderby)
@@ -55,6 +53,16 @@ module.exports = function (settings, collection) {
       data._id = data._id || id
       store[id] = data
       return data
+    },
+    // Designed to match Mongo
+    // https://docs.mongodb.com/manual/reference/method/db.collection.updateMany/
+    updateWithQuery: async function (query, update, options) {
+      const arr = Object.keys(store).map((id) => ({ _id: id, ...store[id]}) )
+      const matches = sift(query || {}, arr)
+      matches.forEach((doc) => {
+        util.mongoUpdate(doc, update)
+        store[doc._id] = doc
+      })
     },
     delete: async function (id) {
       if (store[id]) {

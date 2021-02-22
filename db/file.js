@@ -89,6 +89,16 @@ module.exports = function (settings, collection) {
       }
       return data
     },
+    updateWithQuery: async function (query, update, options) {
+      const data = await store.allAsync()
+      const arr = Object.keys(data).map((id) => ({ _id: id, ...data[id]}) )
+      const matches = sift(query || {}, arr)
+      const promises = matches.map((doc) => {
+        util.mongoUpdate(doc, update)
+        return store.saveAsync(doc._id, doc)
+      })
+      await Promise.all(promises)
+    },
     delete: async function (id) {
       await this.get(id) // to check if exists
       await store.delete(id)

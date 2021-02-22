@@ -6,6 +6,7 @@ const crypto = require('crypto')
 const pg = require('pg')
 const pgPools = {}
 const dot = require('dot-object')
+const mongoQuery = require('mongo-query')
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
@@ -108,6 +109,10 @@ exports.mongoProject = function(record, projection) {
   const expanded = dot.object(projection)
   const result = isInclude ? _include(record, expanded) : _exclude(record, expanded)
   return result
+}
+
+exports.mongoUpdate = function(doc, update) {
+  return mongoQuery(doc, {}, update)
 }
 
 exports.normalizeOrderBy = function(orderby) {

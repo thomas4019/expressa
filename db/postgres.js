@@ -66,6 +66,15 @@ module.exports = function (settings, collectionId, collection) {
       }
       return data
     },
+    updateWithQuery: async function (query, update, options) {
+      const arrayFields = util.getArrayPaths('', collection.schema)
+      const pgQuery = mongoToPostgres('data', query || {}, arrayFields)
+      const updateSql = mongoToPostgres.convertUpdate('data', update,false)
+      const result = await pool.query('UPDATE ' + collectionId + ' SET data=' + updateSql + ' WHERE ' + pgQuery)
+      if (result.rowCount === 0) {
+        throw new util.ApiError(404, 'document not found')
+      }
+    },
     delete: async function (id) {
       const result = await pool.query('DELETE FROM ' + collectionId + ' WHERE id=$1', [id])
       if (result.rowCount === 0) {

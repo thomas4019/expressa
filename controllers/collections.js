@@ -1,6 +1,5 @@
 const debug = require('debug')('expressa')
 const MongoQS = require('mongo-querystring')
-const mongoQuery = require('mongo-query')
 
 const util = require('../util')
 const queryStringParser = new MongoQS({})
@@ -120,7 +119,7 @@ exports.updateById = async function (req) {
 
   const doc = await req.db[req.params.collection].get(req.params.id)
   const owner = doc.meta && doc.meta.owner
-  mongoQuery(doc, {}, modifier)
+  util.mongoUpdate(doc, modifier)
   const newOwner = doc.meta && doc.meta.owner
   if (owner !== newOwner) {
     debug('attempting to change document owner.')

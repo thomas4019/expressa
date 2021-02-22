@@ -25,6 +25,10 @@ module.exports = function (storage) {
       await cache.update(id, data)
       return storage.update(id, data)
     },
+    updateWithQuery: async function (query, update, options) {
+      await cache.updateWithQuery(query, update, options)
+      return storage.updateWithQuery(query, update, options)
+    },
     delete: async function (id) {
       await cache.delete(id)
       return storage.delete(id)
