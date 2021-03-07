@@ -1,5 +1,3 @@
-const util = require('../../util')
-
 exports.settingSchema = {
   enforce_permissions: {
     type: 'boolean',

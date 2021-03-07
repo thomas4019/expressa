@@ -67,6 +67,13 @@ module.exports = function (settings, collection) {
       // doc._id = doc._id.toString()
       return data
     },
+    updateWithQuery: async function (query, update, options) {
+      const db = await this.getClient()
+      const res = await db.collection(collection).updateMany(query, update, options)
+      return {
+        matchedCount: res.matchedCount
+      }
+    },
     delete: async function (id) {
       const db = await this.getClient()
       const res = await db.collection(collection).deleteOne({
