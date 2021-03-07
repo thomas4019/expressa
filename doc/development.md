@@ -15,6 +15,7 @@ In another folder, create a project using app.js from the readme.
 * npm run testserver
 * (cd modules/admin && npm run dev)
 * npm run cypress (to manually run specific tests)
+* Open http://localhost:3001/admin
 
 ## Before committing/releasing
 * npm run test

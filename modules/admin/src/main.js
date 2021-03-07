@@ -20,6 +20,8 @@ import 'vue-material-design-icons/styles.css'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// import 'vue-json-schema-editor/dist/json-schema-editor.min.css'
+
 import { VuePlugin } from 'vuera'
 
 import Unicon from 'vue-unicons'

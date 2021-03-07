@@ -6,6 +6,8 @@
       </div>
       <template v-if="ready">
         <JSONEditor v-if="ready" v-model="data" :schema="schema" />
+        <h2>Schema</h2>
+        <json-schema-editor :value="{}" />
         <div>
           <button class="btn btn-primary" @click="save">
             Save
@@ -23,6 +25,11 @@
 import request from '@/utils/request'
 import JSONEditor from '@/components/JSONEditor'
 import store from '../store'
+
+import 'vue-json-schema-editor'
+
+// import { default as component } from 'vue-json-schema-editor'
+// Vue.component('json-schema-editor', component);
 
 export default {
   name: 'CollectionTable',
@@ -74,6 +81,15 @@ export default {
           this.data = {}
         }
         this.schema = (await request({ url: `/${this.collectionName}/schema` })).data
+        if (this.collectionName === 'collection') {
+          console.log('after');
+          this.collectionSchema = arrayifyJSONSchema(this.data.schema);
+          console.log('after');
+          delete this.data.schema;
+          delete this.schema.properties.schema;
+          this.schema.required.splice(this.schema.required.indexOf('schema'), 1);
+        }
+        console.log(this.schema);
         this.ready = true
       } catch (e) {
         this.error = e.error || e
@@ -107,6 +123,7 @@ export default {
 </script>
 
 <style>
+  @import '../../node_modules/vue-json-schema-editor/dist/json-schema-editor.min.css';
   .comment-link {
     margin-top: -15px;
   }

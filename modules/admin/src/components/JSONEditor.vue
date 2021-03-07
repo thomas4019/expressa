@@ -6,7 +6,13 @@
 
 <script>
 import JsonEditor from '@json-editor/json-editor'
-import 'json-schema-editor'
+window.JSONEditor = JsonEditor
+import Vue from 'vue'
+window.Vue = Vue
+// import { default as component } from 'vue-json-schema-editor'
+
+// Vue.component('json-schema-editor', component);
+
 export default {
   props: {
     value: {
@@ -62,83 +68,133 @@ export default {
   }
 }
 
-if (JsonEditor) {
-  JsonEditor.defaults.resolvers.unshift(function(schema) {
-    if (schema.type === 'object' && schema.format === 'schema') {
-      return 'schema'
+if (typeof JSONEditor !== 'undefined' && JSONEditor && false) {
+  console.log('aaaaaaa')
+  JSONEditor.defaults.resolvers.unshift(function(schema) {
+    if (schema.type === "object" && schema.format === "schema") {
+      return "schema";
     }
 
     // If no valid editor is returned, the next resolver function will be used
-  })
+  });
 
-  JsonEditor.defaults.editors.schema = JsonEditor.AbstractEditor.extend({
-    setValue: function(value, initial) {
-      this.value = value
-      this.schemaeditor.setValue(value)
-      this.onChange()
+  JSONEditor.defaults.editors.schema = JSONEditor.AbstractEditor.extend({
+    setValue: function(value) {
+      this.value = value;
+      console.log('setValue2')
+      if (value && Object.keys(value).length > 0) {
+        console.log(value.properties)
+        console.log(this.schemaeditor)
+        let av = arrayifyJSONSchema(value);
+        Vue.set(this.schemaeditor.$props, 'value', av);
+        // this.schemaeditor.$emit('updateValue', arrayifyJSONSchema(value))
+        // this.schemaeditor.data.$props.$set('value', arrayifyJSONSchema(value))
+        // this.schemaeditor.$forceUpdate()
+        // return this.schemaeditor.$data.value = arrayifyJSONSchema(value);
+      }
+      this.onChange();
     },
     getValue: function() {
-      if (typeof this.schemaeditor !== 'undefined') { return this.schemaeditor.getValue() } else { return {} }
+        console.log('getting');
+        if (typeof this.schemaeditor != 'undefined' && this.schemaeditor.$data.value)
+            return objectifyJSONSchema(this.schemaeditor.$data.value);
+        else
+            return {}
     },
     register: function() {
-      this._super()
-      if (!this.input) return
-      this.input.setAttribute('name', this.formname)
+      console.log('register');
+      this._super();
+      if(!this.input) return;
+      this.input.setAttribute('name', this.formname);
     },
     unregister: function() {
-      this._super()
-      if (!this.input) return
-      this.input.removeAttribute('name')
+      this._super();
+      if(!this.input) return;
+      this.input.removeAttribute('name');
     },
     getNumColumns: function() {
-      return 12
+      return 12;
     },
     build: function() {
-      var self = this
-      if (!this.options.compact) {
-        this.label = this.header = this.theme.getFormInputLabel(this.getTitle())
+      console.log('build');
+      var self = this;
+      if(!this.options.compact) {
+        this.label = this.header = this.theme.getFormInputLabel(this.getTitle());
       }
-      if (this.schema.description) this.description = this.theme.getFormInputDescription(this.schema.description)
-      if (this.options.compact) this.container.className += ' compact'
+      if(this.schema.description) this.description = this.theme.getFormInputDescription(this.schema.description);
+      if(this.options.compact) this.container.className += ' compact';
 
-      this.input = document.createElement('div')
-      this.control = this.theme.getFormControl(this.label, this.input, this.description)
+      const componentClass = Vue.extend(component);
+      this.schemaeditor = new componentClass({
+        propsData: { "value": { type: "object" } },
+      });
+      this.schemaeditor.$mount();
+      this.input = this.schemaeditor.$el
+      console.log(this.input)
 
-      if (this.schema.readOnly || this.schema.readonly) {
-        this.always_disabled = true
-        this.input.disabled = true
+      this.control = this.theme.getFormControl(this.label, this.input, this.description);
+
+      if(this.schema.readOnly || this.schema.readonly) {
+        this.always_disabled = true;
+        this.input.disabled = true;
       }
 
-      this.container.appendChild(this.control)
+      console.log('----2')
+      this.container.appendChild(this.control);
+      console.log(this.container)
+      console.log(this.control)
+      console.log(this.input)
 
-      this.schemaeditor = new window.JSONSchemaEditor(this.input, {
-        startval: {}
-      })
-      this.schemaeditor.on('change', function() {
-        self.onChange(true)
-      })
+
+      /*this.schemaeditor = new Vue({
+        el: '#js-schema-edit',
+        render: function (createElement) {
+            return createElement(
+              'json-schema-editor',   // tag name
+              {
+                attrs: {
+                  "v-on:change": "changed()",
+                  ":value": "value",
+                },
+                props: {
+                  "value": { type: "object" },
+                },
+              }
+            )
+        },
+        data: {
+          value: {
+            type: 'object'
+          }
+        },
+        methods: {
+          changed() {
+            self.onChange(true);
+          }
+        }
+      })*/
+      global.se = this.schemaeditor;
+      console.log('d')
     },
     enable: function() {
-      if (!this.always_disabled) {
-        this.input.disabled = false
+      if(!this.always_disabled) {
+        this.input.disabled = false;
       }
-      this._super()
+      this._super();
     },
     disable: function() {
-      this.input.disabled = true
-      this._super()
+      this.input.disabled = true;
+      this._super();
     },
     destroy: function() {
-      if (this.label && this.label.parentNode) this.label.parentNode.removeChild(this.label)
-      if (this.description && this.description.parentNode) this.description.parentNode.removeChild(this.description)
-      if (this.input && this.input.parentNode) this.input.parentNode.removeChild(this.input)
-      this._super()
+      if(this.label && this.label.parentNode) this.label.parentNode.removeChild(this.label);
+      if(this.description && this.description.parentNode) this.description.parentNode.removeChild(this.description);
+      if(this.input && this.input.parentNode) this.input.parentNode.removeChild(this.input);
+      this._super();
     }
-  })
+  });
 }
-
 </script>
-
 <style>
   .jsoneditor-vue button.btn {
     font-size: 14px !important;
@@ -150,5 +206,8 @@ if (JsonEditor) {
   .jsoneditor-vue input[type="checkbox"] {
     margin-right: 5px;
     margin-top: 3px;
+  }
+  .jsoneditor-vue textarea {
+    resize: both;
   }
 </style>
