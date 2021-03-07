@@ -140,6 +140,9 @@ if (JsonEditor) {
 </script>
 
 <style>
+  h3 textarea {
+    resize: both;
+  }
   .jsoneditor-vue button.btn {
     font-size: 14px !important;
     padding: 3px;
