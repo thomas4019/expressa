@@ -93,7 +93,10 @@ function ph (requestHandler) {
       if ((req.settings.print_400_errors) || err.status >= 500) {
         console.error(err + ' | ' + req.uerror)
       }
-      res.status(err.status).send({ error: err.result || err.message || err, tokenError: req.uerror })
+      req.returnedError = err
+      res.status(err.status).send({
+        error: err.result || err.message || err, tokenError: req.uerror
+      })
     }
   }
 }
@@ -280,6 +283,7 @@ module.exports.api = function (settings) {
     router.use(function safeErrorHandler(err, req, res, next) {
       console.error('my err handler')
       console.error(err.stack)
+      req.returnedError = err
       res.status(res.errCode || 500)
       if (process.env.DEBUG || (req.hasPermission && req.hasPermission('view errors'))) {
         res.send({

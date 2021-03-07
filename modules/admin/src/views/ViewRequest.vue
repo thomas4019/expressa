@@ -32,6 +32,8 @@
         <dd>{{ res.statusCode }}</dd>
         <dt>Content-Length</dt>
         <dd>{{ res.headers['content-length'] }} bytes</dd>
+        <dt>Message</dt>
+        <dd>{{ res.message }}</dd>
       </dl>
     </div>
   </div>
