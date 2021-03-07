@@ -74,6 +74,9 @@ module.exports = function (settings, collectionId, collection) {
       if (result.rowCount === 0) {
         throw new util.ApiError(404, 'document not found')
       }
+      return {
+        matchedCount: result.rowCount
+      }
     },
     delete: async function (id) {
       const result = await pool.query('DELETE FROM ' + collectionId + ' WHERE id=$1', [id])

@@ -69,7 +69,10 @@ module.exports = function (settings, collection) {
     },
     updateWithQuery: async function (query, update, options) {
       const db = await this.getClient()
-      await db.collection(collection).updateMany(query, update, options)
+      const res = await db.collection(collection).updateMany(query, update, options)
+      return {
+        matchedCount: res.matchedCount
+      }
     },
     delete: async function (id) {
       const db = await this.getClient()

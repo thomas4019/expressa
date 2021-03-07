@@ -118,7 +118,8 @@ collectionNames.forEach(function (collection) {
     })
 
     it('update by query with id', async function () {
-      await db.updateWithQuery({ _id: id }, { $set: { title: 'first22' } })
+      const res = await db.updateWithQuery({ _id: id }, { $set: { title: 'first22' } })
+      expect(res.matchedCount).to.equal(1)
 
       const doc = await db.get(id)
       expect(doc.title).to.equal('first22')
@@ -128,13 +129,15 @@ collectionNames.forEach(function (collection) {
       let docs = await db.find({})
       expect(docs).to.have.length(3)
 
-      await db.updateWithQuery({ 'data.field': '123' }, { $set: { test: true } })
+      const res1 = await db.updateWithQuery({ 'data.field': '123' }, { $set: { test: true } })
       docs = await db.find({test: true })
       expect(docs).to.have.length(2)
+      expect(res1.matchedCount).to.equal(2)
 
-      await db.updateWithQuery({ 'data.field': { $in: ['123', '12345'] } }, { $set: { test: true } })
+      const res2 = await db.updateWithQuery({ 'data.field': { $in: ['123', '12345'] } }, { $set: { test: true } })
       docs = await db.find({ test: true })
       expect(docs).to.have.length(3)
+      expect(res2.matchedCount).to.equal(3)
     })
   })
 })

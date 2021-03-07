@@ -98,6 +98,9 @@ module.exports = function (settings, collection) {
         return store.saveAsync(doc._id, doc)
       })
       await Promise.all(promises)
+      return {
+        matchedCount: promises.length
+      }
     },
     delete: async function (id) {
       await this.get(id) // to check if exists

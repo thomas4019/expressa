@@ -63,6 +63,9 @@ module.exports = function (settings, collection) {
         util.mongoUpdate(doc, update)
         store[doc._id] = doc
       })
+      return {
+        matchedCount: matches.length
+      }
     },
     delete: async function (id) {
       if (store[id]) {
