@@ -66,6 +66,7 @@ module.exports = function (settings, collectionId, collection) {
       }
       return data
     },
+    // eslint-disable-next-line no-unused-vars
     updateWithQuery: async function (query, update, options) {
       const arrayFields = util.getArrayPaths('', collection.schema)
       const pgQuery = mongoToPostgres('data', query || {}, arrayFields)

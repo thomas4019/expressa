@@ -89,6 +89,7 @@ module.exports = function (settings, collection) {
       }
       return data
     },
+    // eslint-disable-next-line no-unused-vars
     updateWithQuery: async function (query, update, options) {
       const data = await store.allAsync()
       const arr = Object.keys(data).map((id) => ({ _id: id, ...data[id]}) )

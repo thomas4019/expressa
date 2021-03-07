@@ -12,6 +12,15 @@ async function addRolePermissions (req, user, roles) {
   })
 }
 
+async function doesAuthenticatedRoleExist(req) {
+  try {
+    await req.db.role.get('Authenticated')
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddlewareAsync(req) {
   if (!req.settings || !req.settings.enforce_permissions) {
     // Use a dummy permission getter
@@ -20,11 +29,12 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
   }
   req.hasPermission = (permission) => req.user && req.user.permissions[permission]
   let roles = ['Anonymous']
+  const isAuthenticatedRole = await doesAuthenticatedRoleExist(req)
   if (req.uid) {
     try {
       const user = await req.db[req.ucollection].get(req.uid)
       req.user = user
-      roles = (user.roles || []).concat(['Authenticated'])
+      roles = (user.roles || []).concat(isAuthenticatedRole ? ['Authenticated'] : [])
     } catch (e) {
       throw new util.ApiError(404, 'User no longer exists')
     }
