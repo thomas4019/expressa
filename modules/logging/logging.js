@@ -6,7 +6,7 @@ exports.settingSchema = {
   },
   logging_level: {
     type: 'string',
-    description: 'The minimum severity level to preserve logs in the log collection.',
+    description: 'The minimum severity level to preserve logs in the log collection. "warning" will log 400+ errors. "error" will log 500+ errors.',
     enum: ['critical', 'error', 'warning', 'notice', 'info', 'debug'],
     default: 'warning',
   }
