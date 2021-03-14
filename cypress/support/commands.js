@@ -41,7 +41,7 @@ Cypress.Commands.add('fillValue', (path, value) => {
 Cypress.Commands.add('login', (email, password) => {
     cy.request({
         method: 'POST',
-        url: 'http://localhost:3001/api/user/login',
+        url: 'http://localhost:3001/api/users/login',
         body: {
             email: email || 'test@example.com',
             password: password || 'expressa',

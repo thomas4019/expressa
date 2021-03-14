@@ -53,7 +53,7 @@ export default {
 
       await request({
         method: 'post',
-        url: '/user/register',
+        url: '/users/register',
         data: {
           email,
           roles: ['Admin'],

@@ -22,7 +22,7 @@ describe('user functionality', function () {
 
   it('can signup', async function () {
     const res = await request(app)
-      .post('/user/register')
+      .post('/users/register')
       .send(validUser)
       .expect(200)
     validId = res.body.id
@@ -30,7 +30,7 @@ describe('user functionality', function () {
 
   it('can login', async function () {
     const res = await request(app)
-      .post('/user/login')
+      .post('/users/login')
       .send(validUser)
       .expect(200)
     expect(res.body.uid).to.equal(validId)
@@ -38,7 +38,7 @@ describe('user functionality', function () {
 
   it('rejects unknown email', async function () {
     await request(app)
-      .post('/user/login')
+      .post('/users/login')
       .send(invalidEmailUser)
       .expect({
         error: 'No users found with this email.'
@@ -48,7 +48,7 @@ describe('user functionality', function () {
 
   it('rejects invalid password', async function () {
     await request(app)
-      .post('/user/login')
+      .post('/users/login')
       .send(badPasswordUser)
       .expect({
         error: 'Incorrect password'
@@ -58,7 +58,7 @@ describe('user functionality', function () {
 
   it('rejects signup of duplicate email', async function () {
     await request(app)
-      .post('/user/register')
+      .post('/users/register')
       .send(validUser)
       .expect({
         error: 'This email is already registered.'
@@ -70,7 +70,7 @@ describe('user functionality', function () {
   it('get my user', async function () {
     const token = await testutils.getUserWithPermissions(api, 'users: view own')
     const res = await request(app)
-      .get('/user/me')
+      .get('/users/me')
       .set('x-access-token', token)
     expect(res.body.email).to.include('@example.com')
 

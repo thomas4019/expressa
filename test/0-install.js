@@ -50,7 +50,7 @@ describe('install flow', function () {
 
   it('can create admin account', async function() {
     const res = await request(app)
-      .post('/user/register')
+      .post('/users/register')
       .send({
         email: 'a@example.com',
         roles: ['Admin'],
@@ -64,7 +64,7 @@ describe('install flow', function () {
 
   it('2nd account cannot be admin account', async function() {
     await request(app)
-      .post('/user/register')
+      .post('/users/register')
       .send({
         email: 'try2@example.com',
         roles: ['Admin'],
