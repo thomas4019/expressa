@@ -49,7 +49,7 @@ Once you add a collections in the admin interface, every collection will have th
 
 | method | endpoint                                     | description  |
 |--------|----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| POST   | /user/login                                  | expects JSON in the message body. e.g. `{"email": "email@example.com", password: "<the password>"}                                                                                             |
+| POST   | /users/login                                 | expects JSON in the message body. e.g. `{"email": "email@example.com", password: "<the password>"}                                                                                             |
 | GET    | /:collection                                 | get an array of all documents in a collection                                                                                                                                                  |
 | GET    | /:collection/:id                             | get a specific document                                                                                                                                                                        |
 | GET    | /:collection/?query={..}                     | get an array of documents matching the [mongo query](https://www.npmjs.com/package/mongo-query). For pagination append `&skip=0&offset=0&limit=6`                                              |
