@@ -103,20 +103,28 @@ export default {
       if (this.$route.params.collectionName) {
         this.collectionName = this.$route.params.collectionName
       }
+      // Avoid refetching schema info if name hasn't changed
+      if (!this.collection || this.collection._id !== this.collectionName) {
+        this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
+        this.schema = this.collection.schema
+      }
       const params = {
         page: this.page,
         limit: this.pageSize,
         orderby: '{"meta.created":-1}',
         ...this.filter,
       }
+      const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
+      if (columns) {
+        params.fields = columns.reduce((map, field) => {
+          map[field] = 1
+          return map
+        }, {})
+      }
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = info.data
-      if (!this.collection || this.collection._id !== this.collectionName) {
-        this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
-        this.schema = this.collection.schema
-      }
-      this.listedProperties = this.columns || (this.collection.admin && this.collection.admin.columns) || Object.keys(this.schema.properties)
+      this.listedProperties = columns || Object.keys(this.schema.properties)
     },
     downloadCSV() {
       const collection = this.collectionName

@@ -3,6 +3,9 @@ import { Message } from 'element-ui'
 import store from '../store'
 import { getToken } from '@/utils/auth'
 
+const get = (o, p) =>
+  p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+
 const service = axios.create({
   // eslint-disable-next-line
   baseURL: (typeof settings !== 'undefined' ? settings.apiurl : process.env.BASE_API),
@@ -30,11 +33,13 @@ service.interceptors.response.use(
     return response
   },
   error => {
-    console.log('err' + error) // for debug
+    console.log(error) // for debug
+    const errorMessage = get(error, ['response', 'data', 'error']) || error.message
     Message({
-      message: error.message,
+      message: errorMessage,
       type: 'error',
-      duration: 5 * 1000
+      duration: 0,
+      showClose: true,
     })
     return Promise.reject(error)
   }

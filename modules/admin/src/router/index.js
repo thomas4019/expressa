@@ -141,7 +141,7 @@ export const constantRouterMap = [
         meta: { title: 'Request Logs', icon: 'diary' },
         name: 'requestlogs',
         component: () => import('@/views/ListDocuments2'),
-        props: { collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.statusCode', 'res.headers.content-length'] },
+        props: { collectionName: 'requestlog', columns: ['method', 'url', 'req.ip', 'user', 'res.message', 'res.statusCode', 'res.headers.content-length'] },
       }, {
         path: 'viewrequest/:requestId',
         hidden: true,

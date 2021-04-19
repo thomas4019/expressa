@@ -29,7 +29,7 @@
       :show-paginate-on-bottom="false"
       :show-add-button="false"
       :filter="{ limit: 5, query: { method: { $ne: 'OPTIONS' } } }"
-      :columns="['method', 'url', 'user', 'res.statusCode']"
+      :columns="['method', 'url', 'user', 'res.message', 'res.statusCode']"
       collection-name="requestlog"
     />
   </div>
