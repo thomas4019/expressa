@@ -254,7 +254,7 @@ exports.notify = async function (event, req, collection, data) {
       result = result || await listener(req, collection, data, { event })
     } catch (e) {
       if (e && e.message) {
-        console.error(e);
+        console.error(e)
       }
       // If a listener has already allowed the request, do not error
       if (!result) {
