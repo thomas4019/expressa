@@ -55,7 +55,7 @@ module.exports = async function (api) {
     }
     const isValid = schemaValidators[collection](data)
     if (!isValid) {
-      throw new util.ApiError(400, schemaValidators[collection].errors.map((err) => err.message).join(', '))
+      throw new util.ApiError(400, schemaValidators[collection].errors.map((err) => `${err.message}: ${JSON.stringify(err.params)}`).join(', '))
     }
   })
 }

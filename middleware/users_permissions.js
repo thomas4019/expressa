@@ -1,12 +1,12 @@
 const util = require('../util')
 
-async function addRolePermissions (req, user, roles) {
-  user.permissions = user.permissions || {}
+async function addRolePermissions (req, roles) {
+  req.userPermissions = req.userPermissions || {}
   const roleDocs = await Promise.all(roles.map((name) => req.db.role.get(name)))
   roleDocs.forEach((roleDoc) => {
     for (const permission in roleDoc.permissions) {
       if (roleDoc.permissions[permission]) {
-        user.permissions[permission] = true
+        req.userPermissions[permission] = true
       }
     }
   })
@@ -27,7 +27,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
     req.hasPermission = () => true
     return
   }
-  req.hasPermission = (permission) => req.user && req.user.permissions[permission]
+  req.hasPermission = (permission) => req.userPermissions && req.userPermissions[permission]
   let roles = ['Anonymous']
   const isAuthenticatedRole = await doesAuthenticatedRoleExist(req)
   if (req.uid) {
@@ -41,7 +41,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
   } else {
     req.user = { permissions: {} }
   }
-  await addRolePermissions(req, req.user, roles)
+  await addRolePermissions(req, roles)
 }
 
 module.exports.middleware = function addRolePermissionsMiddleware (req, res, next) {
