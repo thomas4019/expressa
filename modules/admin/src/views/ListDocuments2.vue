@@ -9,7 +9,7 @@
       @current-change="update()"
     />
     <el-table
-      :data="data"
+      :data="tableRows"
       element-loading-text="Loading"
       border
       fit
@@ -17,16 +17,31 @@
     >
       <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
         <template slot-scope="scope">
-          <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
-            {{ getPath(scope.row, name) }}
-          </router-link>
-          <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
-            {{ getPath(scope.row, name) }}
-          </router-link>
-          <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
+          <div v-if="scope.$index === 0" class="text-left">
+            <el-input
+              v-model="searchFilters[name]"
+              :placeholder="`Search by ${name}`"
+              @change="update()"
+            />
+
+            <el-checkbox v-model="exactSearches[name]" class="mt-3" @change="update()">
+              Exact match
+            </el-checkbox>
+          </div>
+
+          <template v-else>
+            <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
+              {{ getPath(scope.row, name) }}
+            </router-link>
+            <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
+              {{ getPath(scope.row, name) }}
+            </router-link>
+            <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
+          </template>
         </template>
       </el-table-column>
     </el-table>
+
     <el-pagination
       v-if="count > pageSize && showPaginateOnBottom"
       :page-size="pageSize"
@@ -82,8 +97,35 @@ export default {
     count: 0,
     data: [],
     schema: {},
-    listedProperties: []
+    exactSearches: {},
+    searchFilters: {},
+    listedProperties: [],
   }),
+  computed: {
+    tableRows() {
+      return [
+        // INFO: This empty row is used to display the search filters.
+        {},
+        ...this.data
+      ]
+    },
+    appliedSearchFilters() {
+      return Object.keys(this.searchFilters).reduce((filter, fieldName) => {
+        const searchKeyword = this.searchFilters[fieldName]
+
+        if (!searchKeyword) {
+          return filter
+        }
+
+        const regexQuery = { '$regex': searchKeyword, '$options': 'i' }
+
+        return {
+          ...filter,
+          [fieldName]: this.exactSearches[fieldName] ? searchKeyword : regexQuery
+        }
+      }, {})
+    }
+  },
   watch: {
     collectionName: {
       handler: 'update'
@@ -113,6 +155,7 @@ export default {
         limit: this.pageSize,
         orderby: '{"meta.created":-1}',
         ...this.filter,
+        query: { ...this.appliedSearchFilters }
       }
       const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
       if (columns) {
