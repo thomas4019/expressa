@@ -1,25 +1,28 @@
 <template>
   <div class="px-3">
-    <el-pagination
-      v-if="count > pageSize"
-      :page-size="pageSize"
-      :total="count"
-      :current-page.sync="page"
-      layout="prev, pager, next"
-      @current-change="update()"
-    />
-
     <div class="d-flex align-items-center py-2">
       <h3 class="mb-0 text-capitalize">
         {{ collectionName }}
       </h3>
 
+      <span class="mx-auto" />
+
       <el-checkbox
         v-model="isFiltersVisible"
-        class="ml-auto mb-0 mr-4"
+        class="mb-0 mr-4"
       >
         Show Filters
       </el-checkbox>
+
+      <el-pagination
+        :page-size="pageSize"
+        :total="count"
+        :page-sizes="pageSizes"
+        :current-page.sync="page"
+        layout="sizes, prev, pager, next"
+        @current-change="update()"
+        @size-change="pageSize = $event, update()"
+      />
     </div>
 
     <el-table
@@ -62,22 +65,29 @@
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      v-if="count > pageSize && showPaginateOnBottom"
-      :page-size="pageSize"
-      :total="count"
-      :current-page.sync="page"
-      layout="prev, pager, next"
-      @current-change="update()"
-    />
-    <router-link v-if="showAddButton" :to="'/edit/' + collectionName + '/create'">
-      <button class="btn btn-primary">
-        Add
+    <div class="d-flex align-items-center my-3">
+      <router-link v-if="showAddButton" :to="'/edit/' + collectionName + '/create'" class="mr-2">
+        <button class="btn btn-primary">
+          Add
+        </button>
+      </router-link>
+
+      <button class="btn btn-secondary download-button" @click="downloadCSV()">
+        Download All
       </button>
-    </router-link>
-    <button class="btn btn-secondary download-button" @click="downloadCSV()">
-      Download All
-    </button>
+
+      <span class="mx-auto" />
+
+      <el-pagination
+        :page-size="pageSize"
+        :total="count"
+        :page-sizes="pageSizes"
+        :current-page.sync="page"
+        layout="sizes, prev, pager, next"
+        @current-change="update()"
+        @size-change="pageSize = $event, update()"
+      />
+    </div>
   </div>
 </template>
 
@@ -85,6 +95,8 @@
 import request from '@/utils/request'
 import saveAs from 'file-saver'
 import objectPath from 'object-path'
+
+const pageSizes = [25, 50, 100, 500]
 
 export default {
   name: 'ListDocuments',
@@ -113,13 +125,14 @@ export default {
   data: () => ({
     start: 0,
     page: 1,
-    pageSize: 25,
     count: 0,
     data: [],
     schema: {},
     exactSearches: {},
     searchFilters: {},
     listedProperties: [],
+    pageSizes: pageSizes,
+    pageSize: pageSizes[0],
     isFiltersVisible: true,
   }),
   computed: {
