@@ -21,10 +21,16 @@
             <el-input
               v-model="searchFilters[name]"
               :placeholder="`Search by ${name}`"
+              :type="getFieldType(name) === 'number' ? 'number' : 'text'"
               @change="update()"
             />
 
-            <el-checkbox v-model="exactSearches[name]" class="mt-3" @change="update()">
+            <el-checkbox
+              v-model="exactSearches[name]"
+              :disabled="getFieldType(name) === 'number'"
+              class="mt-3"
+              @change="update()"
+            >
               Exact match
             </el-checkbox>
           </div>
@@ -117,11 +123,13 @@ export default {
           return filter
         }
 
-        const regexQuery = { '$regex': searchKeyword, '$options': 'i' }
+        const fieldtype = this.getFieldType(fieldName)
+
+        const queryBuilder = this.getQueryBuilder(fieldtype)
 
         return {
           ...filter,
-          [fieldName]: this.exactSearches[fieldName] ? searchKeyword : regexQuery
+          [fieldName]: queryBuilder({ fieldName, searchKeyword })
         }
       }, {})
     }
@@ -183,6 +191,22 @@ export default {
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
         saveAs(blob, collection + '.csv')
       }
+    },
+    getFieldType(fieldName) {
+      return this.schema.properties[fieldName] &&
+      this.schema.properties[fieldName].type
+    },
+    getQueryBuilder(fieldType) {
+      const queryBuilders = {
+        'string': this.getStringSearchQuery,
+        'number': (payload) => parseInt(payload.searchKeyword)
+      }
+
+      return queryBuilders[fieldType] || this.getStringSearchQuery
+    },
+    getStringSearchQuery({ fieldName, searchKeyword }) {
+      const regexQuery = { '$regex': searchKeyword, '$options': 'i' }
+      return this.exactSearches[fieldName] ? searchKeyword : regexQuery
     },
     resetFilters() {
       this.exactSearches = {}
