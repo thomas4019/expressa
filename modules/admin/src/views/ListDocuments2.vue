@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="px-3">
     <el-pagination
       v-if="count > pageSize"
       :page-size="pageSize"
@@ -8,6 +8,20 @@
       layout="prev, pager, next"
       @current-change="update()"
     />
+
+    <div class="d-flex align-items-center py-2">
+      <h3 class="mb-0 text-capitalize">
+        {{ collectionName }}
+      </h3>
+
+      <el-checkbox
+        v-model="isFiltersVisible"
+        class="ml-auto mb-0 mr-4"
+      >
+        Show Filters
+      </el-checkbox>
+    </div>
+
     <el-table
       :data="tableRows"
       element-loading-text="Loading"
@@ -17,7 +31,7 @@
     >
       <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
         <template slot-scope="scope">
-          <div v-if="scope.$index === 0" class="text-left">
+          <div v-if="scope.$index === 0 && isFiltersVisible" class="text-left">
             <el-input
               v-model="searchFilters[name]"
               :placeholder="`Search by ${name}`"
@@ -106,9 +120,14 @@ export default {
     exactSearches: {},
     searchFilters: {},
     listedProperties: [],
+    isFiltersVisible: true,
   }),
   computed: {
     tableRows() {
+      if (!this.isFiltersVisible) {
+        return this.data
+      }
+
       return [
         // INFO: This empty row is used to display the search filters.
         {},
