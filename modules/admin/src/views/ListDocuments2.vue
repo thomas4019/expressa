@@ -129,6 +129,9 @@ export default {
   watch: {
     collectionName: {
       handler: 'update'
+    },
+    '$route.params.collectionName': {
+      handler: 'resetFilters'
     }
   },
   mounted() {
@@ -181,6 +184,10 @@ export default {
         saveAs(blob, collection + '.csv')
       }
     },
+    resetFilters() {
+      this.exactSearches = {}
+      this.searchFilters = {}
+    }
   }
 }
 </script>
