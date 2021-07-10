@@ -35,12 +35,17 @@
       layout="prev, pager, next"
       @current-change="update()"
     />
-    <router-link v-if="showAddButton" :to="'/edit/' + collectionName + '/create'">
+    <router-link v-if="showAddButton" :to="'/edit/' + collectionName + '/create'" class="mr-2">
       <button class="btn btn-primary">
         Add
       </button>
     </router-link>
-    <button class="btn btn-secondary download-button" @click="downloadCSV()">
+
+    <button class="btn btn-secondary download-button mr-2" @click="downloadCSV()">
+      Download
+    </button>
+
+    <button class="btn btn-secondary download-button" @click="downloadAllCSV()">
       Download All
     </button>
   </div>
@@ -126,17 +131,35 @@ export default {
       this.data = info.data
       this.listedProperties = columns || Object.keys(this.schema.properties)
     },
-    downloadCSV() {
+    downloadCSV(data = this.data) {
       const collection = this.collectionName
       let text = this.listedProperties.map((name) => '"' + name + '"').join(',') + '\n'
-      if (this.data) {
-        text += this.data.map((row) =>
+      if (data) {
+        text += data.map((row) =>
           this.listedProperties.map((key) => '"' + String(objectPath.get(row, key) || '').replace(/"/g, '""') + '"')
         ).join('\n')
         console.log(text)
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
         saveAs(blob, collection + '.csv')
       }
+    },
+    async downloadAllCSV() {
+      let rows = []
+      let page = 1
+
+      while (this.count > rows.length) {
+        const params = {
+          page: page,
+          limit: 500,
+          orderby: '{"meta.created":-1}',
+        }
+
+        const response = (await request({ url: `/${this.collectionName}/`, params })).data
+        rows = [...response.data, ...rows]
+        page += 1
+      }
+
+      this.downloadCSV(rows)
     },
   }
 }
