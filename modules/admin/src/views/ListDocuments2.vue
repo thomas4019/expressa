@@ -168,7 +168,27 @@ export default {
           [fieldName]: queryBuilder({ fieldName, searchKeyword })
         }
       }, {})
-    }
+    },
+    allFilters() {
+      const params = {
+        page: this.page,
+        limit: this.pageSize,
+        orderby: '{"meta.created":-1}',
+        ...this.filter,
+        query: { ...this.appliedSearchFilters }
+      }
+
+      const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
+
+      if (columns) {
+        params.fields = columns.reduce((map, field) => {
+          map[field] = 1
+          return map
+        }, {})
+      }
+
+      return params
+    },
   },
   watch: {
     collectionName: {
@@ -197,20 +217,8 @@ export default {
         this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
         this.schema = this.collection.schema
       }
-      const params = {
-        page: this.page,
-        limit: this.pageSize,
-        orderby: '{"meta.created":-1}',
-        ...this.filter,
-        query: { ...this.appliedSearchFilters }
-      }
+      const params = { ...this.allFilters }
       const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
-      if (columns) {
-        params.fields = columns.reduce((map, field) => {
-          map[field] = 1
-          return map
-        }, {})
-      }
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = info.data
@@ -234,9 +242,9 @@ export default {
 
       while (this.count > rows.length) {
         const params = {
+          ...this.allFilters,
           page: page,
           limit: 500,
-          orderby: '{"meta.created":-1}',
         }
 
         const response = (await request({ url: `/${this.collectionName}/`, params })).data
