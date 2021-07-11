@@ -72,7 +72,11 @@
         </button>
       </router-link>
 
-      <button class="btn btn-secondary download-button" @click="downloadCSV()">
+      <button class="btn btn-secondary download-button mr-2" @click="downloadCSV()">
+        Download
+      </button>
+
+      <button class="btn btn-secondary download-button" @click="downloadAllCSV()">
         Download All
       </button>
 
@@ -164,7 +168,27 @@ export default {
           [fieldName]: queryBuilder({ fieldName, searchKeyword })
         }
       }, {})
-    }
+    },
+    allFilters() {
+      const params = {
+        page: this.page,
+        limit: this.pageSize,
+        orderby: '{"meta.created":-1}',
+        ...this.filter,
+        query: { ...this.appliedSearchFilters }
+      }
+
+      const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
+
+      if (columns) {
+        params.fields = columns.reduce((map, field) => {
+          map[field] = 1
+          return map
+        }, {})
+      }
+
+      return params
+    },
   },
   watch: {
     collectionName: {
@@ -193,36 +217,42 @@ export default {
         this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
         this.schema = this.collection.schema
       }
-      const params = {
-        page: this.page,
-        limit: this.pageSize,
-        orderby: '{"meta.created":-1}',
-        ...this.filter,
-        query: { ...this.appliedSearchFilters }
-      }
+      const params = { ...this.allFilters }
       const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
-      if (columns) {
-        params.fields = columns.reduce((map, field) => {
-          map[field] = 1
-          return map
-        }, {})
-      }
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = info.data
       this.listedProperties = columns || Object.keys(this.schema.properties)
     },
-    downloadCSV() {
+    downloadCSV(data = this.data) {
       const collection = this.collectionName
       let text = this.listedProperties.map((name) => '"' + name + '"').join(',') + '\n'
-      if (this.data) {
-        text += this.data.map((row) =>
+      if (data) {
+        text += data.map((row) =>
           this.listedProperties.map((key) => '"' + String(objectPath.get(row, key) || '').replace(/"/g, '""') + '"')
         ).join('\n')
         console.log(text)
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
         saveAs(blob, collection + '.csv')
       }
+    },
+    async downloadAllCSV() {
+      let rows = []
+      let page = 1
+
+      while (this.count > rows.length) {
+        const params = {
+          ...this.allFilters,
+          page: page,
+          limit: 500,
+        }
+
+        const response = (await request({ url: `/${this.collectionName}/`, params })).data
+        rows = [...response.data, ...rows]
+        page += 1
+      }
+
+      this.downloadCSV(rows)
     },
     getFieldType(fieldName) {
       return this.schema.properties[fieldName] &&
