@@ -5,6 +5,18 @@ const ajv = new Ajv({
   strictSchema: 'log',
   validateFormats: false,
 })
+ajv.addKeyword({
+  keyword: 'links',
+  type: 'string',
+  schemaType: 'array',
+})
+ajv.addKeyword({
+  keyword: 'media',
+  type: 'string',
+  schemaType: 'object',
+})
+const formatKey = ajv.getKeyword('format')
+formatKey.type = formatKey.type.concat(['array', 'boolean', 'object'])
 
 const util = require('./util')
 const schemaValidators = {}
