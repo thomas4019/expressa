@@ -4,6 +4,7 @@ const ajv = new Ajv({
   strict: 'log',
   strictSchema: 'log',
   validateFormats: false,
+  allowUnionTypes: true,
 })
 ajv.addKeyword({
   keyword: 'links',
