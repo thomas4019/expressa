@@ -22,8 +22,8 @@ import '@/permission' // permission control
 
 import { VuePlugin } from 'vuera'
 
-import Unicon from 'vue-unicons'
-import { uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog, uniPlus } from 'vue-unicons/src/icons'
+import Unicon from 'vue-unicons/dist/vue-unicons-vue2.umd'
+import { uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog, uniPlus } from 'vue-unicons/dist/icons'
 
 Unicon.add([uniDatabase, uniHome, uniHomeAlt, uniUsersAlt, uniShieldCheck, uniBookOpen, uniDiary, uniFlask, uniCog, uniPlus])
 Vue.use(Unicon)
