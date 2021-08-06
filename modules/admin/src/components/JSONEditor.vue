@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import JsonEditor from '@json-editor/json-editor'
+const { JSONEditor } = require('@json-editor/json-editor/dist/jsoneditor')
 import 'json-schema-editor'
 export default {
   props: {
@@ -46,7 +46,7 @@ export default {
       if (this.editor) {
         this.editor.destroy()
       }
-      this.editor = new JsonEditor(this.$el.querySelector('.jsoneditor-vue'), options)
+      this.editor = new JSONEditor(this.$el.querySelector('.jsoneditor-vue'), options)
       let first = true
       this.editor.on('change', () => {
         if (first) {
@@ -62,8 +62,8 @@ export default {
   }
 }
 
-if (JsonEditor) {
-  JsonEditor.defaults.resolvers.unshift(function(schema) {
+if (JSONEditor) {
+  JSONEditor.defaults.resolvers.unshift(function(schema) {
     if (schema.type === 'object' && schema.format === 'schema') {
       return 'schema'
     }
@@ -71,29 +71,38 @@ if (JsonEditor) {
     // If no valid editor is returned, the next resolver function will be used
   })
 
-  JsonEditor.defaults.editors.schema = JsonEditor.AbstractEditor.extend({
-    setValue: function(value, initial) {
+  JSONEditor.defaults.callbacks.template = {
+    'deleteProfilePic': (jseditor, e) => {
+      alert('hey')
+    }
+  }
+
+  JSONEditor.defaults.editors.schema = class schema extends JSONEditor.AbstractEditor {
+    setValue(value, initial) {
+      console.log(this)
       this.value = value
       this.schemaeditor.setValue(value)
       this.onChange()
-    },
-    getValue: function() {
+    }
+
+    getValue() {
       if (typeof this.schemaeditor !== 'undefined') { return this.schemaeditor.getValue() } else { return {} }
-    },
-    register: function() {
-      this._super()
+    }
+
+    register() {
+      super.register()
       if (!this.input) return
       this.input.setAttribute('name', this.formname)
-    },
-    unregister: function() {
-      this._super()
+    }
+    unregister() {
+      super.unregister()
       if (!this.input) return
       this.input.removeAttribute('name')
-    },
-    getNumColumns: function() {
+    }
+    getNumColumns() {
       return 12
-    },
-    build: function() {
+    }
+    build() {
       var self = this
       if (!this.options.compact) {
         this.label = this.header = this.theme.getFormInputLabel(this.getTitle())
@@ -117,24 +126,25 @@ if (JsonEditor) {
       this.schemaeditor.on('change', function() {
         self.onChange(true)
       })
-    },
-    enable: function() {
+    }
+    enable() {
       if (!this.always_disabled) {
         this.input.disabled = false
       }
-      this._super()
-    },
-    disable: function() {
+
+      super.enable()
+    }
+    disable() {
       this.input.disabled = true
-      this._super()
-    },
-    destroy: function() {
+      super.disable()
+    }
+    destroy() {
       if (this.label && this.label.parentNode) this.label.parentNode.removeChild(this.label)
       if (this.description && this.description.parentNode) this.description.parentNode.removeChild(this.description)
       if (this.input && this.input.parentNode) this.input.parentNode.removeChild(this.input)
-      this._super()
+      super.destroy()
     }
-  })
+  }
 }
 
 </script>
