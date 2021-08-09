@@ -14,7 +14,7 @@
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml"
   },
   "dependencies": {
-    "@json-editor/json-editor": "^1.2.1",
+    "@json-editor/json-editor": "^2.5.4",
     "axios": "^0.21.1",
     "bootstrap": "^4.2.1",
     "element-ui": "2.4.6",
