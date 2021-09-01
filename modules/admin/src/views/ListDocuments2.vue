@@ -155,11 +155,11 @@ export default {
       return Object.keys(this.searchFilters).reduce((filter, fieldName) => {
         const searchKeyword = this.searchFilters[fieldName]
 
-        if (!searchKeyword) {
+        const fieldtype = this.getFieldType(fieldName)
+
+        if (!searchKeyword || fieldtype === 'custom') {
           return filter
         }
-
-        const fieldtype = this.getFieldType(fieldName)
 
         const queryBuilder = this.getQueryBuilder(fieldtype)
 
@@ -221,8 +221,30 @@ export default {
       const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
-      this.data = info.data
+      this.data = this.applyCustomColumnFilter(info.data)
       this.listedProperties = columns || Object.keys(this.schema.properties)
+    },
+    applyCustomColumnFilter(tableData) {
+      const customColumnSearches = Object.keys(this.searchFilters)
+        .filter((fieldName) => this.getFieldType(fieldName) === 'custom')
+
+      return tableData.filter((row) => {
+        return customColumnSearches.every(fieldName => {
+          const searchKeyword = this.searchFilters[fieldName]
+
+          if (!searchKeyword) {
+            return true
+          }
+
+          const stringified = row[fieldName].toString()
+
+          if (this.exactSearches[fieldName]) {
+            return stringified === searchKeyword
+          } else {
+            return stringified.toLowerCase().includes(searchKeyword.toLowerCase())
+          }
+        })
+      })
     },
     downloadCSV(data = this.data) {
       const collection = this.collectionName
@@ -252,11 +274,11 @@ export default {
         page += 1
       }
 
-      this.downloadCSV(rows)
+      this.downloadCSV(this.applyCustomColumnFilter(rows))
     },
     getFieldType(fieldName) {
-      return this.schema.properties[fieldName] &&
-      this.schema.properties[fieldName].type
+      return (this.schema.properties[fieldName] &&
+      this.schema.properties[fieldName].type) || 'custom'
     },
     getQueryBuilder(fieldType) {
       const queryBuilders = {
