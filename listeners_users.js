@@ -47,7 +47,7 @@ module.exports = async function(api) {
     }
   })
 
-  api.addCollectionListenerWithPriority('get', loginCollections, 100, function hidePasswordHashes(req, collection, data) {
+  api.addCollectionListenerWithPriority(['get', 'changed', 'deleted'], loginCollections, 100, function hidePasswordHashes(req, collection, data) {
     if (!req.hasPermission(`${collection}: view hashed passwords`)) {
       debug(`deleting password because "${collection}: view hashed passwords"-permission is not set`)
       delete data.password
