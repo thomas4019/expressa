@@ -13,7 +13,7 @@ exports.updateAdminPermissions = async function (api) {
     // expected if not installed
   }
   const neededPermissions = permissions.reduce((obj, p) => { obj[p] = 1; return obj }, {})
-  adminRole.permissions = Object.assign({}, neededPermissions, adminRole.permissions)
+  adminRole.permissions = { ...neededPermissions, ...adminRole.permissions }
   await api.db.role.update('Admin', adminRole)
 }
 
