@@ -14,7 +14,11 @@ exports.doLogin = handler.doLogin
 
 exports.middleware = async function authMiddleware(req, res, next) {
   try {
-    const user = await handler.isLoggedIn(req)
+    req.query = req.query || {}
+    const token = req.query['token'] || req.headers['x-access-token']
+    delete req.query['token']
+    delete req.headers['x-access-token']
+    const user = await handler.isLoggedIn(token, req.getSetting('jwt_secret'))
     if (user) {
       req.uid = user._id
       req.ucollection = user.collection
