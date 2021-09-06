@@ -9,7 +9,6 @@ exports.doLogin = function (id, collection, jwt_secret, jwt_options = {}) {
     throw new util.ApiError(500, 'missing jwt_secret')
   }
   const token = jwt.sign({
-    email: user.email,
     _id: id,
     collection
   }, jwt_secret, jwt_options)
