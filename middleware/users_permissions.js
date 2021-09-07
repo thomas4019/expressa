@@ -39,7 +39,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
       throw new util.ApiError(404, 'User no longer exists')
     }
   } else {
-    req.user = { permissions: {} }
+    req.user = {}
   }
   await addRolePermissions(req, roles)
 }
