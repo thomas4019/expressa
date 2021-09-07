@@ -1,7 +1,7 @@
 const auth = require('../auth')
 const util = require('../util')
 const collectionsApi = require('./collections')
-const userPermissions = require('../middleware/users_permissions')
+const permissions = require('../middleware/permissions')
 
 exports.login = async (req, collection) => {
   const password = req.body.password
@@ -25,7 +25,7 @@ exports.login = async (req, collection) => {
   const payload = auth.doLogin(user._id, collection, req.getSetting('jwt_secret'), jwt_options)
   req.uid = user._id
   req.ucollection = collection
-  await userPermissions.addRolePermissionsAsync(req)
+  await permissions.addRolePermissionsAsync(req)
   payload.canUseAdmin = req.hasPermission('login to admin')
   return payload
 }
