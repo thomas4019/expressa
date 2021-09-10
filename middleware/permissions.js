@@ -1,12 +1,12 @@
 const util = require('../util')
 
 async function addRolePermissions (req, roles) {
-  req.userPermissions = req.userPermissions || {}
+  req.permissions = req.permissions || {}
   const roleDocs = await Promise.all(roles.map((name) => req.db.role.get(name)))
   roleDocs.forEach((roleDoc) => {
     for (const permission in roleDoc.permissions) {
       if (roleDoc.permissions[permission]) {
-        req.userPermissions[permission] = true
+        req.permissions[permission] = true
       }
     }
   })
@@ -27,7 +27,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
     req.hasPermission = () => true
     return
   }
-  req.hasPermission = (permission) => req.userPermissions && req.userPermissions[permission]
+  req.hasPermission = (permission) => req.permissions && req.permissions[permission]
   let roles = ['Anonymous']
   const isAuthenticatedRole = await doesAuthenticatedRoleExist(req)
   if (req.uid) {
@@ -39,7 +39,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
       throw new util.ApiError(404, 'User no longer exists')
     }
   } else {
-    req.user = { permissions: {} }
+    req.user = {}
   }
   await addRolePermissions(req, roles)
 }

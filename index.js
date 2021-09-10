@@ -17,7 +17,7 @@ const collectionsApi = require('./controllers/collections')
 const usersApi = require('./controllers/users')
 const installApi = require('./controllers/install')
 const statusApi = require('./controllers/status')
-const userPermissions = require('./middleware/users_permissions')
+const permissions = require('./middleware/permissions')
 const loggingMiddleware = require('./middleware/logging')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -249,7 +249,7 @@ module.exports.api = function (settings) {
     }
 
     router.use(auth.middleware) // Add user id to request
-    router.use(userPermissions.middleware) // Add user and permissions to request
+    router.use(permissions.middleware) // Add user and permissions to request
 
     router.get('/status', ph(statusApi.getStatus(router)))
 

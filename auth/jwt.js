@@ -4,31 +4,27 @@ const util = require('../util')
 
 // User document already validated, created, and saved to database
 // The id of that document is given.
-exports.doLogin = function (user, req, collection, jwt_options = {}) {
-  if (!req.settings.jwt_secret) {
-    throw new util.ApiError(500, 'missing jwt_secret in settings')
+exports.doLogin = function (id, collection, jwt_secret, jwt_options = {}) {
+  if (!jwt_secret) {
+    throw new util.ApiError(500, 'missing jwt_secret')
   }
   const token = jwt.sign({
-    _id: user._id,
-    email: user.email,
+    _id: id,
     collection
-  }, req.settings.jwt_secret, jwt_options)
+  }, jwt_secret, jwt_options)
   return {
     token: token,
-    uid: user._id
+    uid: id
   }
 }
 
 // Returns the user id, or false if not logged in.
-exports.isLoggedIn = async function (req) {
-  if (!req.settings.jwt_secret) {
+exports.isLoggedIn = async function (token, jwt_secret) {
+  if (!jwt_secret) {
     return false
   }
-  req.query = req.query || {}
-  const token = req.query.token || req.headers['x-access-token']
-  delete req.query.token
   if (token) {
-    return jwt.verify(token, req.settings.jwt_secret)
+    return jwt.verify(token, jwt_secret)
   }
   return false
 }
