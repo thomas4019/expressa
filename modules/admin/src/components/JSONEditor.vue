@@ -55,6 +55,14 @@ export default {
         }
         this.$emit('input', this.editor.getValue())
       })
+
+      const makeEditJsonTextAreaExpandable = () => {
+        const textarea = document.querySelector('.je-modal .je-edit-json--textarea')
+        textarea.classList.remove('je-edit-json--textarea') // INFO: Had to remove this class to remove height and width property
+        textarea.classList.add('expandable-textarea')
+      }
+
+      makeEditJsonTextAreaExpandable()
     },
     onSave() {
       this.$emit('json-save', this.json)
@@ -71,15 +79,8 @@ if (JSONEditor) {
     // If no valid editor is returned, the next resolver function will be used
   })
 
-  JSONEditor.defaults.callbacks.template = {
-    'deleteProfilePic': (jseditor, e) => {
-      alert('hey')
-    }
-  }
-
   JSONEditor.defaults.editors.schema = class schema extends JSONEditor.AbstractEditor {
     setValue(value, initial) {
-      console.log(this)
       this.value = value
       this.schemaeditor.setValue(value)
       this.onChange()
@@ -150,8 +151,11 @@ if (JSONEditor) {
 </script>
 
 <style>
-  h3 textarea {
-    resize: both;
+  .expandable-textarea {
+    display: block;
+    min-height: 250px;
+    min-width: 250px;
+    resize: both !important;
   }
   .jsoneditor-vue button.btn {
     font-size: 14px !important;
