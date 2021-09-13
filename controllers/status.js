@@ -29,6 +29,7 @@ exports.getStatus = function(router) {
     })
     listeners.sort((a, b) => a.priority - b.priority)
     const collections = Object.keys(router.db)
+      .filter((collection) => req.hasPermission(`${collection}: view`) || req.hasPermission(`${collection}: view own`))
     return {
       nodeVersion: process.version,
       uptime: util.friendlyDuration(process.uptime()),
