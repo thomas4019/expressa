@@ -16,6 +16,10 @@ ajv.addKeyword({
   type: 'string',
   schemaType: 'object',
 })
+ajv.addKeyword({
+  keyword: 'propertyOrder',
+  schemaType: 'number',
+})
 const formatKey = ajv.getKeyword('format')
 formatKey.type = formatKey.type.concat(['array', 'boolean', 'object'])
 
