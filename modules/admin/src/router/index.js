@@ -37,10 +37,10 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/home',
     name: 'Home',
-    meta: { title: 'Home', icon: 'home-alt' },
+    meta: { title: 'Home', icon: 'home' },
     children: [{
       path: 'home',
-      meta: { title: 'Home', icon: 'home-alt' },
+      meta: { title: 'Home', icon: 'home' },
       component: () => import('@/views/Home')
     }, {
       path: '/edit/:collectionName/:id',
@@ -101,7 +101,7 @@ export const constantRouterMap = [
     path: '/manage/permissions',
     component: Layout,
     name: 'permissions',
-    meta: { title: 'Manage' },
+    meta: { title: 'Manage', icon: 'shield-check' },
     children: [
       {
         path: '',
