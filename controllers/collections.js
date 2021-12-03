@@ -49,8 +49,8 @@ exports.get = async function (req) {
     orderby = util.normalizeOrderBy(orderby)
   }
 
-  // only retrieve docs relevant to logged in user
   if (req.uid) {
+    // scenario where logged in user can only retrieve own docs
     if (!req.hasPermission(`${req.params.collection}: view`) && req.hasPermission(`${req.params.collection}: view own`)) {
       query['meta.owner'] = req.uid
       fields['meta.owner'] = 1
