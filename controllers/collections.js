@@ -49,6 +49,13 @@ exports.get = async function (req) {
     orderby = util.normalizeOrderBy(orderby)
   }
 
+  // only retrieve docs relevant to logged in user
+  if (req.uid) {
+    if (!req.hasPermission(`${req.params.collection}: view`) && req.hasPermission(`${req.params.collection}: view own`)) {
+      fields['meta.owner'] = 1
+    }
+  }
+
   const data = await req.db[req.params.collection].find(query, req.query.skip || req.query.offset,
     req.query.limit, orderby, fields)
   total = data.length
