@@ -52,6 +52,7 @@ exports.get = async function (req) {
   // only retrieve docs relevant to logged in user
   if (req.uid) {
     if (!req.hasPermission(`${req.params.collection}: view`) && req.hasPermission(`${req.params.collection}: view own`)) {
+      query['meta.owner'] = req.uid
       fields['meta.owner'] = 1
     }
   }
