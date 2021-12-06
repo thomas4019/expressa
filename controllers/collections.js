@@ -18,35 +18,23 @@ exports.getSchema = async function (req) {
 
 exports.get = async function (req) {
   assertValidCollection(req)
-  let total = 0
   if (typeof req.db[req.params.collection] === 'undefined') {
     throw new util.ApiError(404, 'unknown collection')
   }
+
   const fields = req.query.fields ? JSON.parse(req.query.fields) : null
-  let query
+
+  let data, query
   if (req.query.query) {
     query = JSON.parse(req.query.query)
-  } else {
+  }
+  else {
     const { skip, offset, limit, page, orderby, fields, ...params } = req.query // eslint-disable-line no-unused-vars
     query = queryStringParser.parse(params)
   }
-  if (req.query.skip) {
-    req.query.skip = parseInt(req.query.skip)
-  }
-  if (req.query.offset) {
-    req.query.offset = parseInt(req.query.offset)
-  }
-  if (req.query.limit) {
-    req.query.limit = parseInt(req.query.limit)
-    if (req.query.page) {
-      req.query.pageitems = req.query.limit
-      delete req.query.limit
-    }
-  }
-  let orderby
   if (req.query.orderby) {
-    orderby = JSON.parse(req.query.orderby)
-    orderby = util.normalizeOrderBy(orderby)
+    req.query.orderby = JSON.parse(req.query.orderby)
+    req.query.orderby = util.normalizeOrderBy(req.query.orderby)
   }
 
   if (req.uid) {
@@ -57,23 +45,41 @@ exports.get = async function (req) {
     }
   }
 
-  const data = await req.db[req.params.collection].find(query, req.query.skip || req.query.offset,
-    req.query.limit, orderby, fields)
-  total = data.length
-  const limit = req.query.pageitems || (total > 10 ? 10 : total)
-  // calculate pagination in case `page`-queryarg was passed
-  const allowed = await Promise.all(data.map((doc) =>
-    util.notify('get', req, req.params.collection, doc).catch(() => false)
-  ))
-  let result = data.filter((doc, i) => allowed[i] === true)
-  if (req.query.page) {
+  if (req.query.page != null) {
+    req.query.page = parseInt(req.query.page)
     if (req.query.page <= 0) {
       throw new util.ApiError(400, 'invalid page number')
     }
-    result = util.createPagination(result, req.query.page, limit)
+    req.query.pageitems = parseInt(req.query.pageitems) || parseInt(req.query.limit) || 10
+    req.query.offset = util.getDatabaseOffset(req.query.page, req.query.pageitems)
+    req.query.orderby = req.query.orderby || util.normalizeOrderBy({ 'meta.created': 1 })
+    delete req.query.limit
+    delete req.query.skip
+    data = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
+    await Promise.all(data.map((doc) => util.notify('get', req, req.params.collection, doc)))
+    data = {
+      data,
+      page: req.query.page,
+      itemsPerPage: req.query.pageitems,
+    }
   }
-  await util.notify('getpresend', req, req.params.collection, result)
-  return result
+  else {
+    if (req.query.limit) {
+      req.query.limit = parseInt(req.query.limit)
+    }
+    if (req.query.skip) {
+      req.query.offset = parseInt(req.query.skip)
+      delete req.query.skip
+    }
+    else if (req.query.offset) {
+      req.query.offset = parseInt(req.query.offset)
+    }
+    data = await req.db[req.params.collection].find(query, req.query.offset, req.query.limit, req.query.orderby, fields)
+    await Promise.all(data.map((doc) => util.notify('get', req, req.params.collection, doc)))
+  }
+
+  await util.notify('getpresend', req, req.params.collection, data)
+  return data
 }
 
 exports.insert = async function (req) {
