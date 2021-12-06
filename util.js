@@ -388,3 +388,7 @@ exports.createPagination = function createPagination (data, page, limit) {
   pagination.data = data.splice((pagination.page - 1) * limit, limit)
   return pagination
 }
+
+exports.getDatabaseOffset = function getDatabaseOffset(page, itemsPerPage) {
+  return (page - 1) * itemsPerPage
+}
