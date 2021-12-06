@@ -47,14 +47,18 @@ describe('General Tests:', () => {
   })
 
   it('returns collections', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['collection: view'])
     await request(app)
       .get('/collection')
+      .set('x-access-token', token)
       .expect(200)
   })
 
   it('Sets headers', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['collection: view'])
     const res = await request(app)
       .get('/collection')
+      .set('x-access-token', token)
       .expect(200)
     expect(res.headers).to.have.property('x-request-id')
     expect(res.headers['x-request-id']).to.have.length(12)
