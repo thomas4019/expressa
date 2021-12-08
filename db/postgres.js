@@ -35,8 +35,18 @@ module.exports = function (settings, collectionId, collection) {
       const result = await pool.query(query)
       return result.rows.map((row) => row.data)
     },
-    count: async function(...params) {
-      return (await this.find(...params)).length
+    count: async function(rawQuery, offset, limit) {
+      const arrayFields = util.getArrayPaths('', collection.schema)
+      const pgQuery = mongoToPostgres('data', rawQuery || {}, arrayFields)
+      let query = 'SELECT COUNT(*) FROM ' + collectionId + (pgQuery ? ' WHERE ' + pgQuery : '')
+      if (typeof offset !== 'undefined') {
+        query += ' OFFSET ' + offset
+      }
+      if (typeof limit !== 'undefined') {
+        query += ' LIMIT ' + limit
+      }
+      const result = await pool.query(query)
+      return parseInt(result.rows[0].count)
     },
     get: async function (id, fields) {
       const arrayFields = util.getArrayPaths('', collection.schema)
