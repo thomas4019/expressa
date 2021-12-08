@@ -29,7 +29,7 @@ exports.get = async function (req) {
     query = JSON.parse(req.query.query)
   }
   else {
-    const { skip, offset, limit, page, orderby, fields, ...params } = req.query // eslint-disable-line no-unused-vars
+    const { skip, offset, limit, page, orderby, fields, pageMeta, ...params } = req.query // eslint-disable-line no-unused-vars
     query = queryStringParser.parse(params)
   }
   if (req.query.orderby) {
@@ -55,13 +55,10 @@ exports.get = async function (req) {
     req.query.orderby = req.query.orderby || util.normalizeOrderBy({ 'meta.created': 1 })
     delete req.query.limit
     delete req.query.skip
-    data = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
-    await Promise.all(data.map((doc) => util.notify('get', req, req.params.collection, doc)))
-    data = {
-      data,
-      page: req.query.page,
-      itemsPerPage: req.query.pageitems,
-    }
+    const pageData = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
+    await Promise.all(pageData.map((doc) => util.notify('get', req, req.params.collection, doc)))
+    const totalItems = req.query.pageMeta ? await req.db[req.params.collection].count(query) : undefined
+    data = util.createPagePagination(pageData, req.query.page, req.query.pageitems, totalItems)
   }
   else {
     if (req.query.limit) {
