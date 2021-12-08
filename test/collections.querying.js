@@ -146,6 +146,21 @@ describe('querying collections', function () {
     expect(res.body.data[0].title).to.equal('doc3')
   })
 
+  it('pagemetadisable url parameter strips additional page detail', async function () {
+    const res = await request(app)
+      .get('/testdoc?limit=2&page=2&pagemetadisable=1')
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body.itemsTotal).to.equal(undefined)
+    expect(res.body.itemsPerPage).to.equal(2)
+    expect(res.body.pages).to.equal(undefined)
+    expect(res.body.pagePrev).to.equal(1)
+    expect(res.body.pageNext).to.equal(undefined)
+    expect(res.body.data).to.have.lengthOf(1)
+
+    expect(res.body.data[0].title).to.equal('doc3')
+  })
+
   it('page 3 is empty', async function () {
     const res = await request(app)
       .get('/testdoc?limit=2&page=3')
