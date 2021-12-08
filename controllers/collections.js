@@ -24,12 +24,12 @@ exports.get = async function (req) {
 
   const fields = req.query.fields ? JSON.parse(req.query.fields) : null
 
-  let data, query, totalItems
+  let data, query
   if (req.query.query) {
     query = JSON.parse(req.query.query)
   }
   else {
-    const { skip, offset, limit, page, orderby, fields, pageMeta, ...params } = req.query // eslint-disable-line no-unused-vars
+    const { skip, offset, limit, page, pageitems, pagemetadisable, orderby, fields, ...params } = req.query // eslint-disable-line no-unused-vars
     query = queryStringParser.parse(params)
   }
   if (req.query.orderby) {
@@ -55,18 +55,21 @@ exports.get = async function (req) {
     req.query.orderby = req.query.orderby || util.normalizeOrderBy({ 'meta.created': 1 }) // paging requires orderby to ensure consistent results with offset and limit
     delete req.query.limit
     delete req.query.skip
-    const pageData = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
-    if (req.query.pageMeta) {
-      // optimization, no db count necessary as can infer totalItems
-      if (req.query.page === 1 && pageData.length < req.query.pageitems) {
-        totalItems = (req.query.pageitems * (req.query.page - 1)) + pageData.length
-      }
-      else {
-        totalItems = await req.db[req.params.collection].count(query)
-      }
+    if (req.query.pagemetadisable) {
+      // a way to skip the extra count database call, but lose additional page detail
+      const pageData = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
+      await Promise.all(pageData.map((doc) => util.notify('get', req, req.params.collection, doc)))
+      data = util.createPagePagination(pageData, req.query.page, req.query.pageitems)
     }
-    await Promise.all(pageData.map((doc) => util.notify('get', req, req.params.collection, doc)))
-    data = util.createPagePagination(pageData, req.query.page, req.query.pageitems, totalItems)
+    else {
+      // this is default - full detail
+      const [pageData, totalItems] = await Promise.all([
+        req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields),
+        req.db[req.params.collection].count(query)
+      ])
+      await Promise.all(pageData.map((doc) => util.notify('get', req, req.params.collection, doc)))
+      data = util.createPagePagination(pageData, req.query.page, req.query.pageitems, totalItems)
+    }
   }
   else {
     if (req.query.limit) {
