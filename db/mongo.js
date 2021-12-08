@@ -28,8 +28,10 @@ module.exports = function (settings, collection) {
       })
       return docs
     },
-    count: async function(...params) {
-      return (await this.find(...params)).length
+    count: async function(query, skip, limit) {
+      const db = await this.getClient()
+      const count = await db.collection(collection).count(query, { skip, limit })
+      return count
     },
     get: async function (id, fields) {
       const db = await this.getClient()
