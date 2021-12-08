@@ -33,7 +33,7 @@ module.exports = function (settings, collection) {
     },
     get: async function (id, fields) {
       const db = await this.getClient()
-      const doc = await db.collection(collection).findOne({ _id: id }, { fields })
+      const doc = await db.collection(collection).findOne({ _id: id }, { projection: fields })
       if (doc) {
         doc._id = doc._id.toString()
       }
