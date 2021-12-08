@@ -102,11 +102,10 @@ describe('querying collections', function () {
     expect(res.body).to.have.lengthOf(1)
   })
 
-  it('returns no documents without permission', async function () {
-    const res = await request(app)
+  it('errors without permission', async function () {
+    await request(app)
       .get('/testdoc')
-      .expect(200)
-    expect(res.body).to.have.lengthOf(0)
+      .expect(401)
   })
 
   it('page 0 returns an error', async function () {
