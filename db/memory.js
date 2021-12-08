@@ -30,6 +30,9 @@ module.exports = function (settings, collection) {
       }
       return matches
     },
+    count: async function(...params) {
+      return (await this.find(...params)).length
+    },
     get: async function (id, fields) {
       if (!store[id]) {
         throw new util.ApiError(404, 'document not found')

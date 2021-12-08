@@ -14,6 +14,9 @@ module.exports = function (storage) {
     find: function (query, offset, limit, orderby, fields) {
       return cache.find(query, offset, limit, orderby, fields)
     },
+    count: async function(...params) {
+      return (await this.find(...params)).length
+    },
     get: function (id, fields) {
       return cache.get(id, fields)
     },

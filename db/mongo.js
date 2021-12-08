@@ -34,6 +34,9 @@ module.exports = function (settings, collection) {
       })
       return docs
     },
+    count: async function(...params) {
+      return (await this.find(...params)).length
+    },
     get: async function (id, fields) {
       const db = await this.getClient()
       const doc = await db.collection(collection).findOne({ _id: id }, { fields })

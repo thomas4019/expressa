@@ -35,6 +35,9 @@ module.exports = function (settings, collectionId, collection) {
       const result = await pool.query(query)
       return result.rows.map((row) => row.data)
     },
+    count: async function(...params) {
+      return (await this.find(...params)).length
+    },
     get: async function (id, fields) {
       const arrayFields = util.getArrayPaths('', collection.schema)
       const select = fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
