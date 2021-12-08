@@ -389,6 +389,21 @@ exports.createPagination = function createPagination (data, page, limit) {
   return pagination
 }
 
+exports.createPagePagination = function createPagePagination (pageData, page, pageItems, totalItems) {
+  const pages = totalItems >= 0 ? Math.ceil(totalItems / pageItems) : undefined
+  page = parseInt(page)
+  page = page > pages ? pages + 1 : page
+  return {
+    data: pageData,
+    page: page > pages ? pages + 1 : page,
+    itemsPerPage: pageItems,
+    itemsTotal: totalItems,
+    pages,
+    pageNext: page < pages ? page + 1 : undefined,
+    pagePrev: page - 1 > 0 ? page - 1 : undefined,
+  }
+}
+
 exports.getDatabaseOffset = function getDatabaseOffset(page, itemsPerPage) {
   return (page - 1) * itemsPerPage
 }
