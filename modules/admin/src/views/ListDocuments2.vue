@@ -172,6 +172,7 @@ export default {
     allFilters() {
       const params = {
         page: this.page,
+        pageMeta: 1,
         limit: this.pageSize,
         orderby: '{"meta.created":-1}',
         ...this.filter,
