@@ -24,7 +24,7 @@ exports.get = async function (req) {
 
   const fields = req.query.fields ? JSON.parse(req.query.fields) : null
 
-  let data, query
+  let data, query, totalItems
   if (req.query.query) {
     query = JSON.parse(req.query.query)
   }
@@ -56,8 +56,16 @@ exports.get = async function (req) {
     delete req.query.limit
     delete req.query.skip
     const pageData = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
+    if (req.query.pageMeta) {
+      // optimization, no db count necessary as can infer totalItems
+      if (req.query.page === 1 && pageData.length < req.query.pageitems) {
+        totalItems = (req.query.pageitems * (req.query.page - 1)) + pageData.length
+      }
+      else {
+        totalItems = await req.db[req.params.collection].count(query)
+      }
+    }
     await Promise.all(pageData.map((doc) => util.notify('get', req, req.params.collection, doc)))
-    const totalItems = req.query.pageMeta ? await req.db[req.params.collection].count(query) : undefined
     data = util.createPagePagination(pageData, req.query.page, req.query.pageitems, totalItems)
   }
   else {
