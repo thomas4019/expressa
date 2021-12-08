@@ -117,7 +117,7 @@ describe('querying collections', function () {
 
   it('returns page 1 correctly', async function () {
     const res = await request(app)
-      .get('/testdoc?limit=2&page=1&pageMeta=1')
+      .get('/testdoc?limit=2&page=1')
       .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
@@ -133,7 +133,7 @@ describe('querying collections', function () {
 
   it('returns page 2 correctly', async function () {
     const res = await request(app)
-      .get('/testdoc?limit=2&page=2&pageMeta=1')
+      .get('/testdoc?limit=2&page=2')
       .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
@@ -148,7 +148,7 @@ describe('querying collections', function () {
 
   it('page 3 is empty', async function () {
     const res = await request(app)
-      .get('/testdoc?limit=2&page=3&pageMeta=1')
+      .get('/testdoc?limit=2&page=3')
       .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
@@ -161,7 +161,7 @@ describe('querying collections', function () {
 
   it('page 4 is empty', async function () {
     const res = await request(app)
-      .get('/testdoc?limit=2&page=3&pageMeta=1')
+      .get('/testdoc?limit=2&page=3')
       .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(3)
@@ -174,7 +174,7 @@ describe('querying collections', function () {
 
   it('pagination works with query', async function () {
     const res = await request(app)
-      .get('/testdoc?query={"data.number":2}&limit=2&page=1&pageMeta=1')
+      .get('/testdoc?query={"data.number":2}&limit=2&page=1')
       .set('x-access-token', token)
       .expect(200)
     expect(res.body.itemsTotal).to.equal(1)
