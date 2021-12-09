@@ -59,7 +59,6 @@ exports.get = async function (req) {
     if (req.query.pagemetadisable) {
       // a way to skip the extra count database call, but lose additional page detail
       pageData = await req.db[req.params.collection].find(query, req.query.offset, req.query.pageitems, req.query.orderby, fields)
-      data = util.createPagePagination(pageData, req.query.page, req.query.pageitems)
     }
     else {
       // this is default - full detail
