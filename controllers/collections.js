@@ -49,6 +49,14 @@ exports.get = async function (req) {
     orderby = util.normalizeOrderBy(orderby)
   }
 
+  if (req.uid) {
+    // scenario where logged in user can only retrieve own docs
+    if (!req.hasPermission(`${req.params.collection}: view`) && req.hasPermission(`${req.params.collection}: view own`)) {
+      query['meta.owner'] = req.uid
+      fields['meta.owner'] = 1
+    }
+  }
+
   const data = await req.db[req.params.collection].find(query, req.query.skip || req.query.offset,
     req.query.limit, orderby, fields)
   total = data.length
