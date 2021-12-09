@@ -52,9 +52,10 @@ Once you add a collections in the admin interface, every collection will have th
 | POST   | /users/login                                 | expects JSON in the message body. e.g. `{"email": "email@example.com", password: "<the password>"}                                                                                             |
 | GET    | /:collection                                 | get an array of all documents in a collection                                                                                                                                                  |
 | GET    | /:collection/:id                             | get a specific document                                                                                                                                                                        |
-| GET    | /:collection/?query={..}                     | get an array of documents matching the [mongo query](https://www.npmjs.com/package/mongo-query). For pagination append `&skip=0&offset=0&limit=6`                                              |
-| GET    | /:collection/?query={..}&limit=10&page=1&orderby=["meta.created"] | same as previous, but with pagination support |
-| GET    | /:collection/?query={..}&limit=10&offset=10 | same as previous, but with finergrained output control |
+| GET    | /:collection/?query={..}                     | get an array of documents matching the [mongo query](https://www.npmjs.com/package/mongo-query)                                            |
+| GET    | /:collection/?query={..}&limit=10&offset=10&orderby={"meta.created":1}  | same as previous, but with targeted output control and sorting |
+| GET    | /:collection/?query={..}&page=1&pageitems=10 | similar to previous, but with pagination support |
+| GET    | /:collection/?query={..}&page=1&pageitems=10&pagemetadisable=1 | same as previous but *slightly* faster and with less pagination detail |
 | GET    | /:collection/?query={..}&fields={..}         | the fields param can be used to do a mongo projection to request only specific fields |
 | GET    | /:collection/?fieldname=value                | get an array of documents matching with the specified values. See [node-mongo-querystring](https://github.com/Turistforeningen/node-mongo-querystring) for details.                            |
 | GET    | /:collection/schema                          | get the collection schema                                                                                                                                                                      |

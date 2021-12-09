@@ -159,11 +159,10 @@ describe('basic collections', function () {
 
   it('fail to read paged without permission', async function () {
     const token = await testutils.getUserWithPermissions(api)
-    const res = await request(app)
+    await request(app)
       .get('/testdoc/?page=1')
       .set('x-access-token', token)
-      .expect(200)
-    expect(res.body.data.length).to.equal(0)
+      .expect(401)
   })
 
   it('read a specific doc', async function () {

@@ -46,6 +46,9 @@ module.exports = function (settings, collection) {
       }
       return matches
     },
+    count: async function(...params) {
+      return (await this.find(...params)).length
+    },
     get: async function (id, fields) {
       try {
         let data = await store.getAsync(id)
