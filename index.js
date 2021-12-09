@@ -117,7 +117,9 @@ module.exports.api = function (settings) {
     generateDocumentId: util.generateDocumentId,
     doLogin: auth.doLogin,
     createPagination: util.createPagination,
-    normalizeOrderBy: util.normalizeOrderBy
+    createPagePagination: util.createPagePagination,
+    normalizeOrderBy: util.normalizeOrderBy,
+    getDatabaseOffset: util.getDatabaseOffset,
   }
   router.eventListeners = {}
 
