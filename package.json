@@ -18,7 +18,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongo-query": "^0.5.7",
     "mongo-query-to-postgres-jsonb": "^0.2.9",
-    "mongo-querystring": "3.0.0",
+    "mongo-querystring": "4.1.1",
     "mongodb": "^3.5.7",
     "on-finished": "^2.3.0",
     "pg": "^8.4.2",
