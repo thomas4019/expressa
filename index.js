@@ -33,8 +33,6 @@ async function bootstrapCollections (router) {
   }))
 }
 
-let initialized = false
-
 async function initCollections (db, router) {
   debug('init collections')
   try {
@@ -103,6 +101,7 @@ function ph (requestHandler) {
 
 module.exports.api = function (settings) {
   const router = express.Router()
+  router.initialized = false
   router.custom = express.Router()
   router.dbTypes = dbTypes
   router.settings = settings || {}
@@ -139,7 +138,7 @@ module.exports.api = function (settings) {
     }
     router.eventListeners[event].push(listener)
     router.eventListeners[event].sort((a, b) => a.priority - b.priority)
-    if (event === 'ready' && initialized) {
+    if (event === 'ready' && router.initialized) {
       listener(router)
     }
   }
@@ -207,7 +206,7 @@ module.exports.api = function (settings) {
       console.error(e)
     }
 
-    initialized = true
+    router.initialized = true
     await util.notify('ready', router)
   })()
 
