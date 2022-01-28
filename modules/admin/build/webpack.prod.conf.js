@@ -131,13 +131,15 @@ if (config.build.productionGzip) {
 
   webpackConfig.plugins.push(
     new CompressionWebpackPlugin({
-      asset: '[path].gz[query]',
+      filename: '[path][base].gz',
       algorithm: 'gzip',
       test: new RegExp(
         '\\.(' + config.build.productionGzipExtensions.join('|') + ')$'
       ),
-      threshold: 10240,
-      minRatio: 0.8
+      compressionOptions: {
+        level: 9,
+      },
+      minRatio: Infinity,
     })
   )
 }
