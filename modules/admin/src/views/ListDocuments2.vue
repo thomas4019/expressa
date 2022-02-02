@@ -31,8 +31,16 @@
       border
       fit
       highlight-current-row
+      @sort-change="handleSortChange"
     >
-      <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
+      <el-table-column
+        v-for="(name, i) in listedProperties"
+        :key="name"
+        :label="name"
+        :prop="name"
+        align="center"
+        :sortable="sortableFieldTypes.includes(getFieldType(name)) ? 'custom': undefined"
+      >
         <template slot-scope="scope">
           <div v-if="scope.$index === 0 && isFiltersVisible" class="text-left">
             <el-input
@@ -138,6 +146,8 @@ export default {
     pageSizes: pageSizes,
     pageSize: pageSizes[0],
     isFiltersVisible: true,
+    sortableFieldTypes: ['number', 'string', 'boolean'],
+    orderBy: { order: null, prop: null },
   }),
   computed: {
     tableRows() {
@@ -170,10 +180,18 @@ export default {
       }, {})
     },
     allFilters() {
+      let orderby = '{"meta.created":-1}'
+
+      if (!!this.orderBy.prop && !!this.orderBy.order) {
+        const propName = this.orderBy.prop
+        const direction = this.orderBy.order === 'descending' ? '1' : '-1'
+        orderby = `{"${propName}": ${direction}}`
+      }
+
       const params = {
+        orderby,
         page: this.page,
         limit: this.pageSize,
-        orderby: '{"meta.created":-1}',
         ...this.filter,
         query: { ...this.appliedSearchFilters }
       }
@@ -207,6 +225,10 @@ export default {
         .filter(Boolean)
         .reduce((res, key) => (res !== null && res !== undefined) ? res[key] : res, obj)
       return (result === undefined || result === obj) ? defaultValue : result
+    },
+    handleSortChange(orderBy) {
+      this.orderBy = orderBy
+      this.update()
     },
     async update() {
       if (this.$route.params.collectionName) {
