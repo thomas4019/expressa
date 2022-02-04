@@ -20,7 +20,7 @@
         <el-dropdown-menu slot="dropdown" style="max-height: 300px; overflow: auto">
           <el-checkbox-group v-model="selectedColumns">
             <el-dropdown-item
-              v-for="column in listedProperties"
+              v-for="column in allPossibleColumns"
               :key="column"
               :label="column"
               :value="column"
@@ -251,8 +251,26 @@ export default {
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
+      this.allPossibleColumns = this.getAllPossibleColumns()
       this.listedProperties = columns || Object.keys(this.schema.properties)
       this.selectedColumns = [...this.listedProperties]
+    },
+    getAllPossibleColumns() {
+      const configuredCols = (this.collection.admin && this.collection.admin.columns) || []
+      const allProperties = this.getNestedProperties(this.schema.properties)
+      return Array.from(new Set(configuredCols.concat(allProperties).sort()))
+    },
+    getNestedProperties(obj, parent) {
+      let keys = []
+      for (const key in obj) {
+        if (obj[key].properties) {
+          keys = keys.concat(this.getNestedProperties(obj[key].properties, key))
+        }
+        else {
+          keys.push(`${parent ? parent + '.' : ''}${key}`)
+        }
+      }
+      return keys
     },
     applyCustomColumnFilter(tableData) {
       const customColumnSearches = Object.keys(this.searchFilters)
