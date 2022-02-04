@@ -20,7 +20,7 @@
         <el-dropdown-menu slot="dropdown" style="max-height: 300px; overflow: auto">
           <el-checkbox-group v-model="selectedColumns">
             <el-dropdown-item
-              v-for="column in allColumns"
+              v-for="column in listedProperties"
               :key="column"
               :label="column"
               :value="column"
@@ -169,9 +169,6 @@ export default {
     selectedColumns: []
   }),
   computed: {
-    allColumns() {
-      return Object.keys(this.schema.properties)
-    },
     tableRows() {
       if (!this.isFiltersVisible) {
         return this.data
