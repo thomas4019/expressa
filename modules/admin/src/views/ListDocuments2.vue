@@ -166,7 +166,8 @@ export default {
     pageSizes: pageSizes,
     pageSize: pageSizes[0],
     isFiltersVisible: true,
-    selectedColumns: []
+    selectedColumns: [],
+    allPossibleColumns: []
   }),
   computed: {
     tableRows() {
