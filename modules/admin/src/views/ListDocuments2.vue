@@ -7,6 +7,34 @@
 
       <span class="mx-auto" />
 
+      <el-dropdown
+        multiple
+        class="mr-4"
+        :hide-on-click="false"
+      >
+        <span class="el-dropdown-link">
+          Select columns
+          <i class="el-icon-arrow-down el-icon--right" />
+        </span>
+
+        <el-dropdown-menu slot="dropdown" style="max-height: 300px; overflow: auto">
+          <el-checkbox-group v-model="selectedColumns">
+            <el-dropdown-item
+              v-for="column in listedProperties"
+              :key="column"
+              :label="column"
+              :value="column"
+            >
+              <el-checkbox
+                class="mb-0 mr-4"
+                :label="column"
+                :disabled="selectedColumns.length === 1 && selectedColumns[0] === column"
+              />
+            </el-dropdown-item>
+          </el-checkbox-group>
+        </el-dropdown-menu>
+      </el-dropdown>
+
       <el-checkbox
         v-model="isFiltersVisible"
         class="mb-0 mr-4"
@@ -32,7 +60,7 @@
       fit
       highlight-current-row
     >
-      <el-table-column v-for="(name, i) in listedProperties" :key="name" :label="name" align="center">
+      <el-table-column v-for="(name, i) in selectedColumns" :key="name" :label="name" align="center">
         <template slot-scope="scope">
           <div v-if="scope.$index === 0 && isFiltersVisible" class="text-left">
             <el-input
@@ -138,6 +166,7 @@ export default {
     pageSizes: pageSizes,
     pageSize: pageSizes[0],
     isFiltersVisible: true,
+    selectedColumns: []
   }),
   computed: {
     tableRows() {
@@ -223,6 +252,7 @@ export default {
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
       this.listedProperties = columns || Object.keys(this.schema.properties)
+      this.selectedColumns = [...this.listedProperties]
     },
     applyCustomColumnFilter(tableData) {
       const customColumnSearches = Object.keys(this.searchFilters)
