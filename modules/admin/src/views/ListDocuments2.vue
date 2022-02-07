@@ -18,7 +18,7 @@
         </span>
 
         <el-dropdown-menu slot="dropdown" style="max-height: 300px; overflow: auto">
-          <el-checkbox-group v-model="selectedColumns">
+          <el-checkbox-group v-model="selectedColumns" @input="update">
             <el-dropdown-item
               v-for="column in allPossibleColumns"
               :key="column"
@@ -155,14 +155,12 @@ export default {
     },
   },
   data: () => ({
-    start: 0,
     page: 1,
     count: 0,
     data: [],
     schema: {},
     exactSearches: {},
     searchFilters: {},
-    listedProperties: [],
     pageSizes: pageSizes,
     pageSize: pageSizes[0],
     isFiltersVisible: true,
@@ -208,7 +206,7 @@ export default {
         query: { ...this.appliedSearchFilters }
       }
 
-      const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
+      const columns = this.selectedColumns
 
       if (columns) {
         params.fields = columns.reduce((map, field) => {
@@ -225,7 +223,7 @@ export default {
       handler: 'update'
     },
     '$route.params.collectionName': {
-      handler: 'resetFilters'
+      handler: 'resetTable'
     }
   },
   mounted() {
@@ -242,19 +240,25 @@ export default {
       if (this.$route.params.collectionName) {
         this.collectionName = this.$route.params.collectionName
       }
-      // Avoid refetching schema info if name hasn't changed
+
+      // Fetch and Set schema info if name hasn't changed
       if (!this.collection || this.collection._id !== this.collectionName) {
         this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
         this.schema = this.collection.schema
       }
+
+      // Set columns data if not set.
+      if (!this.selectedColumns.length) {
+        const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
+        this.allPossibleColumns = this.getAllPossibleColumns()
+        this.selectedColumns = columns || Object.keys(this.schema.properties)
+      }
+
+      // Fetch and Set table data
       const params = { ...this.allFilters }
-      const columns = this.columns || (this.collection.admin && this.collection.admin.columns)
       const info = (await request({ url: `/${this.collectionName}/`, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
-      this.allPossibleColumns = this.getAllPossibleColumns()
-      this.listedProperties = columns || Object.keys(this.schema.properties)
-      this.selectedColumns = [...this.listedProperties]
     },
     getAllPossibleColumns() {
       const configuredCols = (this.collection.admin && this.collection.admin.columns) || []
@@ -266,8 +270,7 @@ export default {
       for (const key in obj) {
         if (obj[key].properties) {
           keys = keys.concat(this.getNestedProperties(obj[key].properties, key))
-        }
-        else {
+        } else {
           keys.push(`${parent ? parent + '.' : ''}${key}`)
         }
       }
@@ -297,10 +300,10 @@ export default {
     },
     downloadCSV(data = this.data) {
       const collection = this.collectionName
-      let text = this.listedProperties.map((name) => '"' + name + '"').join(',') + '\n'
+      let text = this.selectedColumns.map((name) => '"' + name + '"').join(',') + '\n'
       if (data) {
         text += data.map((row) =>
-          this.listedProperties.map((key) => '"' + String(objectPath.get(row, key) || '').replace(/"/g, '""') + '"')
+          this.selectedColumns.map((key) => '"' + String(objectPath.get(row, key) || '').replace(/"/g, '""') + '"')
         ).join('\n')
         console.log(text)
         const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
@@ -341,9 +344,19 @@ export default {
       const regexQuery = { '$regex': searchKeyword, '$options': 'i' }
       return this.exactSearches[fieldName] ? searchKeyword : regexQuery
     },
-    resetFilters() {
+    resetTable() {
+      // Reset Filters
       this.exactSearches = {}
       this.searchFilters = {}
+      this.selectedColumns = []
+
+      // Reset pagination
+      this.page = 0
+      this.pageSize = pageSizes[0]
+
+      // Reset table data
+      this.data = []
+      this.count = 0
     }
   }
 }
