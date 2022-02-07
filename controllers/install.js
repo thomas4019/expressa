@@ -30,7 +30,7 @@ exports.install = async (req, api) => {
   let settings = await api.db.settings.get(process.env.NODE_ENV).catch(() => {})
 
   if (!settings) {
-    const settings = JSON.parse(JSON.stringify(req.body.settings))
+    settings = JSON.parse(JSON.stringify(req.body.settings))
     settings._id = process.env.NODE_ENV
     settings.jwt_secret = util.createSecureRandomId()
     // Remove fields that are not real settings
