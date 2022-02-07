@@ -268,10 +268,11 @@ export default {
     getNestedProperties(obj, parent) {
       let keys = []
       for (const key in obj) {
+        const fullKey = `${parent ? parent + '.' : ''}${key}`
         if (obj[key].properties) {
-          keys = keys.concat(this.getNestedProperties(obj[key].properties, key))
+          keys = keys.concat(this.getNestedProperties(obj[key].properties, fullKey))
         } else {
-          keys.push(`${parent ? parent + '.' : ''}${key}`)
+          keys.push(fullKey)
         }
       }
       return keys
