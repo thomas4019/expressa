@@ -289,14 +289,14 @@ export default {
     },
     getNestedProperties(obj, parent) {
       let keys = []
-      for (const key in obj) {
+      Object.keys(obj).forEach(key => {
         const fullKey = `${parent ? parent + '.' : ''}${key}`
         if (obj[key].properties) {
           keys = keys.concat(this.getNestedProperties(obj[key].properties, fullKey))
         } else {
           keys.push(fullKey)
         }
-      }
+      })
       return keys
     },
     applyCustomColumnFilter(tableData) {
