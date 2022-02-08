@@ -299,6 +299,18 @@ export default {
       })
       return keys
     },
+    getNestedProperty(obj, path) {
+      const parts = path.split('.')
+      let partObj = obj
+      for (const part of parts) {
+        if (partObj.properties && partObj.properties[part]) {
+          partObj = partObj.properties[part]
+        } else {
+          return
+        }
+      }
+      return partObj
+    },
     applyCustomColumnFilter(tableData) {
       const customColumnSearches = Object.keys(this.searchFilters)
         .filter((fieldName) => this.getFieldType(fieldName) === 'custom')
@@ -352,8 +364,8 @@ export default {
       this.downloadCSV(this.applyCustomColumnFilter(rows))
     },
     getFieldType(fieldName) {
-      return (this.schema.properties[fieldName] &&
-      this.schema.properties[fieldName].type) || 'custom'
+      const property = this.getNestedProperty(this.schema, fieldName)
+      return (property && property.type) || 'custom'
     },
     getQueryBuilder(fieldType) {
       const queryBuilders = {
