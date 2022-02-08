@@ -284,23 +284,23 @@ export default {
     },
     getAllPossibleColumns() {
       const configuredCols = (this.collection.admin && this.collection.admin.columns) || []
-      const allProperties = this.getNestedProperties(this.schema)
+      const allProperties = this.getSchemaProperties(this.schema)
       return Array.from(new Set(configuredCols.concat(allProperties).sort()))
     },
-    getNestedProperties(obj, parent) {
+    getSchemaProperties(obj, parent) {
       let keys = []
       const properties = obj.properties
       Object.keys(properties).forEach(key => {
         const fullKey = `${parent ? parent + '.' : ''}${key}`
         if (properties[key].properties) {
-          keys = keys.concat(this.getNestedProperties(properties[key], fullKey))
+          keys = keys.concat(this.getSchemaProperties(properties[key], fullKey))
         } else {
           keys.push(fullKey)
         }
       })
       return keys
     },
-    getNestedProperty(obj, path) {
+    getSchemaProperty(obj, path) {
       const parts = path.split('.')
       let partObj = obj
       for (const part of parts) {
@@ -365,7 +365,7 @@ export default {
       this.downloadCSV(this.applyCustomColumnFilter(rows))
     },
     getFieldType(fieldName) {
-      const property = this.getNestedProperty(this.schema, fieldName)
+      const property = this.getSchemaProperty(this.schema, fieldName)
       return (property && property.type) || 'custom'
     },
     getQueryBuilder(fieldType) {
