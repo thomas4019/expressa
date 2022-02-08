@@ -27,39 +27,46 @@ exports.install = async (req, api) => {
 
   const modules = selectedModules.map((name) => req.modules[name])
 
-  const settings = JSON.parse(JSON.stringify(req.body.settings))
-  settings._id = process.env.NODE_ENV
-  settings.jwt_secret = util.createSecureRandomId()
-  // Remove fields that are not real settings
-  delete settings.email
-  delete settings.user_storage
-  delete settings.password
-  Object.assign(req.settings, settings)
-  await req.db.settings.create(settings)
+  let settings = await api.db.settings.get(process.env.NODE_ENV).catch(() => {})
 
-  for (const m of modules) {
-    const colls = await util.resolve(m.collections, api)
-    if (colls) {
-      for (const coll of colls) {
-        if (!coll.storage) {
-          coll.storage = 'file'
-        }
-        if (coll._id == 'users') {
-          if (req.body.settings.user_storage) {
-            coll.storage = req.body.settings.user_storage
+  if (!settings) {
+    settings = JSON.parse(JSON.stringify(req.body.settings))
+    settings._id = process.env.NODE_ENV
+    settings.jwt_secret = util.createSecureRandomId()
+    // Remove fields that are not real settings
+    delete settings.email
+    delete settings.user_storage
+    delete settings.password
+    Object.assign(req.settings, settings)
+    await req.db.settings.create(settings)
+
+    for (const m of modules) {
+      const colls = await util.resolve(m.collections, api)
+      if (colls) {
+        for (const coll of colls) {
+          if (!coll.storage) {
+            coll.storage = 'file'
           }
-          coll.enableLogin = true
+          if (coll._id == 'users') {
+            if (req.body.settings.user_storage) {
+              coll.storage = req.body.settings.user_storage
+            }
+            coll.enableLogin = true
+          }
+          await req.db.collection.create(coll)
+          await api.notify('changed', req, 'collection', coll)
+          // await collectionsApi.insert(Object.assign({}, req, { body: coll }))
         }
-        await req.db.collection.create(coll)
-        await api.notify('changed', req, 'collection', coll)
-        // await collectionsApi.insert(Object.assign({}, req, { body: coll }))
       }
+      await util.resolve(m.install, api)
     }
-
-    await util.resolve(m.install, api)
+    await exports.updateAdminPermissions(api)
   }
-
-  await exports.updateAdminPermissions(api)
+  else {
+    if (settings.installed) {
+      throw new Error(`${process.env.NODE_ENV}.json exists and indicates expressa is already installed. Try setting 'installed' to false if you are attempting to reinstall.`)
+    }
+  }
 
   settings.installed = true
   settings.enforce_permissions = true
