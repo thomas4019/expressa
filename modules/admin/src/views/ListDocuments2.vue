@@ -212,7 +212,7 @@ export default {
 
       if (!!this.orderBy.prop && !!this.orderBy.order) {
         const propName = this.orderBy.prop
-        const direction = this.orderBy.order === 'descending' ? '1' : '-1'
+        const direction = this.orderBy.order === 'descending' ? '-1' : '1'
         orderby = `{"${propName}": ${direction}}`
       }
 
