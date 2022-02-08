@@ -284,15 +284,16 @@ export default {
     },
     getAllPossibleColumns() {
       const configuredCols = (this.collection.admin && this.collection.admin.columns) || []
-      const allProperties = this.getNestedProperties(this.schema.properties)
+      const allProperties = this.getNestedProperties(this.schema)
       return Array.from(new Set(configuredCols.concat(allProperties).sort()))
     },
     getNestedProperties(obj, parent) {
       let keys = []
-      Object.keys(obj).forEach(key => {
+      const properties = obj.properties
+      Object.keys(properties).forEach(key => {
         const fullKey = `${parent ? parent + '.' : ''}${key}`
-        if (obj[key].properties) {
-          keys = keys.concat(this.getNestedProperties(obj[key].properties, fullKey))
+        if (properties[key].properties) {
+          keys = keys.concat(this.getNestedProperties(properties[key], fullKey))
         } else {
           keys.push(fullKey)
         }
