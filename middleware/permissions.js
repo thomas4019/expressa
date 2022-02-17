@@ -1,4 +1,5 @@
 const util = require('../util')
+let authenticatedRoleExists
 
 async function addRolePermissions (req, roles) {
   req.permissions = req.permissions || {}
@@ -13,12 +14,15 @@ async function addRolePermissions (req, roles) {
 }
 
 async function doesAuthenticatedRoleExist(req) {
-  try {
-    await req.db.role.get('Authenticated')
-    return true
-  } catch (e) {
-    return false
+  if (typeof authenticatedRoleExists === 'undefined') {
+    try {
+      await req.db.role.get('Authenticated')
+      authenticatedRoleExists = true
+    } catch (e) {
+      authenticatedRoleExists = false
+    }
   }
+  return authenticatedRoleExists
 }
 
 module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddlewareAsync(req) {
