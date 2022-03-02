@@ -85,9 +85,6 @@ module.exports = function (settings, collectionId, collection) {
       const pgQuery = mongoToPostgres('data', query || {}, arrayFields)
       const updateSql = mongoToPostgres.convertUpdate('data', update,false)
       const result = await pool.query('UPDATE ' + collectionId + ' SET data=' + updateSql + ' WHERE ' + pgQuery)
-      if (result.rowCount === 0) {
-        throw new util.ApiError(404, 'document not found')
-      }
       return {
         matchedCount: result.rowCount
       }
