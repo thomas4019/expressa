@@ -292,7 +292,7 @@ export default {
       const properties = obj.properties
       Object.keys(properties).forEach(key => {
         const fullKey = `${parent ? parent + '.' : ''}${key}`
-        if (properties[key].properties) {
+        if (properties[key].properties && Object.keys(properties[key].properties).length) {
           keys = keys.concat(this.getSchemaProperties(properties[key], fullKey))
         } else {
           keys.push(fullKey)
