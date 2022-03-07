@@ -24,7 +24,12 @@ module.exports = function (api) {
     if (event === 'post') {
       data.meta.created = new Date().toISOString()
       if (req.user) {
-        data.meta.owner = req.user._id
+        if (req.hasPermission('login to admin')) {
+          data.meta.owner = data.meta.owner || req.user._id
+        }
+        else {
+          data.meta.owner = req.user._id
+        }
       }
     }
   })
