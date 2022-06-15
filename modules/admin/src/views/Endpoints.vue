@@ -10,7 +10,9 @@
         </div>
 
         Params
-        <div v-for="(parameter, index) in params" :key="index" class="d-flex align-items-center">
+        <div v-for="(parameter, index) in params" :key="index" class="d-flex align-items-center mb-1">
+          <el-checkbox v-model="parameter.isEnabled" class="mr-2" />
+
           <el-input v-model="parameter.key" placeholder="key" @input="handleParamKeyChange(index)" />
 
           <el-input v-model="parameter.value" placeholder="value" class="ml-1" />
@@ -165,27 +167,29 @@ export default {
       apiBaseUrl: request.defaults.baseURL,
       apiSuffix: '',
       params: [
-        { key: '', value: '' }
+        { key: '', value: '', isEnabled: true }
       ]
     }
   },
   computed: {
     apiParams() {
-      return this.params.map(param => {
-        if (param.key && param.value) {
-          return `${param.key}=${param.value}`
-        }
+      return this.params
+        .filter(param => param.isEnabled)
+        .map(param => {
+          if (param.key && param.value) {
+            return `${param.key}=${param.value}`
+          }
 
-        if (param.key) {
-          return param.key
-        }
+          if (param.key) {
+            return param.key
+          }
 
-        if (param.value) {
-          return `=${param.value}`
-        }
+          if (param.value) {
+            return `=${param.value}`
+          }
 
-        return ''
-      }).join('&')
+          return ''
+        }).join('&')
     },
   },
   methods: {
@@ -240,7 +244,7 @@ export default {
         return
       }
 
-      this.params.push({ key: '', value: '' })
+      this.params.push({ key: '', value: '', isEnabled: true })
     },
     removeParam(index) {
       this.params.splice(index, 1)
