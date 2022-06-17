@@ -17,6 +17,7 @@
     "@json-editor/json-editor": "^2.5.4",
     "axios": "^0.21.1",
     "bootstrap": "^4.2.1",
+    "dot-object": "^2.1.4",
     "element-ui": "2.4.6",
     "file-saver": "^2.0.2",
     "jquery": "^3.3.1",

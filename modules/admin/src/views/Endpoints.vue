@@ -158,6 +158,8 @@
 <script>
 import ListDocuments2 from '@/views/ListDocuments2.vue'
 import request from '@/utils/request'
+var dot = require('dot-object')
+dot.keepArray = true
 
 export default {
   name: 'Endpoints',
@@ -210,7 +212,15 @@ export default {
 
       // Set columns data if not set.
       if (!this.selectedColumns.length) {
-        const columns = Object.keys(this.data[0])
+        const columns = Array.from(this.data.reduce((acc, row) => {
+          const rowWithDottedKeys = dot.dot(row)
+
+          return new Set([
+            ...Object.keys(rowWithDottedKeys),
+            ...acc
+          ])
+        }, []))
+
         this.selectedColumns = ['_id']
         this.allPossibleColumns = columns
       }
@@ -226,7 +236,8 @@ export default {
             return true
           }
 
-          const stringified = row[fieldName].toString()
+          const rowWithDottedKeys = dot.dot(row)
+          const stringified = rowWithDottedKeys[fieldName].toString()
 
           if (this.exactSearches[fieldName]) {
             return stringified.trim() === searchKeyword.trim()
