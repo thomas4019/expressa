@@ -6,6 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: set npm registry
+          command: 'npm config set registry https://registry.npmjs.org/'
+      - run:
           name: install-npm
           command: npm install
       - run:
