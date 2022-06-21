@@ -4,13 +4,14 @@ const util = require('../util')
 
 // User document already validated, created, and saved to database
 // The id of that document is given.
-exports.doLogin = function (id, collection, jwt_secret, jwt_options = {}) {
+exports.doLogin = function (id, collection, timestamp, jwt_secret, jwt_options = {}) {
   if (!jwt_secret) {
     throw new util.ApiError(500, 'missing jwt_secret')
   }
   const token = jwt.sign({
     _id: id,
-    collection
+    collection,
+    timestamp,
   }, jwt_secret, jwt_options)
   return {
     token: token,
