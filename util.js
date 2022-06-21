@@ -171,11 +171,17 @@ exports.getUserWithPermissions = async function (api, permissions) {
   })
   const randId = randomstring.generate(12)
   const roleName = 'role' + randId
+  const now = new Date().toISOString()
   const user = {
     email: 'test' + randId + '@example.com',
     password: '123',
     collection: 'users',
-    roles: [roleName]
+    roles: [roleName],
+    meta: {
+      created: now,
+      updated: now,
+      updated_password: now,
+    }
   }
   await api.db.role.cache.create({
     _id: roleName,
