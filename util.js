@@ -1,5 +1,4 @@
 const randomstring = require('randomstring')
-const jwt = require('jsonwebtoken')
 const {v4} = require('uuid')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
@@ -184,8 +183,8 @@ exports.getUserWithPermissions = async function (api, permissions) {
   })
   const result = await api.db.users.create(user)
   user._id = result
-  const token = jwt.sign(user, api.settings.jwt_secret, {})
-  return token
+  const payload = api.util.doLogin(user._id, 'users', user.meta.updated_password, api.settings.jwt_secret, {})
+  return payload.token
 }
 
 const severities = ['critical', 'error', 'warning', 'notice', 'info', 'debug']
