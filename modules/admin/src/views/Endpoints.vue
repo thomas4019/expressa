@@ -95,7 +95,7 @@
         :label="name"
         :prop="name"
         align="center"
-        :sortable="sortableFieldTypes.includes(getFieldType(name)) ? 'custom': undefined"
+        :sortable="true"
       >
         <template slot-scope="scope">
           <div class="text-left">
