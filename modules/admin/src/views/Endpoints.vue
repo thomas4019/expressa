@@ -168,31 +168,7 @@ export default {
     return {
       apiBaseUrl: request.defaults.baseURL,
       apiSuffix: '',
-      params: [
-        { key: '', value: '', isEnabled: true }
-      ]
     }
-  },
-  computed: {
-    apiParams() {
-      return this.params
-        .filter(param => param.isEnabled)
-        .map(param => {
-          if (param.key && param.value) {
-            return `${param.key}=${param.value}`
-          }
-
-          if (param.key) {
-            return param.key
-          }
-
-          if (param.value) {
-            return `=${param.value}`
-          }
-
-          return ''
-        }).join('&')
-    },
   },
   methods: {
     async update() {
@@ -204,9 +180,10 @@ export default {
       const params = {
         page: this.page,
         limit: this.pageSize,
-        ...this.allFilters
+        ...this.allFilters,
+        query: undefined
       }
-      const info = (await request({ url: `/${this.apiSuffix}?${this.apiParams}`, params })).data
+      const info = (await request({ url: `/${this.apiSuffix}?${this.customParams}`, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
 
@@ -247,19 +224,6 @@ export default {
         })
       })
     },
-    handleParamKeyChange(index) {
-      const key = this.params[index].key
-      const isLast = index === this.params.length - 1
-
-      if (!isLast || !key) {
-        return
-      }
-
-      this.params.push({ key: '', value: '', isEnabled: true })
-    },
-    removeParam(index) {
-      this.params.splice(index, 1)
-    },
     async downloadAllCSV() {
       let rows = []
       let page = 1
@@ -269,9 +233,10 @@ export default {
           ...this.allFilters,
           page: page,
           limit: 500,
+          query: undefined
         }
 
-        const url = `/${this.apiSuffix}?${this.apiParams}`
+        const url = `/${this.apiSuffix}?${this.customParams}`
         const response = (await request({ url, params })).data
         rows = [...response.data, ...rows]
         page += 1
