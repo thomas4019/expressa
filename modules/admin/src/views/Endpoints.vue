@@ -259,7 +259,26 @@ export default {
     },
     removeParam(index) {
       this.params.splice(index, 1)
-    }
+    },
+    async downloadAllCSV() {
+      let rows = []
+      let page = 1
+
+      while (this.count > rows.length) {
+        const params = {
+          ...this.allFilters,
+          page: page,
+          limit: 500,
+        }
+
+        const url = `/${this.apiSuffix}?${this.apiParams}`
+        const response = (await request({ url, params })).data
+        rows = [...response.data, ...rows]
+        page += 1
+      }
+
+      this.downloadCSV(this.applyCustomColumnFilter(rows))
+    },
   }
 }
 </script>
