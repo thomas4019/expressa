@@ -113,6 +113,21 @@ export const constantRouterMap = [
   },
 
   {
+    path: '/endpoints',
+    component: Layout,
+    name: 'endpoints',
+    meta: { title: 'Search', icon: 'link' },
+    children: [
+      {
+        path: '',
+        name: 'endpoints',
+        component: () => import('@/views/Endpoints'),
+        meta: { title: 'Endpoints' }
+      }
+    ]
+  },
+
+  {
     path: '/dev',
     component: Layout,
     meta: { title: 'Dev', icon: 'flask' },

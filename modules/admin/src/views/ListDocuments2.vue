@@ -53,6 +53,29 @@
       />
     </div>
 
+    <div style="width: 50%" class="mb-2">
+      Params
+      <div v-for="(parameter, index) in params" :key="index" class="d-flex align-items-center mb-1">
+        <el-checkbox v-model="parameter.isEnabled" class="mr-2" />
+
+        <el-input v-model="parameter.key" placeholder="key" @input="handleParamKeyChange(index)" />
+
+        <el-input v-model="parameter.value" placeholder="value" class="ml-1" />
+
+        <el-button
+          v-if="params.length > 1"
+          icon="el-icon-close"
+          circle
+          type="text"
+          @click="removeParam(index)"
+        />
+      </div>
+
+      <el-button class="btn btn-primary mb-3" @click="update">
+        Search
+      </el-button>
+    </div>
+
     <el-table
       :data="tableRows"
       element-loading-text="Loading"
@@ -175,7 +198,10 @@ export default {
     sortableFieldTypes: ['number', 'string', 'boolean'],
     orderBy: { order: null, prop: null },
     selectedColumns: [],
-    allPossibleColumns: []
+    allPossibleColumns: [],
+    params: [
+      { key: '', value: '', isEnabled: true }
+    ]
   }),
   computed: {
     tableRows() {
@@ -235,6 +261,25 @@ export default {
 
       return params
     },
+    customParams() {
+      return this.params
+        .filter(param => param.isEnabled)
+        .map(param => {
+          if (param.key && param.value) {
+            return `${param.key}=${param.value}`
+          }
+
+          if (param.key) {
+            return param.key
+          }
+
+          if (param.value) {
+            return `=${param.value}`
+          }
+
+          return ''
+        }).join('&')
+    },
   },
   watch: {
     collectionName: {
@@ -278,7 +323,7 @@ export default {
 
       // Fetch and Set table data
       const params = { ...this.allFilters }
-      const info = (await request({ url: `/${this.collectionName}/`, params })).data
+      const info = (await request({ url: `/${this.collectionName}/?${this.customParams}`, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
     },
@@ -357,7 +402,7 @@ export default {
           limit: 500,
         }
 
-        const response = (await request({ url: `/${this.collectionName}/`, params })).data
+        const response = (await request({ url: `/${this.collectionName}/${this.customParams}`, params })).data
         rows = [...response.data, ...rows]
         page += 1
       }
@@ -393,7 +438,20 @@ export default {
       // Reset table data
       this.data = []
       this.count = 0
-    }
+    },
+    handleParamKeyChange(index) {
+      const key = this.params[index].key
+      const isLast = index === this.params.length - 1
+
+      if (!isLast || !key) {
+        return
+      }
+
+      this.params.push({ key: '', value: '', isEnabled: true })
+    },
+    removeParam(index) {
+      this.params.splice(index, 1)
+    },
   }
 }
 </script>
