@@ -218,7 +218,8 @@ exports.createLogEntry = function (req, res) {
   const severity = exports.getLogSeverity(res.statusCode)
   return {
     severity: severity,
-    user: req.user ? req.user._id : undefined,
+    user: req.uid,
+    user_collection: req.ucollection,
     url: decodeURI(req.originalUrl || req.url),
     method: req.method,
     referer: req.headers['referer'],
