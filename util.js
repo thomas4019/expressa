@@ -230,7 +230,7 @@ exports.createLogEntry = function (req, res) {
       statusCode: res.statusCode,
       requestId: res.getHeader('x-request-id'),
       headers: res.getHeaders(),
-      message: req.returnedError ? req.returnedError.message : undefined,
+      message: req.returnedError ? req.returnedError.result || req.returnedError.message : undefined,
     },
     meta: {
       created: new Date().toISOString(),
