@@ -211,8 +211,6 @@ function filterHeaders(req) {
     'user-agent': headers['user-agent'],
     origin: headers['origin'],
     referer: headers['referer'],
-    'x-access-token': req.headers['x-access-token'] ?
-      req.headers['x-access-token'].substring(0, 8) + '...' : ''
   }
 }
 
