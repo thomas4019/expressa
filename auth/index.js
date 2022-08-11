@@ -25,7 +25,7 @@ exports.middleware = async function authMiddleware(req, res, next) {
     }
   }
   catch(e) {
-    req.uerror = e.message === 'jwt expired' ? 'expired token' : 'jwt error'
+    req.uerror = e.message
   }
   next()
 }
