@@ -94,7 +94,7 @@ function ph (requestHandler) {
       req.returnedError = err
       res.status(err.status).send({
         error: err.result || err.message || err,
-        tokenError: req.uerror ?  req.uerror === 'jwt expired' ? 'expired token' : 'jwt error' : undefined
+        tokenError: req.uerror ?  (req.uerror === 'jwt expired' ? 'expired token' : 'jwt error') : undefined
       })
     }
   }
