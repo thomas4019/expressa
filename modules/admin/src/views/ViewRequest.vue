@@ -8,12 +8,14 @@
       <dl>
         <dt>Request Time</dt>
         <dd>{{ log.meta.created }}</dd>
+        <dt>User</dt>
+        <dd>{{ log.user }}</dd>
+        <dt>User Collection</dt>
+        <dd>{{ log.user_collection }}</dd>
         <dt>IP</dt>
         <dd>{{ req.ip }}</dd>
-        <dt>Access token</dt>
-        <dd>{{ req.headers.x-access-token }}</dd>
         <dt>User-Agent</dt>
-        <dd>{{ req.headers.user-agent }}</dd>
+        <dd>{{ req.headers['user-agent'] }}</dd>
         <dt>Referrer</dt>
         <dd>{{ req.headers.referer }}</dd>
         <dt>Origin</dt>
@@ -34,6 +36,8 @@
         <dd>{{ res.headers['content-length'] }} bytes</dd>
         <dt>Message</dt>
         <dd>{{ res.message }}</dd>
+        <dt>Token Message</dt>
+        <dd>{{ res.tokenMessage }}</dd>
       </dl>
     </div>
   </div>

@@ -211,8 +211,6 @@ function filterHeaders(req) {
     'user-agent': headers['user-agent'],
     origin: headers['origin'],
     referer: headers['referer'],
-    'x-access-token': req.headers['x-access-token'] ?
-      req.headers['x-access-token'].substring(0, 8) + '...' : ''
   }
 }
 
@@ -220,7 +218,8 @@ exports.createLogEntry = function (req, res) {
   const severity = exports.getLogSeverity(res.statusCode)
   return {
     severity: severity,
-    user: req.user ? req.user._id : undefined,
+    user: req.uid,
+    user_collection: req.ucollection,
     url: decodeURI(req.originalUrl || req.url),
     method: req.method,
     referer: req.headers['referer'],
@@ -232,7 +231,8 @@ exports.createLogEntry = function (req, res) {
       statusCode: res.statusCode,
       requestId: res.getHeader('x-request-id'),
       headers: res.getHeaders(),
-      message: req.returnedError ? req.returnedError.message : undefined,
+      message: req.returnedError ? req.returnedError.result || req.returnedError.message : undefined,
+      tokenMessage: req.uerror,
     },
     meta: {
       created: new Date().toISOString(),

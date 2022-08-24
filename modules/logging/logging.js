@@ -31,6 +31,9 @@ exports.collections = [{
       user: {
         type: 'string'
       },
+      user_collection: {
+        type: 'string'
+      },
       req: {
         type: 'object',
         properties: {
