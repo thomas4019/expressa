@@ -180,7 +180,7 @@ exports.getUserWithPermissions = async function (api, permissions) {
     meta: {
       created: now,
       updated: now,
-      updated_password: now,
+      password_last_updated_at: now,
     }
   }
   await api.db.role.cache.create({
@@ -189,7 +189,7 @@ exports.getUserWithPermissions = async function (api, permissions) {
   })
   const result = await api.db.users.create(user)
   user._id = result
-  const payload = api.util.doLogin(user._id, 'users', user.meta.updated_password, api.settings.jwt_secret, {})
+  const payload = api.util.doLogin(user._id, 'users', user.meta.password_last_updated_at, api.settings.jwt_secret, {})
   return payload.token
 }
 
