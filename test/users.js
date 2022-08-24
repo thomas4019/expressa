@@ -18,7 +18,7 @@ const invalidEmailUser = {
   password: 'test'
 }
 describe('user functionality', function () {
-  let validId
+  let validId, userToken
 
   it('can signup', async function () {
     const res = await request(app)
@@ -34,6 +34,7 @@ describe('user functionality', function () {
       .send(validUser)
       .expect(200)
     expect(res.body.uid).to.equal(validId)
+    userToken = res.body.token
   })
 
   it('rejects unknown email', async function () {
@@ -64,6 +65,41 @@ describe('user functionality', function () {
         error: 'This email is already registered.'
       })
       .expect(409)
+  })
+
+  it ('new token required after password change', async function () {
+
+    validUser.password = '123test'
+
+    await request(app)
+      .post(`/users/${validId}/update`)
+      .set('x-access-token', userToken)
+      .send({ $set: { password: validUser.password } })
+      .expect(200)
+
+    const res = await request(app)
+      .get('/users/me')
+      .set('x-access-token', userToken)
+      .expect(404)
+
+    expect(res.body.error).to.exist
+    expect(res.body.tokenError).to.equal('new token required')
+
+    const res2 = await request(app)
+      .post('/users/login')
+      .send(validUser)
+      .expect(200)
+
+    expect(res2.body.uid).to.equal(validId)
+    userToken = res2.body.token
+
+    const res3 = await request(app)
+      .get('/users/me')
+      .set('x-access-token', userToken)
+      .expect(200)
+
+    expect(res3.body.error).to.not.exist
+    expect(res3.body.tokenError).to.not.exist
   })
 
   let user
