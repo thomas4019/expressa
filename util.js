@@ -189,7 +189,12 @@ exports.getUserWithPermissions = async function (api, permissions) {
   })
   const result = await api.db.users.create(user)
   user._id = result
-  const payload = api.util.doLogin(user._id, 'users', user.meta.password_last_updated_at, api.settings.jwt_secret, {})
+  const payload = api.util.doLogin({
+    id: user._id,
+    collection: 'users',
+    timestamp: user.meta.password_last_updated_at,
+    jwt_secret: api.settings.jwt_secret,
+  })
   return payload.token
 }
 

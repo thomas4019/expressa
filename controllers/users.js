@@ -22,7 +22,13 @@ exports.login = async (req, collection) => {
     throw new util.ApiError(401, 'Incorrect password')
   }
   const jwt_options = req.settings.jwt_expires_in ? { expiresIn: req.settings.jwt_expires_in } : {}
-  const payload = auth.doLogin(user._id, collection, user.meta.password_last_updated_at, req.getSetting('jwt_secret'), jwt_options)
+  const payload = auth.doLogin({
+    id: user._id,
+    collection,
+    timestamp: user.meta.password_last_updated_at,
+    jwt_secret: req.getSetting('jwt_secret'),
+    jwt_options
+  })
   req.uid = user._id
   req.ucollection = collection
   req.user = user
