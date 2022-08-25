@@ -24,6 +24,7 @@ describe('install flow', function () {
         modules: ['collections', 'core', 'logging', 'permissions'],
         settings: {
           jwt_secret: 'testing 123',
+          jwt_expire_on_password_change: true,
           mongodb_uri: 'mongodb://localhost:27017/test',
           postgresql_uri: 'postgresql://postgres:expressa@localhost/pgtest',
           enforce_permissions: true,
