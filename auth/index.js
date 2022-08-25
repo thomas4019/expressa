@@ -33,7 +33,7 @@ exports.middleware = async function authMiddleware(req, res, next) {
       throw new util.ApiError(404, 'User no longer exists')
     }
     if (user.meta.password_last_updated_at !== payload.timestamp) {
-      req.uerror = 'new token required'
+      req.uerror = 'expired token'
     }
     else {
       req.uid = payload._id

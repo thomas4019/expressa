@@ -83,7 +83,7 @@ describe('user functionality', function () {
       .expect(404)
 
     expect(res.body.error).to.exist
-    expect(res.body.tokenError).to.equal('new token required')
+    expect(res.body.tokenError).to.equal('expired token')
 
     const res2 = await request(app)
       .post('/users/login')
