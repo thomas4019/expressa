@@ -13,6 +13,11 @@ exports.settingSchema = {
     type: 'string',
     description: 'JWT expires after - expressed in seconds or a string describing a time span eg 60, "2 days", "10h", "7d", if undefined tokens wont expire'
   },
+  jwt_expire_on_password_change: {
+    description: 'Whether to expire jwt on password change. Defaults to true',
+    type: 'boolean',
+    default: true,
+  },
   postgresql_uri: {
     type: 'string',
     description: 'The full path to your postgres database. E.g. postgres://username:password@host/db'

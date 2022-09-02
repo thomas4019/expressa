@@ -16,6 +16,7 @@ module.exports = async function(api) {
     if (data.password && data.password.length !== 60 && data.password[0] !== '$') {
       debug('hashing and replacing password in the user document.')
       data.password = auth.createHash(data.password)
+      data.meta.password_last_updated_at = new Date().toISOString()
     }
   })
 

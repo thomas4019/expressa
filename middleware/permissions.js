@@ -35,13 +35,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
   let roles = ['Anonymous']
   const isAuthenticatedRole = await doesAuthenticatedRoleExist(req)
   if (req.uid) {
-    try {
-      const user = await req.db[req.ucollection].get(req.uid)
-      req.user = user
-      roles = (user.roles || []).concat(isAuthenticatedRole ? ['Authenticated'] : [])
-    } catch (e) {
-      throw new util.ApiError(404, 'User no longer exists')
-    }
+    roles = (req.user.roles || []).concat(isAuthenticatedRole ? ['Authenticated'] : [])
   } else {
     req.user = {}
   }
