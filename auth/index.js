@@ -33,7 +33,7 @@ exports.middleware = async function authMiddleware(req, res, next) {
       req.uerror = 'user no longer exists'
     }
     if (req.getSetting('jwt_expire_on_password_change') && user.meta.password_last_updated_at !== payload.timestamp) {
-      req.uerror = 'expired token'
+      req.uerror = 'jwt expired'
     }
     if (!req.uerror) {
       req.uid = payload._id
