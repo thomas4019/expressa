@@ -8,8 +8,8 @@ module.exports = async function(api) {
 
   api.addCollectionListener(['post', 'put'], loginCollections, async function updatePassword(req, collection, data) {
     if (req.method === 'PUT') {
-      const oldData = await api.db[collection].get(data._id)
       if (!data.password) {
+        const oldData = await api.db[collection].get(data._id)
         data.password = oldData.password // preserve password if not explicitly set
       }
     }
