@@ -32,13 +32,15 @@ exports.middleware = async function authMiddleware(req, res, next) {
     } catch (e) {
       req.uerror = 'user no longer exists'
     }
-    if (req.getSetting('jwt_expire_on_password_change') && user.meta.password_last_updated_at !== payload.timestamp) {
-      req.uerror = 'jwt expired'
-    }
-    if (!req.uerror) {
-      req.uid = payload._id
-      req.ucollection = payload.collection
-      req.user = user
+    if (user) {
+      if (req.getSetting('jwt_expire_on_password_change') && user.meta.password_last_updated_at !== payload.timestamp) {
+        req.uerror = 'jwt expired'
+      }
+      if (!req.uerror) {
+        req.uid = payload._id
+        req.ucollection = payload.collection
+        req.user = user
+      }
     }
   }
   next()
