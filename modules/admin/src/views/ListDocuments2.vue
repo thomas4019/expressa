@@ -263,22 +263,9 @@ export default {
     },
     customParams() {
       return this.params
-        .filter(param => param.isEnabled)
-        .map(param => {
-          if (param.key && param.value) {
-            return `${param.key}=${param.value}`
-          }
-
-          if (param.key) {
-            return param.key
-          }
-
-          if (param.value) {
-            return `=${param.value}`
-          }
-
-          return ''
-        }).join('&')
+        .filter(param => param.isEnabled && param.key)
+        .map(param => `${param.key}=${param.value || ''}`)
+        .join('&')
     },
   },
   watch: {
