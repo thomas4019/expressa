@@ -6,7 +6,7 @@
 
         <div class="d-flex align-items-center mb-2">
           <el-input v-model="apiBaseUrl" placeholder="key" />
-          <el-input v-model="apiSuffix" placeholder="races" />
+          <el-input v-model="apiSuffix" />
         </div>
 
         Params
