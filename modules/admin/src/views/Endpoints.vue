@@ -170,6 +170,11 @@ export default {
   },
   methods: {
     async update() {
+      // Removes leading slash if any
+      while (this.apiSuffix.charAt(0) === '/') {
+        this.apiSuffix = this.apiSuffix.substring(1)
+      }
+
       if (!this.apiSuffix) {
         return
       }
