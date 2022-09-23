@@ -183,7 +183,7 @@ export default {
       }
 
       const url = this.customParams ? `/${this.apiSuffix}?${this.customParams}` : `/${this.apiSuffix}`
-      const info = (await request({ url, params })).data
+      const info = (await request({ url, params, baseURL: this.apiBaseUrl })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
 
