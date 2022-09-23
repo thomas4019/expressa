@@ -181,7 +181,9 @@ export default {
         ...this.allFilters,
         query: undefined
       }
-      const info = (await request({ url: `/${this.apiSuffix}?${this.customParams}`, params })).data
+
+      const url = this.customParams ? `/${this.apiSuffix}?${this.customParams}` : `/${this.apiSuffix}`
+      const info = (await request({ url, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
 

@@ -234,7 +234,7 @@ export default {
       }, {})
     },
     allFilters() {
-      let orderby = '{"meta.created":-1}'
+      let orderby
 
       if (!!this.orderBy.prop && !!this.orderBy.order) {
         const propName = this.orderBy.prop
@@ -265,7 +265,7 @@ export default {
       return this.params
         .filter(param => param.isEnabled && param.key)
         .map(param => `${param.key}=${param.value || ''}`)
-        .join('&')
+        .join('&') || ''
     },
   },
   watch: {
@@ -310,7 +310,8 @@ export default {
 
       // Fetch and Set table data
       const params = { ...this.allFilters }
-      const info = (await request({ url: `/${this.collectionName}/?${this.customParams}`, params })).data
+      const url = this.customParams ? `/${this.collectionName}/?${this.customParams}` : `/${this.collectionName}`
+      const info = (await request({ url, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
     },
