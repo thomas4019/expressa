@@ -117,15 +117,13 @@
               </el-checkbox>
             </div>
 
-            <template>
-              <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
-                {{ getPath(scope.row, name) }}
-              </router-link>
-              <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
-                {{ getPath(scope.row, name) }}
-              </router-link>
-              <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
-            </template>
+            <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
+              {{ getPath(scope.row, name) }}
+            </router-link>
+            <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
+              {{ getPath(scope.row, name) }}
+            </router-link>
+            <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
           </div>
         </template>
       </el-table-column>
