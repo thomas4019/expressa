@@ -198,7 +198,7 @@ export default {
           ])
         }, []))
 
-        this.selectedColumns = ['_id']
+        this.selectedColumns = columns.slice(0, 5)
         this.allPossibleColumns = columns
       }
     },
