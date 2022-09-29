@@ -160,6 +160,7 @@ import saveAs from 'file-saver'
 import objectPath from 'object-path'
 
 const pageSizes = [25, 50, 100, 500]
+const defaultOrderBy = { order: null, prop: null }
 
 export default {
   name: 'ListDocuments',
@@ -196,7 +197,7 @@ export default {
     pageSize: pageSizes[0],
     isFiltersVisible: true,
     sortableFieldTypes: ['number', 'string', 'boolean'],
-    orderBy: { order: null, prop: null },
+    orderBy: { ...defaultOrderBy },
     selectedColumns: [],
     allPossibleColumns: [],
     params: [
@@ -414,18 +415,23 @@ export default {
       return this.exactSearches[fieldName] ? searchKeyword : regexQuery
     },
     resetTable() {
-      // Reset Filters
-      this.exactSearches = {}
-      this.searchFilters = {}
-      this.selectedColumns = []
-
-      // Reset pagination
-      this.page = 0
-      this.pageSize = pageSizes[0]
+      this.resetFilters()
+      this.resetPagination()
 
       // Reset table data
       this.data = []
       this.count = 0
+    },
+    resetFilters() {
+      this.exactSearches = {}
+      this.searchFilters = {}
+      this.selectedColumns = []
+      this.allPossibleColumns = []
+    },
+    resetPagination() {
+      this.page = 1
+      this.pageSize = pageSizes[0]
+      this.orderBy = defaultOrderBy
     },
     handleParamKeyChange(index) {
       const key = this.params[index].key

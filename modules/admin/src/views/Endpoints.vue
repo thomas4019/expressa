@@ -164,6 +164,7 @@ export default {
   mixins: [ListDocuments2],
   data() {
     return {
+      lastEndpoint: '',
       apiBaseUrl: request.defaults.baseURL,
       apiSuffix: '',
     }
@@ -179,7 +180,14 @@ export default {
         return
       }
 
-      // Fetch and Set table data
+      const currentEndpoint = `${this.apiBaseUrl}/${this.apiSuffix}`
+      const isDifferentEndpoint = currentEndpoint !== this.lastEndpoint
+
+      if (isDifferentEndpoint) {
+        this.lastEndpoint = currentEndpoint
+        this.resetTable()
+      }
+
       const params = {
         page: this.page,
         limit: this.pageSize,
