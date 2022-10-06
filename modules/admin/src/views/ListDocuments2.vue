@@ -160,6 +160,7 @@ import saveAs from 'file-saver'
 import objectPath from 'object-path'
 
 const pageSizes = [25, 50, 100, 500]
+const defaultOrderBy = { order: null, prop: null }
 
 export default {
   name: 'ListDocuments',
@@ -196,7 +197,7 @@ export default {
     pageSize: pageSizes[0],
     isFiltersVisible: true,
     sortableFieldTypes: ['number', 'string', 'boolean'],
-    orderBy: { order: null, prop: null },
+    orderBy: { ...defaultOrderBy },
     selectedColumns: [],
     allPossibleColumns: [],
     params: [
@@ -234,7 +235,7 @@ export default {
       }, {})
     },
     allFilters() {
-      let orderby = '{"meta.created":-1}'
+      let orderby
 
       if (!!this.orderBy.prop && !!this.orderBy.order) {
         const propName = this.orderBy.prop
@@ -263,22 +264,9 @@ export default {
     },
     customParams() {
       return this.params
-        .filter(param => param.isEnabled)
-        .map(param => {
-          if (param.key && param.value) {
-            return `${param.key}=${param.value}`
-          }
-
-          if (param.key) {
-            return param.key
-          }
-
-          if (param.value) {
-            return `=${param.value}`
-          }
-
-          return ''
-        }).join('&')
+        .filter(param => param.isEnabled && param.key)
+        .map(param => `${param.key}=${param.value || ''}`)
+        .join('&') || ''
     },
   },
   watch: {
@@ -323,7 +311,8 @@ export default {
 
       // Fetch and Set table data
       const params = { ...this.allFilters }
-      const info = (await request({ url: `/${this.collectionName}/?${this.customParams}`, params })).data
+      const url = this.customParams ? `/${this.collectionName}/?${this.customParams}` : `/${this.collectionName}`
+      const info = (await request({ url, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
     },
@@ -426,18 +415,23 @@ export default {
       return this.exactSearches[fieldName] ? searchKeyword : regexQuery
     },
     resetTable() {
-      // Reset Filters
-      this.exactSearches = {}
-      this.searchFilters = {}
-      this.selectedColumns = []
-
-      // Reset pagination
-      this.page = 0
-      this.pageSize = pageSizes[0]
+      this.resetFilters()
+      this.resetPagination()
 
       // Reset table data
       this.data = []
       this.count = 0
+    },
+    resetFilters() {
+      this.exactSearches = {}
+      this.searchFilters = {}
+      this.selectedColumns = []
+      this.allPossibleColumns = []
+    },
+    resetPagination() {
+      this.page = 1
+      this.pageSize = pageSizes[0]
+      this.orderBy = defaultOrderBy
     },
     handleParamKeyChange(index) {
       const key = this.params[index].key

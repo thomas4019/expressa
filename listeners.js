@@ -36,28 +36,34 @@ module.exports = function (api) {
 
   api.addCollectionListener('get', 'schemas', function addMetaToSchema (req, collection, data) {
     const schema = data.schema
-    schema.properties.meta = {
-      type: 'object',
-      propertyOrder: 2000,
-      properties: {
-        created: {
-          type: 'string'
-        },
-        updated: {
-          type: 'string'
+    if (!schema.properties.meta) {
+      schema.properties.meta = {
+        type: 'object',
+        properties: {
+          created: {
+            type: 'string'
+          },
+          updated: {
+            type: 'string'
+          }
         }
       }
     }
+    if (schema.properties.meta.propertyOrder === undefined) {
+      schema.properties.meta.propertyOrder =  2000
+    }
     if (data.documentsHaveOwners) {
-      schema.properties.meta.properties.owner = {
-        type: 'string',
-        links: [
-          {
-            rel: '» view owner user',
-            href: '/admin/#/edit/users/{{self}}',
-            class: 'comment-link'
-          }
-        ]
+      if (!schema.properties.meta.properties.owner) {
+        schema.properties.meta.properties.owner = {
+          type: 'string',
+          links: [
+            {
+              rel: '» view owner user',
+              href: '/admin/#/edit/users/{{self}}',
+              class: 'comment-link'
+            }
+          ]
+        }
       }
     }
   })

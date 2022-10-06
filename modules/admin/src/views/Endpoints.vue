@@ -6,7 +6,7 @@
 
         <div class="d-flex align-items-center mb-2">
           <el-input v-model="apiBaseUrl" placeholder="key" />
-          <el-input v-model="apiSuffix" placeholder="races" />
+          <el-input v-model="apiSuffix" />
         </div>
 
         Params
@@ -117,15 +117,13 @@
               </el-checkbox>
             </div>
 
-            <template>
-              <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
-                {{ getPath(scope.row, name) }}
-              </router-link>
-              <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
-                {{ getPath(scope.row, name) }}
-              </router-link>
-              <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
-            </template>
+            <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
+              {{ getPath(scope.row, name) }}
+            </router-link>
+            <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
+              {{ getPath(scope.row, name) }}
+            </router-link>
+            <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
           </div>
         </template>
       </el-table-column>
@@ -166,24 +164,39 @@ export default {
   mixins: [ListDocuments2],
   data() {
     return {
+      lastEndpoint: '',
       apiBaseUrl: request.defaults.baseURL,
       apiSuffix: '',
     }
   },
   methods: {
     async update() {
+      // Removes leading slash if any
+      while (this.apiSuffix.charAt(0) === '/') {
+        this.apiSuffix = this.apiSuffix.substring(1)
+      }
+
       if (!this.apiSuffix) {
         return
       }
 
-      // Fetch and Set table data
+      const currentEndpoint = `${this.apiBaseUrl}/${this.apiSuffix}`
+      const isDifferentEndpoint = currentEndpoint !== this.lastEndpoint
+
+      if (isDifferentEndpoint) {
+        this.lastEndpoint = currentEndpoint
+        this.resetTable()
+      }
+
       const params = {
         page: this.page,
         limit: this.pageSize,
         ...this.allFilters,
         query: undefined
       }
-      const info = (await request({ url: `/${this.apiSuffix}?${this.customParams}`, params })).data
+
+      const url = this.customParams ? `/${this.apiSuffix}?${this.customParams}` : `/${this.apiSuffix}`
+      const info = (await request({ url, params, baseURL: this.apiBaseUrl })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
 
@@ -198,7 +211,7 @@ export default {
           ])
         }, []))
 
-        this.selectedColumns = ['_id']
+        this.selectedColumns = columns.slice(0, 5)
         this.allPossibleColumns = columns
       }
     },
