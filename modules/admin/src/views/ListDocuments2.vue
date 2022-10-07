@@ -205,6 +205,9 @@ export default {
     ]
   }),
   computed: {
+    isEndpointsPage() {
+      return this.$options.name === 'Endpoints'
+    },
     tableRows() {
       if (!this.isFiltersVisible) {
         return this.data
@@ -235,7 +238,7 @@ export default {
       }, {})
     },
     allFilters() {
-      let orderby
+      let orderby = this.isEndpointsPage ? undefined : '{"meta.created":-1}'
 
       if (!!this.orderBy.prop && !!this.orderBy.order) {
         const propName = this.orderBy.prop

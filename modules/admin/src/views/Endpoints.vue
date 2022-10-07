@@ -117,13 +117,7 @@
               </el-checkbox>
             </div>
 
-            <router-link v-if="i === 0 && collectionName !== 'requestlog'" :to="'/edit/'+collectionName+'/'+scope.row._id">
-              {{ getPath(scope.row, name) }}
-            </router-link>
-            <router-link v-if="i === 0 && collectionName === 'requestlog'" :to="'/dev/viewrequest/'+scope.row._id">
-              {{ getPath(scope.row, name) }}
-            </router-link>
-            <span v-if="i !== 0">{{ getPath(scope.row, name) }}</span>
+            <span>{{ getPath(scope.row, name) }}</span>
           </div>
         </template>
       </el-table-column>
@@ -196,7 +190,29 @@ export default {
       }
 
       const url = this.customParams ? `/${this.apiSuffix}?${this.customParams}` : `/${this.apiSuffix}`
-      const info = (await request({ url, params, baseURL: this.apiBaseUrl })).data
+      let info = (await request({ url, params, baseURL: this.apiBaseUrl })).data
+
+      const isNotPaged = !info.page && !info.itemsTotal
+
+      if (isNotPaged) {
+        if (!Array.isArray(info)) {
+          if (typeof info !== 'object') {
+            // If response is primitive type
+            info = [{
+              result: info
+            }]
+          } else {
+            // If response is an object
+            info = [info]
+          }
+        }
+
+        info = {
+          data: info,
+          itemsTotal: 1
+        }
+      }
+
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
 
