@@ -361,7 +361,7 @@ export default {
             return true
           }
 
-          const stringified = row[fieldName].toString()
+          const stringified = String(objectPath.get(row, fieldName) || '')
 
           if (this.exactSearches[fieldName]) {
             return stringified === searchKeyword
