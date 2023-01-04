@@ -15,7 +15,7 @@
     "dot-object": "^2.1.4",
     "express": "^4.17.1",
     "jfs": "^0.3.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "mongo-query": "^0.5.7",
     "mongo-query-to-postgres-jsonb": "^0.2.9",
     "mongo-querystring": "4.1.1",
