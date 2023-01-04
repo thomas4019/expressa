@@ -92,13 +92,15 @@ exports.get = async function (req) {
 exports.insert = async function (req) {
   assertValidCollection(req)
   const data = req.body
+  req.customResponseData = req.customResponseData || {}
   await util.notify('post', req, req.params.collection, data)
 
   const id = await req.db[req.params.collection].create(data)
   await util.notify('changed', req, req.params.collection, data)
   return {
     status: 'OK',
-    id: id
+    id: id,
+    ...req.customResponseData,
   }
 }
 
@@ -113,6 +115,7 @@ exports.getById = async function (req) {
 
 exports.replaceById = async function (req) {
   assertValidCollection(req)
+  req.customResponseData = req.customResponseData || {}
   let oldDoc = {}
   try {
     oldDoc = await req.db[req.params.collection].get(req.params.id)
@@ -130,12 +133,14 @@ exports.replaceById = async function (req) {
   await util.notify('changed', req, req.params.collection, req.body)
   return {
     status: 'OK',
-    id: data._id
+    id: data._id,
+    ...req.customResponseData,
   }
 }
 
 exports.updateById = async function (req) {
   assertValidCollection(req)
+  req.customResponseData = req.customResponseData || {}
   const modifier = req.body
 
   const doc = await req.db[req.params.collection].get(req.params.id)
@@ -152,15 +157,25 @@ exports.updateById = async function (req) {
   req.body.meta.owner = newOwner
   await req.db[req.params.collection].update(req.params.id, req.body)
   await util.notify('changed', req, req.params.collection, req.body)
+  if (Object.keys(req.customResponseData)) {
+    return {
+      ...doc,
+      ...req.customResponseData,
+    }
+  }
   return doc
 }
 
 exports.deleteById = async function (req) {
   assertValidCollection(req)
+  req.customResponseData = req.customResponseData || {}
   const doc = await req.db[req.params.collection].get(req.params.id)
   await util.notify('delete', req, req.params.collection, doc)
 
   await req.db[req.params.collection].delete(req.params.id)
   await util.notify('deleted', req, req.params.collection, doc)
-  return { status: 'OK' }
+  return {
+    status: 'OK',
+    ...req.customResponseData,
+  }
 }
