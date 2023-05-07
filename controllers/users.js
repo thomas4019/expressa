@@ -10,6 +10,8 @@ exports.login = async (req, collection) => {
     throw new util.ApiError(400, 'email must be a string')
   }
 
+  req.body.email = req.body.email.toLowerCase()
+
   // check if user exists
   const result = await req.db[collection].find({
     email: req.body.email
