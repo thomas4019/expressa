@@ -6,6 +6,48 @@ const pg = require('pg')
 const pgPools = {}
 const dot = require('dot-object')
 const mongoQuery = require('mongo-query')
+const Ajv = require('ajv')
+const ajv = new Ajv({
+  allErrors: true,
+  strict: 'log',
+  strictSchema: 'log',
+  validateFormats: false,
+  allowUnionTypes: true,
+})
+ajv.addKeyword({
+  keyword: 'links',
+  type: 'string',
+  schemaType: 'array',
+})
+ajv.addKeyword({
+  keyword: 'media',
+  type: 'string',
+  schemaType: 'object',
+})
+ajv.addKeyword({
+  keyword: 'propertyOrder',
+  schemaType: 'number',
+})
+const formatKey = ajv.getKeyword('format')
+formatKey.type = formatKey.type.concat(['array', 'boolean', 'object'])
+
+const schemaValidators = {}
+
+exports.addSchemaValidator = function(collection, schema) {
+  schemaValidators[collection] = ajv.compile(schema)
+}
+
+exports.validateSchema = function(collection, doc) {
+  if (!schemaValidators[collection]) {
+    console.error(`missing schema validator for collection ${collection}`)
+    return true
+  }
+  const isValid = schemaValidators[collection](doc)
+  if (!isValid) {
+    throw new ApiError(400, schemaValidators[collection].errors.map((err) => `${err.instancePath} ${err.message}: ${JSON.stringify(err.params)}`).join(', '))
+  }
+  return true
+}
 
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
