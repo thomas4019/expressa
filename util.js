@@ -381,7 +381,7 @@ exports.addIdIfMissing = function addIdIfMissing (document) {
 }
 
 exports.sortObjectKeys = function sortObjectKeys(object) {
-  if (typeof object != 'object' || object instanceof Array) { // Do not sort the array
+  if (typeof object != 'object' || object instanceof Array || !object) { // Do not sort the array
     return object
   }
   const keys = Object.keys(object)
