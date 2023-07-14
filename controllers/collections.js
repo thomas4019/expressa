@@ -10,6 +10,25 @@ function assertValidCollection(req) {
   }
 }
 
+async function ensureDocumentHasOwner(req, doc) {
+  if (!doc.meta?.owner) {
+    const schema = await req.db.collection.get(req.params.collection)
+    if (schema.documentsHaveOwners) {
+      util.addIdIfMissing(doc)
+      doc.meta ??= {}
+      if (req.uid) {
+        // make logged in user owner
+        doc.meta.owner = req.uid
+      } else if (schema.enableLogin) {
+        // make self owner
+        doc.meta.owner = doc._id
+      } else {
+        throw new util.ApiError('unable to find valid owner')
+      }
+    }
+  }
+}
+
 exports.getSchema = async function (req) {
   const collection = await req.db.collection.get(req.params.collection)
   await util.notify('get', req, 'schemas', collection)
@@ -96,7 +115,7 @@ exports.insert = async function (req) {
   const data = req.body
   req.customResponseData = req.customResponseData || {}
   await util.notify('post', req, req.params.collection, data)
-
+  await ensureDocumentHasOwner(req, data)
   const id = await req.db[req.params.collection].create(data)
   await util.notify('changed', req, req.params.collection, data)
   return {
