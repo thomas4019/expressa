@@ -23,13 +23,14 @@ exports.get = async function (req) {
   }
 
   const fields = req.query.fields ? JSON.parse(req.query.fields) : null
+  delete req.query.fields
 
   let data, query
   if (req.query.query) {
     query = JSON.parse(req.query.query)
   }
   else {
-    const { skip, offset, limit, page, pageitems, pagemetadisable, orderby, fields, ...params } = req.query // eslint-disable-line no-unused-vars
+    const { skip, offset, limit, page, pageitems, pagemetadisable, orderby, ...params } = req.query // eslint-disable-line no-unused-vars
     query = queryStringParser.parse(params)
   }
   if (req.query.orderby) {
@@ -41,7 +42,8 @@ exports.get = async function (req) {
     // scenario where logged in user can only retrieve own docs
     if (!req.hasPermission(`${req.params.collection}: view`) && req.hasPermission(`${req.params.collection}: view own`)) {
       query['meta.owner'] = req.uid
-      fields['meta.owner'] = 1
+      // if fields is null then all fields are requested
+      if (fields) fields['meta.owner'] = 1
     }
   }
 
