@@ -63,6 +63,17 @@ describe('install flow', function () {
     expect(u.roles || []).to.include('Admin')
   })
 
+  it('can login admin account', async function() {
+    const res = await request(app)
+      .post('/users/login')
+      .send({
+        email: 'a@example.com',
+        password: '123'
+      })
+      .expect(200)
+    testutils.setAdminToken(res.body.token)
+  })
+
   it('2nd account cannot be admin account', async function() {
     await request(app)
       .post('/users/register')
