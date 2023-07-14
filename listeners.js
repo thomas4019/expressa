@@ -18,19 +18,11 @@ module.exports = function (api) {
     Object.assign(req.settings, data)
   })
 
-  api.addListener(['put', 'post'], function updateMetadata (req, collection, data, { event }) {
-    data.meta = data.meta || {}
+  api.addListener(['put', 'post'], async function updateMetadata (req, collection, data, { event }) {
+    data.meta ??= {}
     data.meta.updated = new Date().toISOString()
     if (event === 'post') {
       data.meta.created = new Date().toISOString()
-      if (req.user) {
-        if (req.hasPermission('login to admin')) {
-          data.meta.owner = data.meta.owner || req.user._id
-        }
-        else {
-          data.meta.owner = req.user._id
-        }
-      }
     }
   })
 
