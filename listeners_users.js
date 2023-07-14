@@ -56,7 +56,7 @@ module.exports = async function(api) {
   })
 
   api.addCollectionListener(['post', 'put'], loginCollections, async function userEmailLowerCase(req, collection, data) {
-    data.email = data.email.toLowerCase()
+    data.email = data.email?.toLowerCase()
   })
 
   api.addCollectionListener('post', loginCollections, async function userUniquenessCheck(req, collection, data) {
@@ -73,7 +73,7 @@ module.exports = async function(api) {
       if (!doc.schema.properties.roles.items.enum.includes(data._id)) {
         doc.schema.properties.roles.items.enum.push(data._id)
         await api.db.collection.update(coll, doc)
-        await api.notify('changed', req, coll, doc)
+        await api.notify('changed', req, 'collection', doc)
       }
     }
   })
@@ -85,7 +85,7 @@ module.exports = async function(api) {
       if (roles.includes(data._id)) {
         roles.splice(roles.indexOf(data._id), 1)
         await api.db.collection.update(coll, doc)
-        await api.notify('changed', req, coll, doc)
+        await api.notify('changed', req, 'collection', doc)
       }
     }
   })
