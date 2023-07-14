@@ -55,6 +55,9 @@ module.exports = function (api) {
               class: 'comment-link'
             }
           ]
+        },
+        schema.properties.meta.properties.owner_collection = {
+          type: 'string'
         }
       }
     }
