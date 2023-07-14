@@ -8,6 +8,7 @@ function addImplicitFields (schema) {
   schema['properties']['meta']['properties']['updated'] ??= { type: 'string' }
   schema['properties']['meta']['properties']['owner'] ??= { type: 'string' }
   schema['properties']['meta']['properties']['owner_collection'] ??= { type: 'string' }
+  schema['properties']['_id'] ??= { type: 'string' }
   return schema
 }
 
