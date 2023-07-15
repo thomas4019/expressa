@@ -202,7 +202,9 @@ exports.updateById = async function (req) {
   const newOwnerCollection = doc.meta && doc.meta.ownerCollection
   if (owner !== newOwner || ownerCollection !== newOwnerCollection) {
     if (req.hasPermission(`${req.params.collection}: modify owner`)) {
+      if (owner) {
         await validateDocumentOwner(req, doc)
+      }
     } else {
       debug('attempting to change document owner.')
       doc.meta.owner = owner
