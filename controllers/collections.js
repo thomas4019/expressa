@@ -196,10 +196,10 @@ exports.updateById = async function (req) {
 
   const doc = await req.db[req.params.collection].get(req.params.id)
   const owner = doc.meta && doc.meta.owner
-  const ownerCollection = doc.meta && doc.meta.ownerCollection
+  const ownerCollection = doc.meta && doc.meta.owner_collection
   util.mongoUpdate(doc, modifier)
   const newOwner = doc.meta && doc.meta.owner
-  const newOwnerCollection = doc.meta && doc.meta.ownerCollection
+  const newOwnerCollection = doc.meta && doc.meta.owner_collection
   if (owner !== newOwner || ownerCollection !== newOwnerCollection) {
     if (req.hasPermission(`${req.params.collection}: modify owner`)) {
       if (owner) {
@@ -208,7 +208,7 @@ exports.updateById = async function (req) {
     } else {
       debug('attempting to change document owner.')
       doc.meta.owner = owner
-      doc.meta.ownerCollection = ownerCollection
+      doc.meta.owner_collection = ownerCollection
     }
   }
   req.body = doc
