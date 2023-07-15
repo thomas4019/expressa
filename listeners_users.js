@@ -56,7 +56,7 @@ module.exports = async function(api) {
   })
 
   api.addCollectionListener(['post', 'put'], loginCollections, async function userEmailLowerCase(req, collection, data) {
-    data.email = data.email?.toLowerCase()
+    data.email = data.email.toLowerCase()
   })
 
   api.addCollectionListener('post', loginCollections, async function userUniquenessCheck(req, collection, data) {
