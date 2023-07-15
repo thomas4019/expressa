@@ -178,8 +178,6 @@ exports.updateById = async function (req) {
   }
   req.body = doc
   await util.notify('put', req, req.params.collection, doc)
-
-  req.body.meta.owner = newOwner
   await req.db[req.params.collection].update(req.params.id, req.body)
   await util.notify('changed', req, req.params.collection, req.body)
   if (Object.keys(req.customResponseData)) {
