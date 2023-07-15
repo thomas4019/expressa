@@ -11,6 +11,9 @@ function assertValidCollection(req) {
 }
 
 async function validateDocumentOwner(req, doc) {
+  if (!doc.meta.owner_collection) {
+    throw new util.ApiError(417, 'no owner_collection for owner found')
+  }
   if (doc._id !== doc.meta.owner) {
     const count = await req.db[doc.meta.owner_collection].count({ _id: doc.meta.owner }, undefined, 1)
     if (!count) {
@@ -51,9 +54,6 @@ async function setDocumentOwner(req, doc) {
       }
     }
     if (doc.meta.owner) {
-      if (!doc.meta.owner_collection) {
-        throw new util.ApiError(417, 'no owner_collection for owner found')
-      }
       await validateDocumentOwner(req, doc)
     }
   }
@@ -196,14 +196,17 @@ exports.updateById = async function (req) {
 
   const doc = await req.db[req.params.collection].get(req.params.id)
   const owner = doc.meta && doc.meta.owner
+  const ownerCollection = doc.meta && doc.meta.ownerCollection
   util.mongoUpdate(doc, modifier)
   const newOwner = doc.meta && doc.meta.owner
-  if (owner !== newOwner) {
+  const newOwnerCollection = doc.meta && doc.meta.ownerCollection
+  if (owner !== newOwner || ownerCollection !== newOwnerCollection) {
     if (req.hasPermission(`${req.params.collection}: modify owner`)) {
-      await validateDocumentOwner(req, doc)
+        await validateDocumentOwner(req, doc)
     } else {
       debug('attempting to change document owner.')
       doc.meta.owner = owner
+      doc.meta.ownerCollection = ownerCollection
     }
   }
   req.body = doc
