@@ -368,10 +368,10 @@ exports.getLoginCollections = async function(api) {
 function isValidLoginCollection(collection) {
   const name = collection._id
   if(collection.enableLogin === true) {
-    const properties = collection.schema && collection.schema.properties
-    if (properties && properties.email && properties.password && properties.roles) {
-      const required = collection.schema && collection.schema.required
-      if (required && required.includes('email') && required.includes('password')) {
+    const properties = collection.schema?.properties
+    if (properties && properties.password && properties.roles) {
+      const required = collection.schema?.required
+      if (required?.includes('password')) {
         return true
       }
       else {
