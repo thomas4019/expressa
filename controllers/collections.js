@@ -10,21 +10,51 @@ function assertValidCollection(req) {
   }
 }
 
-async function ensureDocumentHasOwner(req, doc) {
-  if (!doc.meta?.owner) {
-    const schema = await req.db.collection.get(req.params.collection)
-    if (schema.documentsHaveOwners) {
-      util.addIdIfMissing(doc)
-      doc.meta ??= {}
-      if (req.uid) {
-        // make logged in user owner
-        doc.meta.owner = req.uid
-      } else if (schema.enableLogin) {
-        // make self owner
-        doc.meta.owner = doc._id
+async function validateDocumentOwner(req, doc) {
+  if (doc._id !== doc.meta.owner) {
+    const count = await req.db[doc.meta.owner_collection].count({ _id: doc.meta.owner }, undefined, 1)
+    if (!count) {
+      throw new util.ApiError(417, 'invalid owner')
+    }
+  } else if (req.params.collection !== doc.meta.owner_collection) {
+    throw new util.ApiError(417, 'invalid owner collection')
+  }
+}
+
+async function setDocumentOwner(req, doc) {
+  const schema = await req.db.collection.get(req.params.collection)
+  if (schema.documentsHaveOwners) {
+    util.addIdIfMissing(doc)
+    doc.meta ??= {}
+    if (req.uid) {
+      // request done by logged in user
+      if (!doc.meta.owner) {
+        // no owner - make logged in user as owner
+        doc.meta.owner = req.user._id
+        doc.meta.owner_collection = req.ucollection
       } else {
-        throw new util.ApiError('unable to find valid owner')
+        if (!req.hasPermission(`${req.params.collection}: modify owner`)) {
+          // has an owner - but if no permission to modify owner then override owner to logged in user
+          doc.meta.owner = req.user._id
+          doc.meta.owner_collection = req.ucollection
+        }
       }
+    } else {
+      // request done by NOT logged in user
+      if (schema.enableLogin) {
+        // is a user/login collection so make self owner
+        doc.meta.owner = doc._id
+        doc.meta.owner_collection = req.params.collection
+      } else {
+        // is a normal collection
+        debug('unable to find valid owner')
+      }
+    }
+    if (doc.meta.owner) {
+      if (!doc.meta.owner_collection) {
+        throw new util.ApiError(417, 'no owner_collection for owner found')
+      }
+      await validateDocumentOwner(req, doc)
     }
   }
 }
@@ -115,7 +145,7 @@ exports.insert = async function (req) {
   const data = req.body
   req.customResponseData = req.customResponseData || {}
   await util.notify('post', req, req.params.collection, data)
-  await ensureDocumentHasOwner(req, data)
+  await setDocumentOwner(req, data)
   const id = await req.db[req.params.collection].create(data)
   await util.notify('changed', req, req.params.collection, data)
   return {
@@ -172,9 +202,9 @@ exports.updateById = async function (req) {
     if (req.hasPermission(`${req.params.collection}: modify owner`)) {
       await validateDocumentOwner(req, doc)
     } else {
-    debug('attempting to change document owner.')
-    doc.meta.owner = owner
-  }
+      debug('attempting to change document owner.')
+      doc.meta.owner = owner
+    }
   }
   req.body = doc
   await util.notify('put', req, req.params.collection, doc)
