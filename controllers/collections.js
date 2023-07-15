@@ -169,8 +169,12 @@ exports.updateById = async function (req) {
   util.mongoUpdate(doc, modifier)
   const newOwner = doc.meta && doc.meta.owner
   if (owner !== newOwner) {
+    if (req.hasPermission(`${req.params.collection}: modify owner`)) {
+      await validateDocumentOwner(req, doc)
+    } else {
     debug('attempting to change document owner.')
     doc.meta.owner = owner
+  }
   }
   req.body = doc
   await util.notify('put', req, req.params.collection, doc)
