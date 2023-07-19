@@ -72,7 +72,6 @@ exports.get = async function (req) {
   }
 
   const fields = req.query.fields ? JSON.parse(req.query.fields) : null
-  delete req.query.fields
 
   let data, query
   if (req.query.query) {
@@ -80,6 +79,7 @@ exports.get = async function (req) {
   }
   else {
     const { skip, offset, limit, page, pageitems, pagemetadisable, orderby, ...params } = req.query // eslint-disable-line no-unused-vars
+    delete params.fields
     query = queryStringParser.parse(params)
   }
   if (req.query.orderby) {
