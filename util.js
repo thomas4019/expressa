@@ -202,44 +202,6 @@ exports.createSecureRandomId = function() {
   return crypto.randomBytes(24).toString('hex')
 }
 
-exports.getUserWithPermissions = async function (api, permissions) {
-  if (typeof permissions === 'string') {
-    permissions = [permissions]
-  }
-  permissions = permissions || []
-  const permissionsMap = {}
-  permissions.forEach(function (permission) {
-    permissionsMap[permission] = true
-  })
-  const randId = randomstring.generate(12)
-  const roleName = 'role' + randId
-  const now = new Date().toISOString()
-  const user = {
-    email: 'test' + randId + '@example.com',
-    password: '123',
-    collection: 'users',
-    roles: [roleName],
-    meta: {
-      created: now,
-      updated: now,
-      password_last_updated_at: now,
-    }
-  }
-  await api.db.role.cache.create({
-    _id: roleName,
-    permissions: permissionsMap
-  })
-  const result = await api.db.users.create(user)
-  user._id = result
-  const payload = api.util.doLogin({
-    id: user._id,
-    collection: 'users',
-    timestamp: user.meta.password_last_updated_at,
-    jwt_secret: api.settings.jwt_secret,
-  })
-  return payload.token
-}
-
 const severities = ['critical', 'error', 'warning', 'notice', 'info', 'debug']
 exports.getLogSeverity = function (status) {
   const severity = status >= 500 ? 'error'
@@ -381,7 +343,7 @@ exports.addIdIfMissing = function addIdIfMissing (document) {
 }
 
 exports.sortObjectKeys = function sortObjectKeys(object) {
-  if (typeof object != 'object' || object instanceof Array) { // Do not sort the array
+  if (typeof object != 'object' || object instanceof Array || !object) { // Do not sort the array
     return object
   }
   const keys = Object.keys(object)
@@ -406,10 +368,10 @@ exports.getLoginCollections = async function(api) {
 function isValidLoginCollection(collection) {
   const name = collection._id
   if(collection.enableLogin === true) {
-    const properties = collection.schema && collection.schema.properties
-    if (properties && properties.email && properties.password && properties.roles) {
-      const required = collection.schema && collection.schema.required
-      if (required && required.includes('email') && required.includes('password')) {
+    const properties = collection.schema?.properties
+    if (properties && properties.password && properties.roles) {
+      const required = collection.schema?.required
+      if (required?.includes('password')) {
         return true
       }
       else {

@@ -189,4 +189,123 @@ describe('user functionality', function () {
       .expect(200)
     expect(res3.body.properties.roles.items.enum).to.not.include('testrole')
   })
+
+  it('cannot change owner by default', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    await request(app)
+      .post(`/users/${newUser._id}/update`)
+      .set('x-access-token', token)
+      .send({ $set: { 'meta.owner': user._id } }) // try change owner to another user
+      .expect(200) // will succeed but owner will not change
+
+    const res2 = await request(app)
+      .get(`/users/${newUser._id}`)
+      .set('x-access-token', token)
+    expect(res2.body.meta.owner).to.not.equal(user._id)
+    expect(res2.body.meta.owner).to.equal(newUser._id)
+
+  })
+
+  it('can change owner with correct permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify owner'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    await request(app)
+      .post(`/users/${newUser._id}/update`)
+      .set('x-access-token', token)
+      .send({ $set: { 'meta.owner': user._id } }) // try change owner to another user
+      .expect(200)
+
+    const res2 = await request(app)
+      .get(`/users/${newUser._id}`)
+      .set('x-access-token', token)
+    expect(res2.body.meta.owner).to.equal(user._id)
+  })
+
+  it('changing to bogus owner fails', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify owner'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    await request(app)
+      .post(`/users/${newUser._id}/update`)
+      .set('x-access-token', token)
+      .send({ $set: { 'meta.owner': 'owner-that-doesnt-exist' } }) // try change owner to another user
+      .expect(417)
+  })
+
+  it('cannot set owner on creation by default', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: create', 'testdoc: view own'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    const doc = {
+      title: 'Test Title',
+      meta: {
+        owner: user._id,
+        owner_collection: 'users',
+      }
+    }
+
+    const res2 = await request(app)
+      .post(`/testdoc`)
+      .set('x-access-token', token)
+      .send(doc)
+      .expect(200) // will succeed but owner will not change
+    doc._id = res2.body.id
+
+    const res3 = await request(app)
+      .get(`/testdoc/${doc._id}`)
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res3.body.meta.owner).to.not.equal(user._id)
+    expect(res3.body.meta.owner).to.equal(newUser._id)
+  })
+
+  it('can set owner on creation with correct permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: create', 'testdoc: view', 'testdoc: modify owner'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    const doc = {
+      title: 'Test Title',
+      meta: {
+        owner: user._id,
+        owner_collection: 'users',
+      }
+    }
+
+    const res2 = await request(app)
+      .post(`/testdoc`)
+      .set('x-access-token', token)
+      .send(doc)
+      .expect(200) // will succeed but owner will not change
+    doc._id = res2.body.id
+
+    const res3 = await request(app)
+      .get(`/testdoc/${doc._id}`)
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res3.body.meta.owner).to.not.equal(newUser._id)
+    expect(res3.body.meta.owner).to.equal(user._id)
+  })
 })

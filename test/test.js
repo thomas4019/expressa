@@ -70,7 +70,7 @@ describe('General Tests:', () => {
       res.send(req.user)
     })
 
-    const token = await util.getUserWithPermissions(api, [])
+    const token = await testutils.getUserWithPermissions(api, [])
     const res = await request(app)
       .get('/test')
       .set('x-access-token', token)

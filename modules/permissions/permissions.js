@@ -1,3 +1,5 @@
+const { collectionPermissions, collectionOwnerPermissions } = require('../collections/collections')
+
 exports.settingSchema = {
   enforce_permissions: {
     type: 'boolean',
@@ -56,14 +58,6 @@ exports.install = async function (app) {
 }
 
 exports.permissions = ['users: modify roles', 'login to admin']
-
-function collectionPermissions (name) {
-  return ['create', 'view', 'edit', 'delete'].map((action) => `${name}: ${action}`)
-}
-
-function collectionOwnerPermissions (name) {
-  return ['view', 'edit', 'delete'].map((action) => `${name}: ${action} own`)
-}
 
 exports.init = async function (api) {
   api.addCollectionListener(['changed'], 'collection', async function addCollectionPerms (req, collection, data) {

@@ -11,7 +11,7 @@ const { app, api } = testutils
  */
 describe('querying collections', function () {
   it('create doc 1', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -28,7 +28,7 @@ describe('querying collections', function () {
   })
 
   it('create doc 2', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -42,7 +42,7 @@ describe('querying collections', function () {
   })
 
   it('create doc 3', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
     await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -60,7 +60,7 @@ describe('querying collections', function () {
   let token
 
   it('read doc by id', async function () {
-    token = await util.getUserWithPermissions(api, 'testdoc: view')
+    token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc/testid123')
       .set('x-access-token', token)
@@ -202,7 +202,7 @@ describe('querying collections', function () {
   })
 
   it('sort by deep field ascending', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc?orderby={"data.number":1}')
       .set('x-access-token', token)
@@ -214,7 +214,7 @@ describe('querying collections', function () {
   })
 
   it('sort by deep field descending', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc?orderby={"meta.created":-1}')
       .set('x-access-token', token)
@@ -226,7 +226,7 @@ describe('querying collections', function () {
   })
 
   it('project a specific field', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc?fields={"title":1}')
       .set('x-access-token', token)
@@ -237,7 +237,7 @@ describe('querying collections', function () {
   })
 
   it('project a specific field on get', async function () {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc/test1?fields={"title":1}')
       .set('x-access-token', token)
@@ -247,7 +247,7 @@ describe('querying collections', function () {
   })
 
   it('project deep fields', async function() {
-    const token = await util.getUserWithPermissions(api, 'testdoc: view')
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: view')
     const res = await request(app)
       .get('/testdoc?fields={"data":1}')
       .set('x-access-token', token)

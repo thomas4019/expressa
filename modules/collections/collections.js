@@ -1,9 +1,17 @@
 function getCollectionPermissions (name, hasOwner) {
-  let permissions = ['create', 'view', 'edit', 'delete'].map((action) => `${name}: ${action}`)
+  let permissions = exports.collectionPermissions(name)
   if (hasOwner) {
-    permissions = permissions.concat(['view', 'edit', 'delete'].map((action) => `${name}: ${action} own`))
+    permissions = permissions.concat(exports.collectionOwnerPermissions(name))
   }
   return permissions
+}
+
+exports.collectionPermissions = function (name) {
+  return ['create', 'view', 'edit', 'modify owner', 'delete'].map((action) => `${name}: ${action}`)
+}
+
+exports.collectionOwnerPermissions = function (name) {
+  return ['view', 'edit', 'delete'].map((action) => `${name}: ${action} own`)
 }
 
 exports.permissions = async function (app) {

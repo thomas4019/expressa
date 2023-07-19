@@ -1,16 +1,14 @@
 const util = require('./util')
 
 function addImplicitFields (schema) {
-  schema['properties'] = schema['properties'] || {}
-  schema['properties']['meta'] = schema['properties']['meta'] || { type: 'object' }
-  schema['properties']['meta']['properties'] = schema['properties']['meta']['properties'] || {}
-  schema['properties']['meta']['properties']['created'] = schema['properties']['meta']['properties']['created'] ||
-      { type: 'string' }
-  schema['properties']['meta']['properties']['updated'] = schema['properties']['meta']['properties']['updated'] ||
-      { type: 'string' }
-  schema['properties']['meta']['properties']['owner'] = schema['properties']['meta']['properties']['owner'] ||
-      { type: 'string' }
-  schema['properties']['_id'] = schema['properties']['_id'] || { type: 'string' }
+  schema['properties'] ??= {}
+  schema['properties']['meta'] ??= { type: 'object' }
+  schema['properties']['meta']['properties'] ??= {}
+  schema['properties']['meta']['properties']['created'] ??= { type: 'string' }
+  schema['properties']['meta']['properties']['updated'] ??= { type: 'string' }
+  schema['properties']['meta']['properties']['owner'] ??= { type: 'string' }
+  schema['properties']['meta']['properties']['owner_collection'] ??= { type: 'string' }
+  schema['properties']['_id'] ??= { type: 'string' }
   return schema
 }
 

@@ -10,6 +10,55 @@ function assertValidCollection(req) {
   }
 }
 
+async function validateDocumentOwner(req, doc) {
+  if (!doc.meta.owner_collection) {
+    throw new util.ApiError(417, 'no owner_collection for owner found')
+  }
+  if (doc._id !== doc.meta.owner) {
+    const count = await req.db[doc.meta.owner_collection].count({ _id: doc.meta.owner }, undefined, 1)
+    if (!count) {
+      throw new util.ApiError(417, 'invalid owner')
+    }
+  } else if (req.params.collection !== doc.meta.owner_collection) {
+    throw new util.ApiError(417, 'invalid owner collection')
+  }
+}
+
+async function setDocumentOwner(req, doc) {
+  const schema = await req.db.collection.get(req.params.collection)
+  if (schema.documentsHaveOwners) {
+    util.addIdIfMissing(doc)
+    doc.meta ??= {}
+    if (req.uid) {
+      // request done by logged in user
+      if (!doc.meta.owner) {
+        // no owner - make logged in user as owner
+        doc.meta.owner = req.user._id
+        doc.meta.owner_collection = req.ucollection
+      } else {
+        if (!req.hasPermission(`${req.params.collection}: modify owner`)) {
+          // has an owner - but if no permission to modify owner then override owner to logged in user
+          doc.meta.owner = req.user._id
+          doc.meta.owner_collection = req.ucollection
+        }
+      }
+    } else {
+      // request done by NOT logged in user
+      if (schema.enableLogin) {
+        // is a user/login collection so make self owner
+        doc.meta.owner = doc._id
+        doc.meta.owner_collection = req.params.collection
+      } else {
+        // is a normal collection
+        debug('unable to find valid owner')
+      }
+    }
+    if (doc.meta.owner) {
+      await validateDocumentOwner(req, doc)
+    }
+  }
+}
+
 exports.getSchema = async function (req) {
   const collection = await req.db.collection.get(req.params.collection)
   await util.notify('get', req, 'schemas', collection)
@@ -96,7 +145,7 @@ exports.insert = async function (req) {
   const data = req.body
   req.customResponseData = req.customResponseData || {}
   await util.notify('post', req, req.params.collection, data)
-
+  await setDocumentOwner(req, data)
   const id = await req.db[req.params.collection].create(data)
   await util.notify('changed', req, req.params.collection, data)
   return {
@@ -147,16 +196,23 @@ exports.updateById = async function (req) {
 
   const doc = await req.db[req.params.collection].get(req.params.id)
   const owner = doc.meta && doc.meta.owner
+  const ownerCollection = doc.meta && doc.meta.owner_collection
   util.mongoUpdate(doc, modifier)
   const newOwner = doc.meta && doc.meta.owner
-  if (owner !== newOwner) {
-    debug('attempting to change document owner.')
-    doc.meta.owner = owner
+  const newOwnerCollection = doc.meta && doc.meta.owner_collection
+  if (owner !== newOwner || ownerCollection !== newOwnerCollection) {
+    if (req.hasPermission(`${req.params.collection}: modify owner`)) {
+      if (owner) {
+        await validateDocumentOwner(req, doc)
+      }
+    } else {
+      debug('attempting to change document owner.')
+      doc.meta.owner = owner
+      doc.meta.owner_collection = ownerCollection
+    }
   }
   req.body = doc
   await util.notify('put', req, req.params.collection, doc)
-
-  req.body.meta.owner = newOwner
   await req.db[req.params.collection].update(req.params.id, req.body)
   await util.notify('changed', req, req.params.collection, req.body)
   if (Object.keys(req.customResponseData)) {
