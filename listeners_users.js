@@ -56,13 +56,17 @@ module.exports = async function(api) {
   })
 
   api.addCollectionListener(['post', 'put'], loginCollections, async function userEmailLowerCase(req, collection, data) {
-    data.email = data.email.toLowerCase()
+    if (data.email) {
+      data.email = data.email.toLowerCase()
+    }
   })
 
   api.addCollectionListener('post', loginCollections, async function userUniquenessCheck(req, collection, data) {
-    const result = await api.db[collection].find({email: data.email})
-    if (result.length > 0) {
-      throw new util.ApiError(409, 'This email is already registered.')
+    if (data.email) {
+      const result = await api.db[collection].find({email: data.email})
+      if (result.length > 0) {
+        throw new util.ApiError(409, 'This email is already registered.')
+      }
     }
   })
 
