@@ -167,26 +167,37 @@ exports.getById = async function (req) {
 exports.replaceById = async function (req) {
   assertValidCollection(req)
   req.customResponseData = req.customResponseData || {}
+  const data = req.body
   let oldDoc = {}
   try {
     oldDoc = await req.db[req.params.collection].get(req.params.id)
   } catch (error) {
     // happens when new documents are created via a PUT
-    oldDoc = { meta: { owner: req.user._id } }
+    oldDoc = { meta: { owner: req.user._id, owner_collection: 'users' } }
+    data._id = req.params.id.trim()
+    await setDocumentOwner(req, data)
   }
   if (data._id) {
     data._id = data._id.trim()
   } else {
     data._id = req.params.id.trim()
   }
-  const data = req.body
-  data._id = req.params.id
   data.meta = data.meta || {}
   data.meta.created = (oldDoc.meta || {}).created
-  data.meta.owner = (oldDoc.meta || {}).owner
+  if (data.meta.owner !== oldDoc.meta.owner || data.meta.owner_collection !== oldDoc.meta.owner_ollection) {
+    if (req.hasPermission(`${req.params.collection}: modify owner`)) {
+      if (oldDoc.meta.owner) {
+        await validateDocumentOwner(req, data)
+      }
+    } else {
+      debug('attempting to change document owner.')
+      data.meta.owner = oldDoc.meta.owner
+      data.meta.owner_collection = oldDoc.meta.owner_collection
+    }
+  }
   await util.notify('put', req, req.params.collection, data)
-  await req.db[req.params.collection].update(req.params.id, req.body)
-  await util.notify('changed', req, req.params.collection, req.body)
+  await req.db[req.params.collection].update(req.params.id, data)
+  await util.notify('changed', req, req.params.collection, data)
   return {
     status: 'OK',
     id: data._id,
