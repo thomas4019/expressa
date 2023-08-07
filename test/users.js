@@ -232,6 +232,50 @@ describe('user functionality', function () {
     expect(res2.body.meta.owner).to.equal(user._id)
   })
 
+  it('cannot change owner with a PUT by default', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: view hashed passwords'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = JSON.parse(JSON.stringify(res.body))
+
+    res.body.meta.owner = user._id
+    await request(app)
+      .put(`/users/${newUser._id}`)
+      .set('x-access-token', token)
+      .send(res.body)
+      .expect(200)
+
+    const res2 = await request(app)
+      .get(`/users/${newUser._id}`)
+      .set('x-access-token', token)
+    expect(res2.body.meta.owner).to.not.equal(user._id)
+    expect(res2.body.meta.owner).to.equal(newUser._id)
+
+  })
+
+  it('can change owner with a PUT with correct permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: view hashed passwords', 'users: modify owner'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = JSON.parse(JSON.stringify(res.body))
+
+    res.body.meta.owner = user._id
+    await request(app)
+      .put(`/users/${newUser._id}`)
+      .set('x-access-token', token)
+      .send(res.body) // try change owner to another user
+      .expect(200)
+
+    const res2 = await request(app)
+      .get(`/users/${newUser._id}`)
+      .set('x-access-token', token)
+    expect(res2.body.meta.owner).to.equal(user._id)
+  })
+
   it('changing to bogus owner fails', async function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify owner'])
 
@@ -300,6 +344,76 @@ describe('user functionality', function () {
       .send(doc)
       .expect(200) // will succeed but owner will not change
     doc._id = res2.body.id
+
+    const res3 = await request(app)
+      .get(`/testdoc/${doc._id}`)
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res3.body.meta.owner).to.not.equal(newUser._id)
+    expect(res3.body.meta.owner).to.equal(user._id)
+  })
+
+  it('cannot set owner with a PUT on creation by default', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: edit', 'testdoc: view own'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    const doc = {
+      title: 'Test Title',
+      meta: {
+        owner: user._id,
+        owner_collection: 'users',
+      }
+    }
+
+    const docId = testutils.generateDocumentId()
+
+    const res2 = await request(app)
+      .put(`/testdoc/${docId}`)
+      .set('x-access-token', token)
+      .send(doc)
+      .expect(200) // will succeed but owner will not change
+
+    expect(res2.body.id).to.equal(docId)
+    doc._id = docId
+
+    const res3 = await request(app)
+      .get(`/testdoc/${doc._id}`)
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res3.body.meta.owner).to.not.equal(user._id)
+    expect(res3.body.meta.owner).to.equal(newUser._id)
+  })
+
+  it('can set owner with a PUT on creation with correct permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: edit', 'testdoc: view', 'testdoc: modify owner'])
+
+    const res = await request(app)
+      .get(`/users/me`)
+      .set('x-access-token', token)
+    const newUser = res.body
+
+    const doc = {
+      title: 'Test Title',
+      meta: {
+        owner: user._id,
+        owner_collection: 'users',
+      }
+    }
+
+    const docId = testutils.generateDocumentId()
+
+    const res2 = await request(app)
+      .put(`/testdoc/${docId}`)
+      .set('x-access-token', token)
+      .send(doc)
+      .expect(200) // will succeed but owner will not change
+
+    expect(res2.body.id).to.equal(docId)
+    doc._id = docId
 
     const res3 = await request(app)
       .get(`/testdoc/${doc._id}`)
