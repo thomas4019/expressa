@@ -174,6 +174,11 @@ exports.replaceById = async function (req) {
     // happens when new documents are created via a PUT
     oldDoc = { meta: { owner: req.user._id } }
   }
+  if (data._id) {
+    data._id = data._id.trim()
+  } else {
+    data._id = req.params.id.trim()
+  }
   const data = req.body
   data._id = req.params.id
   data.meta = data.meta || {}
@@ -210,6 +215,11 @@ exports.updateById = async function (req) {
       doc.meta.owner = owner
       doc.meta.owner_collection = ownerCollection
     }
+  }
+  if (doc._id) {
+    doc._id = doc._id.trim()
+  } else {
+    throw new util.ApiError(400, '_id property is required')
   }
   req.body = doc
   await util.notify('put', req, req.params.collection, doc)
