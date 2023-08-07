@@ -338,7 +338,9 @@ exports.generateDocumentId = function generateDocumentId() {
 
 exports.addIdIfMissing = function addIdIfMissing (document) {
   if (!document._id) {
-    document._id = exports.generateDocumentId()
+    document._id = exports.generateDocumentId().trim()
+  } else {
+    document._id = document._id.trim()
   }
 }
 
