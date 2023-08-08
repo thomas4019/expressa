@@ -14,13 +14,11 @@ async function validateDocumentOwner(req, doc) {
   if (!doc.meta.owner_collection) {
     throw new util.ApiError(417, 'no owner_collection for owner found')
   }
-  if (doc._id !== doc.meta.owner) {
+  if (!(doc._id === doc.meta.owner && req.params.collection === doc.meta.owner_collection)) {
     const count = await req.db[doc.meta.owner_collection].count({ _id: doc.meta.owner }, undefined, 1)
     if (!count) {
       throw new util.ApiError(417, 'invalid owner')
     }
-  } else if (req.params.collection !== doc.meta.owner_collection) {
-    throw new util.ApiError(417, 'invalid owner collection')
   }
 }
 
