@@ -6,6 +6,8 @@ const pg = require('pg')
 const pgPools = {}
 const dot = require('dot-object')
 const mongoQuery = require('mongo-query')
+const sift = require('sift')
+const auth = require('./auth/index')
 const Ajv = require('ajv')
 const ajv = new Ajv({
   allErrors: true,
@@ -150,6 +152,10 @@ exports.mongoProject = function(record, projection) {
   const expanded = dot.object(projection)
   const result = isInclude ? _include(record, expanded) : _exclude(record, expanded)
   return result
+}
+
+exports.mongoSearch = function(docs, query) {
+  return sift(query || {}, docs)
 }
 
 exports.mongoUpdate = function(doc, update) {
@@ -423,3 +429,7 @@ exports.createPagePagination = function createPagePagination (pageData, page, pa
 exports.getDatabaseOffset = function getDatabaseOffset(page, itemsPerPage) {
   return (page - 1) * itemsPerPage
 }
+
+exports.createHash = auth.createHash
+exports.isHashed = auth.isHashed
+exports.doLogin = auth.doLogin

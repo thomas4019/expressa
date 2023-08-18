@@ -1,6 +1,4 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
-const sift = require('sift')
-
 const util = require('../util')
 
 module.exports = function (settings, collection) {
@@ -14,7 +12,7 @@ module.exports = function (settings, collection) {
     },
     find: async function (query, offset, limit, orderby, fields) {
       const arr = Object.values(store)
-      let matches = sift(query || {}, arr)
+      let matches = util.mongoSearch(arr, query)
       if (orderby) {
         matches = util.orderBy(matches, orderby)
       }
@@ -61,7 +59,7 @@ module.exports = function (settings, collection) {
     // https://docs.mongodb.com/manual/reference/method/db.collection.updateMany/
     updateWithQuery: async function (query, update, options) {
       const arr = Object.keys(store).map((id) => ({ _id: id, ...store[id]}) )
-      const matches = sift(query || {}, arr)
+      const matches = util.mongoSearch(arr, query)
       matches.forEach((doc) => {
         util.mongoUpdate(doc, update)
         store[doc._id] = doc
