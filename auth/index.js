@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs')
 const handler = require('./jwt')
-const util = require('../util')
+
+exports.isHashed = function (string) {
+  return string && string.length !== 60 && string[0] !== '$'
+}
 
 exports.createHash = function (password) {
   const salt = bcrypt.genSaltSync(10)

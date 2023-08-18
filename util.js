@@ -431,4 +431,5 @@ exports.getDatabaseOffset = function getDatabaseOffset(page, itemsPerPage) {
 }
 
 exports.createHash = auth.createHash
+exports.isHashed = auth.isHashed
 exports.doLogin = auth.doLogin
