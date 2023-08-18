@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs')
 const handler = require('./jwt')
 
 exports.isHashed = function (string) {
-  return string && string.length !== 60 && string[0] !== '$'
+  return string && string.length === 60 && string[0] === '$'
 }
 
 exports.createHash = function (password) {
