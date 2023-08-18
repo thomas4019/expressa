@@ -13,7 +13,7 @@ module.exports = async function(api) {
         data.password = oldData.password // preserve password if not explicitly set
       }
     }
-    if (data.password && data.password.length !== 60 && data.password[0] !== '$') {
+    if (!auth.isHashed(data.password)) {
       debug('hashing and replacing password in the user document.')
       data.password = auth.createHash(data.password)
       data.meta.password_last_updated_at = new Date().toISOString()
