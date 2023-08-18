@@ -6,6 +6,7 @@ const pg = require('pg')
 const pgPools = {}
 const dot = require('dot-object')
 const mongoQuery = require('mongo-query')
+const auth = require('./auth/index')
 const Ajv = require('ajv')
 const ajv = new Ajv({
   allErrors: true,
@@ -423,3 +424,6 @@ exports.createPagePagination = function createPagePagination (pageData, page, pa
 exports.getDatabaseOffset = function getDatabaseOffset(page, itemsPerPage) {
   return (page - 1) * itemsPerPage
 }
+
+exports.createHash = auth.createHash
+exports.doLogin = auth.doLogin

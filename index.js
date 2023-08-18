@@ -113,8 +113,6 @@ module.exports.api = function (settings) {
     get pgpool() {
       return util.getPgPool(router.settings.postgresql_uri)
     },
-    doLogin: auth.doLogin,
-    createHash: auth.createHash,
     ...util,
   }
   router.eventListeners = {}
