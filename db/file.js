@@ -5,8 +5,6 @@ Store.prototype.allAsync = promisify(Store.prototype.all)
 Store.prototype.getAsync = promisify(Store.prototype.get)
 Store.prototype.saveAsync = promisify(Store.prototype.save)
 
-const sift = require('sift')
-
 const util = require('../util')
 
 module.exports = function (settings, collection) {
@@ -25,7 +23,7 @@ module.exports = function (settings, collection) {
       const arr = Object.keys(data).map(function (id) {
         return data[id]
       })
-      let matches = sift(query || {}, arr)
+      let matches = util.mongoSearch(arr, query)
       if (orderby) {
         matches = util.orderBy(matches, orderby)
       }
@@ -96,7 +94,7 @@ module.exports = function (settings, collection) {
     updateWithQuery: async function (query, update, options) {
       const data = await store.allAsync()
       const arr = Object.keys(data).map((id) => ({ _id: id, ...data[id]}) )
-      const matches = sift(query || {}, arr)
+      const matches = util.mongoSearch(arr, query)
       const promises = matches.map((doc) => {
         util.mongoUpdate(doc, update)
         return store.saveAsync(doc._id, doc)
