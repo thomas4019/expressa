@@ -144,7 +144,7 @@ function _exclude(obj, source) {
 }
 
 exports.mongoToPostgresSelect = function(collection, fields) {
-  const arrayFields = exports.getArrayPaths('', schemas[collection].schema)
+  const arrayFields = exports.getArrayPaths('', schemas[collection])
   return fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
 }
 
@@ -153,7 +153,7 @@ exports.mongoToPostgresUpdate = function(collection, query) {
 }
 
 exports.mongoToPostgresWhere = function(collection, query) {
-  const arrayFields = exports.getArrayPaths('', schemas[collection].schema)
+  const arrayFields = exports.getArrayPaths('', schemas[collection])
   return mongoToPostgres('data', query || {}, arrayFields)
 }
 
