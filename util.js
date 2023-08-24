@@ -32,9 +32,11 @@ ajv.addKeyword({
 const formatKey = ajv.getKeyword('format')
 formatKey.type = formatKey.type.concat(['array', 'boolean', 'object'])
 
+const schemas = {}
 const schemaValidators = {}
 
-exports.addSchemaValidator = function(collection, schema) {
+exports.addSchema = function(collection, schema) {
+  schemas[collection] = schema
   schemaValidators[collection] = ajv.compile(schema)
 }
 
