@@ -1,4 +1,3 @@
-const randomstring = require('randomstring')
 const {v4} = require('uuid')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
