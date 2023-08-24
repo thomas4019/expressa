@@ -195,6 +195,7 @@ exports.normalizeOrderBy = function(orderby) {
           return [ordering[0], 1] // add 1 (default to ascending sort)
         }
       }
+      // if reaches here, is already normalized
       return ordering
     })
   } else if (typeof orderby === 'object') {
