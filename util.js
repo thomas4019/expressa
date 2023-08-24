@@ -5,6 +5,7 @@ const pg = require('pg')
 const pgPools = {}
 const dot = require('dot-object')
 const mongoQuery = require('mongo-query')
+const mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 const sift = require('sift')
 const auth = require('./auth/index')
 const Ajv = require('ajv')
@@ -140,6 +141,27 @@ function _exclude(obj, source) {
     }
   }
   return data
+}
+
+exports.mongoToPostgresSelect = function(collection, fields) {
+  const arrayFields = exports.getArrayPaths('', schemas[collection].schema)
+  return fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
+}
+
+exports.mongoToPostgresUpdate = function(collection, query) {
+  return mongoToPostgres.convertUpdate('data', query,false)
+}
+
+exports.mongoToPostgresWhere = function(collection, query) {
+  const arrayFields = exports.getArrayPaths('', schemas[collection].schema)
+  return mongoToPostgres('data', query || {}, arrayFields)
+}
+
+exports.mongoToPostgresOrderBy = function(collection, orderby) {
+  const normalizedOrderBy = exports.normalizeOrderBy(orderby)
+  return normalizedOrderBy.map((ordering) => {
+    return mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
+  }).join(', ')
 }
 
 exports.mongoProject = function(record, projection) {
