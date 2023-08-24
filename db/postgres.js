@@ -1,4 +1,3 @@
-const mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 const util = require('../util')
 
 module.exports = function (settings, collectionId, collection) {
@@ -16,15 +15,12 @@ module.exports = function (settings, collectionId, collection) {
       return this.find({})
     },
     find: async function (rawQuery, offset, limit, orderby, fields) {
-      const arrayFields = util.getArrayPaths('', collection.schema)
-      const pgQuery = mongoToPostgres('data', rawQuery || {}, arrayFields)
-      const select = fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
-      let query = 'SELECT ' + select + ' FROM ' + collectionId + (pgQuery ? ' WHERE ' + pgQuery : '')
+      const pgSelect = util.mongoToPostgresSelect(collectionId, fields)
+      const pgWhere = util.mongoToPostgresWhere(collectionId, rawQuery)
+      let query = 'SELECT ' + pgSelect + ' FROM ' + collectionId + (pgWhere ? ' WHERE ' + pgWhere : '')
       if (typeof orderby !== 'undefined') {
         query += ' ORDER BY '
-        query += orderby.map((ordering) => {
-          return mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
-        }).join(', ')
+        query += util.mongoToPostgresOrderBy(collectionId, orderby)
       }
       if (typeof offset !== 'undefined') {
         query += ' OFFSET ' + offset
@@ -36,9 +32,8 @@ module.exports = function (settings, collectionId, collection) {
       return result.rows.map((row) => row.data)
     },
     count: async function(rawQuery, offset, limit) {
-      const arrayFields = util.getArrayPaths('', collection.schema)
-      const pgQuery = mongoToPostgres('data', rawQuery || {}, arrayFields)
-      let query = 'SELECT COUNT(*) FROM ' + collectionId + (pgQuery ? ' WHERE ' + pgQuery : '')
+      const pgWhere = util.mongoToPostgresWhere(collectionId, rawQuery)
+      let query = 'SELECT COUNT(*) FROM ' + collectionId + (pgWhere ? ' WHERE ' + pgWhere : '')
       if (typeof offset !== 'undefined') {
         query += ' OFFSET ' + offset
       }
@@ -49,9 +44,8 @@ module.exports = function (settings, collectionId, collection) {
       return parseInt(result.rows[0].count)
     },
     get: async function (id, fields) {
-      const arrayFields = util.getArrayPaths('', collection.schema)
-      const select = fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
-      const result = await pool.query(`SELECT ${select} FROM ${collectionId} WHERE id = $1`, [id])
+      const pgSelect = util.mongoToPostgresSelect(collectionId, fields)
+      const result = await pool.query(`SELECT ${pgSelect} FROM ${collectionId} WHERE id = $1`, [id])
       if (result.rowCount === 0) {
         throw new util.ApiError(404, 'document not found')
       }
@@ -81,10 +75,9 @@ module.exports = function (settings, collectionId, collection) {
     },
     // eslint-disable-next-line no-unused-vars
     updateWithQuery: async function (query, update, options) {
-      const arrayFields = util.getArrayPaths('', collection.schema)
-      const pgQuery = mongoToPostgres('data', query || {}, arrayFields)
-      const updateSql = mongoToPostgres.convertUpdate('data', update,false)
-      const result = await pool.query('UPDATE ' + collectionId + ' SET data=' + updateSql + ' WHERE ' + pgQuery)
+      const pgWhere = util.mongoToPostgresWhere(collectionId, query)
+      const updateSql = util.mongoToPostgresUpdate(collectionId, update)
+      const result = await pool.query('UPDATE ' + collectionId + ' SET data=' + updateSql + ' WHERE ' + pgWhere)
       return {
         matchedCount: result.rowCount
       }
