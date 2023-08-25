@@ -1,4 +1,3 @@
-const randomstring = require('randomstring')
 const {v4} = require('uuid')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
@@ -6,6 +5,7 @@ const pg = require('pg')
 const pgPools = {}
 const dot = require('dot-object')
 const mongoQuery = require('mongo-query')
+const mongoToPostgres = require('mongo-query-to-postgres-jsonb')
 const sift = require('sift')
 const auth = require('./auth/index')
 const Ajv = require('ajv')
@@ -33,9 +33,11 @@ ajv.addKeyword({
 const formatKey = ajv.getKeyword('format')
 formatKey.type = formatKey.type.concat(['array', 'boolean', 'object'])
 
+const schemas = {}
 const schemaValidators = {}
 
-exports.addSchemaValidator = function(collection, schema) {
+exports.addSchema = function(collection, schema) {
+  schemas[collection] = schema
   schemaValidators[collection] = ajv.compile(schema)
 }
 
@@ -141,6 +143,27 @@ function _exclude(obj, source) {
   return data
 }
 
+exports.mongoToPostgresSelect = function(collection, fields) {
+  const arrayFields = exports.getArrayPaths('', schemas[collection])
+  return fields ? mongoToPostgres.convertSelect('data', fields, arrayFields) : '*'
+}
+
+exports.mongoToPostgresUpdate = function(collection, query) {
+  return mongoToPostgres.convertUpdate('data', query,false)
+}
+
+exports.mongoToPostgresWhere = function(collection, query) {
+  const arrayFields = exports.getArrayPaths('', schemas[collection])
+  return mongoToPostgres('data', query || {}, arrayFields)
+}
+
+exports.mongoToPostgresOrderBy = function(collection, orderby) {
+  const normalizedOrderBy = exports.normalizeOrderBy(orderby)
+  return normalizedOrderBy.map((ordering) => {
+    return mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
+  }).join(', ')
+}
+
 exports.mongoProject = function(record, projection) {
   if (!projection || Object.keys(projection).length < 1) {
     return record
@@ -172,6 +195,7 @@ exports.normalizeOrderBy = function(orderby) {
           return [ordering[0], 1] // add 1 (default to ascending sort)
         }
       }
+      // if reaches here, is already normalized
       return ordering
     })
   } else if (typeof orderby === 'object') {

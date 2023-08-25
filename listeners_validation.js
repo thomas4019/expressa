@@ -18,13 +18,13 @@ module.exports = async function (api) {
   const collections = await api.db.collection.all()
   collections.forEach((collection) => {
     const schema = addImplicitFields(collection.schema)
-    util.addSchemaValidator(collection._id, schema)
+    util.addSchema(collection._id, schema)
   })
 
   // Load new and update validators as necessary
   api.addCollectionListener('changed', 'collection', function updateSchemaValidators (req, collection, data) {
     const schema = addImplicitFields(data.schema)
-    util.addSchemaValidator(data._id, schema)
+    util.addSchema(data._id, schema)
   })
 
   api.addCollectionListener('get', ['collection', 'schemas'], function ensureIdAdded (req, collection, data) {
