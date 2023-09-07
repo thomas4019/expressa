@@ -185,6 +185,18 @@ exports.mongoUpdate = function(doc, update) {
   return mongoQuery(doc, {}, update)
 }
 
+// paging requires orderby to include a field that is known to be unique and constant
+// to ensure consistent results from database with offset and limit. Chosen field should
+// also represent a preferred ordering when doing final sort
+exports.orderByForPagedRequests = function(orderby, finalSortField = 'meta.created') {
+  orderby = exports.normalizeOrderBy(orderby || {})
+  const allFields = orderby.map(([field]) => field)
+  if (!allFields.includes(finalSortField)) {
+    orderby.push([finalSortField, 1])
+  }
+  return orderby
+}
+
 exports.normalizeOrderBy = function(orderby) {
   if (Array.isArray(orderby)) {
     orderby = orderby.map(function (ordering) {

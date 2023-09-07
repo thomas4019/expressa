@@ -101,7 +101,7 @@ exports.get = async function (req) {
     }
     req.query.pageitems = parseInt(req.query.pageitems) || parseInt(req.query.limit) || 10
     req.query.offset = util.getDatabaseOffset(req.query.page, req.query.pageitems)
-    req.query.orderby = req.query.orderby || util.normalizeOrderBy({ 'meta.created': 1 }) // paging requires orderby to ensure consistent results with offset and limit
+    req.query.orderby = util.orderByForPagedRequests(req.query.orderby)
     delete req.query.limit
     delete req.query.skip
     let pageData, totalItems
