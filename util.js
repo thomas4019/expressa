@@ -53,6 +53,19 @@ exports.validateSchema = function(collection, doc) {
   return true
 }
 
+exports.getSchemaProperty = function(collection, path) {
+  const parts = path.split('.')
+  let obj = schemas[collection]
+  for (const part of parts) {
+    if (obj.properties && obj.properties[part]) {
+      obj = obj.properties[part]
+    } else {
+      return
+    }
+  }
+  return obj
+}
+
 exports.orderBy = function (data, orderby) {
   data.sort(function compare (a, b) {
     for (let i = 0; i < orderby.length; i++) {
@@ -184,6 +197,8 @@ exports.mongoSearch = function(docs, query) {
 exports.mongoUpdate = function(doc, update) {
   return mongoQuery(doc, {}, update)
 }
+
+exports.mongoToPostgres = mongoToPostgres
 
 // paging requires orderby to include a field that is known to be unique and constant
 // to ensure consistent results from database with offset and limit. Chosen field should
