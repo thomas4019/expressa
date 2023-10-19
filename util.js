@@ -203,11 +203,11 @@ exports.mongoToPostgres = mongoToPostgres
 // paging requires orderby to include a field that is known to be unique and constant
 // to ensure consistent results from database with offset and limit. Chosen field should
 // also represent a preferred ordering when doing final sort
-exports.orderByForPagedRequests = function(orderby, finalSortField = 'meta.created') {
+exports.orderByForPagedRequests = function(orderby, finalSortField = 'meta.created', finalSortDirection = 1) {
   orderby = exports.normalizeOrderBy(orderby || {})
   const allFields = orderby.map(([field]) => field)
   if (!allFields.includes(finalSortField)) {
-    orderby.push([finalSortField, 1])
+    orderby.push([finalSortField, finalSortDirection])
   }
   return orderby
 }
