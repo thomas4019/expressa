@@ -183,7 +183,7 @@ module.exports.api = function (settings) {
   (async function setup() {
     await initCollections(router.db, router)
 
-    const modules = ['collections', 'core', 'logging', 'permissions']
+    const modules = ['collections', 'core', 'logging', 'permissions', 'access_keys']
     router.modules = {}
     for (const module of modules) {
       router.modules[module] = require(`./modules/${module}/${module}`)
