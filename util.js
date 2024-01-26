@@ -37,8 +37,11 @@ const schemas = {}
 const schemaValidators = {}
 
 exports.addSchema = function(collection, schema) {
+  schema.$id = collection
+  ajv.removeSchema(collection)
   schemas[collection] = schema
   schemaValidators[collection] = ajv.compile(schema)
+  delete schema.$id
 }
 
 exports.validateSchema = function(collection, doc) {
@@ -49,6 +52,19 @@ exports.validateSchema = function(collection, doc) {
   const isValid = schemaValidators[collection](doc)
   if (!isValid) {
     throw new ApiError(400, schemaValidators[collection].errors.map((err) => `${err.instancePath} ${err.message}: ${JSON.stringify(err.params)}`).join(', '))
+  }
+  return true
+}
+
+exports.validateSchemaProperty = function(collection, path, value) {
+  if (!schemaValidators[collection]) {
+    console.error(`missing schema validator for collection ${collection}`)
+    return true
+  }
+  const $ref = `${collection}#/properties/${path.split('.').join('/properties/')}`
+  const isValid = ajv.validate({ $ref }, value)
+  if (!isValid) {
+    throw new ApiError(400, ajv.errors.map((err) => `${err.instancePath} ${err.message}: ${JSON.stringify(err.params)}`).join(', '))
   }
   return true
 }
