@@ -37,8 +37,10 @@ const schemas = {}
 const schemaValidators = {}
 
 exports.addSchema = function(collection, schema) {
+  schema.$id = collection
   schemas[collection] = schema
   schemaValidators[collection] = ajv.compile(schema)
+  delete schema.$id
 }
 
 exports.validateSchema = function(collection, doc) {
