@@ -55,6 +55,19 @@ exports.validateSchema = function(collection, doc) {
   return true
 }
 
+exports.validateSchemaProperty = function(collection, path, value) {
+  if (!schemaValidators[collection]) {
+    console.error(`missing schema validator for collection ${collection}`)
+    return true
+  }
+  const $ref = `${collection}#/properties/${path.split('.').join('/properties/')}`
+  const isValid = ajv.validate({ $ref }, value)
+  if (!isValid) {
+    throw new ApiError(400, ajv.errors.map((err) => `${err.instancePath} ${err.message}: ${JSON.stringify(err.params)}`).join(', '))
+  }
+  return true
+}
+
 exports.getSchemaProperty = function(collection, path) {
   const parts = path.split('.')
   let obj = schemas[collection]
