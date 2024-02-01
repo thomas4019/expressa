@@ -81,6 +81,53 @@ exports.getUserWithPermissions = async function(api, permissions) {
   user._id = loginRes.body.uid
   return loginRes.body.token
 }
+
+exports.getAccessKeyForUserWithPermissions = async function(api, permissions) {
+  const service = request(exports.app)
+  if (typeof permissions === 'string') {
+    permissions = [permissions]
+  }
+  permissions = permissions || []
+  const permissionsMap = {}
+  permissions.forEach(function (permission) {
+    permissionsMap[permission] = true
+  })
+
+  const randId = randomstring.generate(12)
+  const roleName = 'role' + randId
+  const role = {
+    _id: roleName,
+    permissions: permissionsMap
+  }
+
+  const roleRes = await service.post('/role')
+    .set('x-access-token', tokens.admin)
+    .send(role)
+    .expect(200)
+
+  const user = {
+    email: 'test' + randId + '@example.com',
+    password: '123',
+  }
+  const registerRes = await service.post('/users/register')
+    .send(user)
+    .expect(200)
+
+  const updateRes = await service.post(`/users/${registerRes.body.id}/update`)
+    .send({ $push: { roles: roleName } })
+    .set('x-access-token', tokens.admin)
+    .expect(200)
+
+  let accessKey = randomstring.generate(8)
+  await exports.api.db.access_keys.create({
+    key: accessKey,
+    user_id: registerRes.body.id,
+    expires_at: '2032-01-01T00:00:00'
+  })
+
+  return accessKey
+}
+
 exports.clone = util.clone
 exports.sleep = function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))

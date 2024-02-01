@@ -54,6 +54,20 @@ describe('General Tests:', () => {
       .expect(200)
   })
 
+  it('returns collections using a key', async function () {
+    const badKey = '123'
+    await request(app)
+      .get('/collection')
+      .set('x-access-key', badKey)
+      .expect(401)
+
+    const key = await testutils.getAccessKeyForUserWithPermissions(api, ['collection: view'])
+    await request(app)
+      .get('/collection')
+      .set('x-access-key', key)
+      .expect(200)
+  })
+
   it('Sets headers', async function () {
     const token = await testutils.getUserWithPermissions(api, ['collection: view'])
     const res = await request(app)

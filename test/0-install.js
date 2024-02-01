@@ -21,7 +21,7 @@ describe('install flow', function () {
     await request(app)
       .post('/install')
       .send({
-        modules: ['collections', 'core', 'logging', 'permissions'],
+        modules: ['collections', 'core', 'logging', 'permissions', 'access_keys'],
         settings: {
           jwt_secret: 'testing 123',
           jwt_expire_on_password_change: true,
