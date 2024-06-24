@@ -19,7 +19,7 @@ exports.doLogin = handler.doLogin
 exports.middleware = async function authMiddleware(req, res, next) {
   const key = req.query['access_key'] || req.headers['x-access-key']
   if (key) {
-    if (typeof key == 'string') {
+    if (typeof key == 'string' && req.db['access_keys']) {
       const accessKeys = await req.db['access_keys'].find({ key: { $eq: key } }, 0, 1)
       if (accessKeys && accessKeys.length > 0) {
         const accessKey = accessKeys[0]
