@@ -20,7 +20,7 @@
         "xdescribe": true
     },
     "parserOptions": {
-        "ecmaVersion": 2022
+        "ecmaVersion": 12
     },
     "env": {
         "es6": true,

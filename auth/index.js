@@ -17,6 +17,32 @@ exports.isValidPassword = function (password, hashedPassword) {
 exports.doLogin = handler.doLogin
 
 exports.middleware = async function authMiddleware(req, res, next) {
+  const key = req.query['access_key'] || req.headers['x-access-key']
+  if (key) {
+    if (typeof key == 'string' && req.db['access_keys']) {
+      const accessKeys = await req.db['access_keys'].find({ key: { $eq: key } }, 0, 1)
+      if (accessKeys && accessKeys.length > 0) {
+        const accessKey = accessKeys[0]
+        // check if access key is still valid
+        if (accessKey.expires_at >= new Date().toISOString()) {
+          let user
+          try {
+            user = await req.db[accessKey.user_collection].get(accessKey.user_id)
+          } catch (e) {
+            req.uerror = 'user no longer exists'
+          }
+          if (user && !req.uerror) {
+            req.uid = user._id
+            req.ucollection = 'users'
+            req.user = user
+          }
+        }
+      }
+    } else {
+      console.error('Non-string access key sent')
+    }
+  }
+
   req.query = req.query || {}
   const token = req.query['token'] || req.headers['x-access-token']
   delete req.query['token']
