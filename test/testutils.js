@@ -120,8 +120,9 @@ exports.getAccessKeyForUserWithPermissions = async function(api, permissions) {
 
   let accessKey = randomstring.generate(8)
   await exports.api.db.access_keys.create({
-    key: accessKey,
+    user_collection: 'users',
     user_id: registerRes.body.id,
+    key: accessKey,
     expires_at: '2032-01-01T00:00:00'
   })
 

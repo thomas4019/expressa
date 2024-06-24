@@ -5,6 +5,9 @@ exports.collections = function () {
       type: 'object',
       additionalProperties: false,
       properties: {
+        user_collection: {
+          type: 'string'
+        },
         user_id: {
           type: 'string'
         },

@@ -20,14 +20,14 @@ exports.middleware = async function authMiddleware(req, res, next) {
   const key = req.query['access_key'] || req.headers['x-access-key']
   if (key) {
     if (typeof key == 'string') {
-      const accessKeys = await req.db['access_keys'].find({ key: { $eq: key } })
+      const accessKeys = await req.db['access_keys'].find({ key: { $eq: key } }, 0, 1)
       if (accessKeys && accessKeys.length > 0) {
         const accessKey = accessKeys[0]
         // check if access key is still valid
         if (accessKey.expires_at >= new Date().toISOString()) {
           let user
           try {
-            user = await req.db['users'].get(accessKey.user_id)
+            user = await req.db[accessKey.user_collection].get(accessKey.user_id)
           } catch (e) {
             req.uerror = 'user no longer exists'
           }
