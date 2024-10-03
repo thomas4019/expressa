@@ -75,6 +75,8 @@ exports.getSchemaProperty = function(collection, path) {
   for (const part of parts) {
     if (obj.properties && obj.properties[part]) {
       obj = obj.properties[part]
+    } else if (obj.items && obj.items.properties && obj.items.properties[part]) {
+      obj = obj.items.properties[part]
     } else {
       return
     }
