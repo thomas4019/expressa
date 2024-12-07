@@ -2,15 +2,9 @@ const util = require('../util')
 let authenticatedRoleExists
 
 async function addRolePermissions (req, roles) {
-  req.permissions = req.permissions || {}
-  const roleDocs = await Promise.all(roles.map((name) => req.db.role.get(name)))
-  roleDocs.forEach((roleDoc) => {
-    for (const permission in roleDoc.permissions) {
-      if (roleDoc.permissions[permission]) {
-        req.permissions[permission] = true
-      }
-    }
-  })
+  const rolePermissions = await util.getEffectivePermissionsForRoles(roles, req.db)
+  req.permissions ??= {}
+  req.permissions = { ...req.permissions, ...rolePermissions }
 }
 
 async function doesAuthenticatedRoleExist(req) {
