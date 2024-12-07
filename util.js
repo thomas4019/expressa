@@ -499,6 +499,10 @@ exports.getDatabaseOffset = function getDatabaseOffset(page, itemsPerPage) {
   return (page - 1) * itemsPerPage
 }
 
+exports.hasPermission = function hasPermission(permissions, permission) {
+  return permissions && permissions[permission]
+}
+
 exports.getEffectivePermissionsForRoles = async function getEffectivePermissionsForRoles(roles, db) {
   const permissions = {}
   const roleDocs = await Promise.all(roles.map((name) => db.role.get(name)))

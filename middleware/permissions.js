@@ -25,7 +25,7 @@ module.exports.addRolePermissionsAsync = async function addRolePermissionsMiddle
     req.hasPermission = () => true
     return
   }
-  req.hasPermission = (permission) => req.permissions && req.permissions[permission]
+  req.hasPermission = (permission) => util.hasPermission(req.permissions, permission)
   let roles = ['Anonymous']
   const isAuthenticatedRole = await doesAuthenticatedRoleExist(req)
   if (req.uid) {
