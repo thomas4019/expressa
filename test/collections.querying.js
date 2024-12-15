@@ -1,7 +1,6 @@
 const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
-const util = require('../util.js')
 const testutils = require('./testutils')
 const { app, api } = testutils
 

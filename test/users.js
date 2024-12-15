@@ -194,7 +194,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 
@@ -216,7 +216,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify owner'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 
@@ -236,7 +236,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: view hashed passwords'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = JSON.parse(JSON.stringify(res.body))
 
@@ -259,7 +259,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: view hashed passwords', 'users: modify owner'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = JSON.parse(JSON.stringify(res.body))
 
@@ -280,7 +280,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'users: modify owner'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 
@@ -295,7 +295,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: create', 'testdoc: view own'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 
@@ -308,7 +308,7 @@ describe('user functionality', function () {
     }
 
     const res2 = await request(app)
-      .post(`/testdoc`)
+      .post('/testdoc')
       .set('x-access-token', token)
       .send(doc)
       .expect(200) // will succeed but owner will not change
@@ -326,7 +326,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: create', 'testdoc: view', 'testdoc: modify owner'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 
@@ -339,7 +339,7 @@ describe('user functionality', function () {
     }
 
     const res2 = await request(app)
-      .post(`/testdoc`)
+      .post('/testdoc')
       .set('x-access-token', token)
       .send(doc)
       .expect(200) // will succeed but owner will not change
@@ -357,7 +357,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: edit', 'testdoc: view own'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 
@@ -392,7 +392,7 @@ describe('user functionality', function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit', 'testdoc: edit', 'testdoc: view', 'testdoc: modify owner'])
 
     const res = await request(app)
-      .get(`/users/me`)
+      .get('/users/me')
       .set('x-access-token', token)
     const newUser = res.body
 

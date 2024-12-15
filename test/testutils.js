@@ -118,7 +118,7 @@ exports.getAccessKeyForUserWithPermissions = async function(api, permissions) {
     .set('x-access-token', tokens.admin)
     .expect(200)
 
-  let accessKey = randomstring.generate(8)
+  const accessKey = randomstring.generate(8)
   await exports.api.db.access_keys.create({
     user_collection: 'users',
     user_id: registerRes.body.id,
