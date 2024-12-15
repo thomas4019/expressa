@@ -3,7 +3,8 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const { VueLoaderPlugin } = require('vue-loader')
-const vueLoaderConfig = require('./vue-loader.conf')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const SvgSpriteLoaderPlugin = require('svg-sprite-loader/plugin');
 
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
@@ -38,6 +39,9 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       '@': resolve('src')
+    },
+    fallback: {
+      path: require.resolve("path-browserify")
     }
   },
   module: {
@@ -46,7 +50,11 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: vueLoaderConfig
+        options: {
+          compilerOptions: {
+            preserveWhitespace: false
+          }
+        }
       },
       {
         test: /\.js$/,
@@ -58,15 +66,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.svg$/,
-        loader: 'svg-sprite-loader',
-        include: [resolve('src/icons')],
-        options: {
-          symbolId: 'icon-[name]'
-        }
-      },
-      {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif)(\?.*)?$/,
         loader: 'url-loader',
         exclude: [resolve('src/icons')],
         options: {
@@ -89,20 +89,24 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
+      },
+      {
+        test: /\.svg$/,
+        loader: 'svg-sprite-loader',
+        options: {
+          symbolId: 'icon-[name]',
+        }
       }
     ]
   },
-  plugins: [new VueLoaderPlugin()],
-  node: {
-    // prevent webpack from injecting useless setImmediate polyfill because Vue
-    // source contains it (although only uses it if it's native).
-    setImmediate: false,
-    // prevent webpack from injecting mocks to Node native modules
-    // that does not make sense for the client
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-    child_process: 'empty'
-  }
+  plugins: [
+    new SvgSpriteLoaderPlugin({
+      plainSprite: true, // Enable the plain sprite mode
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[contenthash:8].css', // Customize output CSS filename
+      chunkFilename: 'css/[id].[contenthash:8].css', // Customize chunk filenames
+    }),
+    new VueLoaderPlugin()],
+  node: false
 }

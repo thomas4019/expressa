@@ -7,9 +7,7 @@ const merge = require('webpack-merge')
 const baseWebpackConfig = require('./webpack.base.conf')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin');
 
 function resolve(dir) {
@@ -17,10 +15,6 @@ function resolve(dir) {
 }
 
 const env = require('../config/prod.env')
-
-// For NamedChunksPlugin
-const seen = new Set()
-const nameLength = 4
 
 const webpackConfig = merge(baseWebpackConfig, {
   mode: 'production',
@@ -42,11 +36,6 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
-    // extract css into its own file
-    new MiniCssExtractPlugin({
-      filename: utils.assetsPath('css/[name].[contenthash:8].css'),
-      chunkFilename: utils.assetsPath('css/[name].[contenthash:8].css')
-    }),
     // generate dist index.html with correct asset hash for caching.
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
@@ -67,29 +56,6 @@ const webpackConfig = merge(baseWebpackConfig, {
       // in certain cases, and in webpack 4, chunk order in HTML doesn't
       // matter anyway
     }),
-    new ScriptExtHtmlWebpackPlugin({
-      //`runtime` must same as runtimeChunk name. default is `runtime`
-      inline: /runtime\..*\.js$/
-    }),
-    // keep chunk.id stable when chunk has no name
-    new webpack.NamedChunksPlugin(chunk => {
-      if (chunk.name) {
-        return chunk.name
-      }
-      const modules = Array.from(chunk.modulesIterable)
-      if (modules.length > 1) {
-        const hash = require('hash-sum')
-        const joinedHash = hash(modules.map(m => m.id).join('_'))
-        let len = nameLength
-        while (seen.has(joinedHash.substr(0, len))) len++
-        seen.add(joinedHash.substr(0, len))
-        return `chunk-${joinedHash.substr(0, len)}`
-      } else {
-        return modules[0].id
-      }
-    }),
-    // keep module.id stable when vender modules does not change
-    new webpack.HashedModuleIdsPlugin(),
     // copy custom static assets
     new CopyWebpackPlugin([
       {
@@ -99,31 +65,6 @@ const webpackConfig = merge(baseWebpackConfig, {
       }
     ])
   ],
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        libs: {
-          name: 'chunk-libs',
-          test: /[\\/]node_modules[\\/]/,
-          priority: 10,
-          chunks: 'initial' // 只打包初始时依赖的第三方
-        },
-        elementUI: {
-          name: 'chunk-elementUI', // 单独将 elementUI 拆包
-          priority: 20, // 权重要大于 libs 和 app 不然会被打包进 libs 或者 app
-          test: /[\\/]node_modules[\\/]element-ui[\\/]/
-        }
-      }
-    },
-    runtimeChunk: 'single',
-    minimizer: [
-      new TerserPlugin(),
-      // Compress extracted CSS. We are using this plugin so that possible
-      // duplicated CSS from different components can be deduped.
-      new OptimizeCSSAssetsPlugin()
-    ]
-  }
 })
 
 if (config.build.productionGzip) {

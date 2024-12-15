@@ -26,8 +26,8 @@ In another folder, create a project using app.js from the readme.
 ## To release
 * Update version in package.json
 * (cd modules/admin && npm run build)
-* npm publish
 * ls -la modules/admin/dist/static/js
+* npm publish
 * Create release on GitHub
 
 ## More info

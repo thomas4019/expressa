@@ -90,7 +90,7 @@
       @sort-change="handleSortChange"
     >
       <el-table-column
-        v-for="(name, i) in selectedColumns"
+        v-for="name in selectedColumns"
         :key="name"
         :label="name"
         :prop="name"
