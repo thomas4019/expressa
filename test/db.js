@@ -104,6 +104,7 @@ collectionNames.forEach(function (collection) {
     it('create without id', async function () {
       id = await db.create({
         title: 'first',
+        number: 11,
         data: { field: '123' },
         arr: [{ color: 'red', subarray: [{ v: 'abc' }] }],
       })
@@ -113,6 +114,7 @@ collectionNames.forEach(function (collection) {
     it('create with id', async function () {
       const id = await db.create({
         _id: id2,
+        number: 100,
         title: 'second',
         arr: [ { color: 'blue', num: 1337 }],
         data: { nestedArr: ['abc'] }
@@ -162,6 +164,12 @@ collectionNames.forEach(function (collection) {
       const docs = await db.find({}, 0, 1, [['title', -1]])
       expect(docs.length).to.equal(1)
       expect(docs[0].title).to.equal('second')
+    })
+
+    it('find orderby numeric', async function () {
+      const docs = await db.find({}, 0, 1, [['number', 1]])
+      expect(docs.length).to.equal(1)
+      expect(docs[0].title).to.equal('first')
     })
 
     it('find by id', async function () {
@@ -220,12 +228,12 @@ collectionNames.forEach(function (collection) {
     })
 
     it('project field exclude id', async function () {
-      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 1, _id: 0 })
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 1, _id: 0})
       expect(docs[0]).to.eql( {data: { field: '123' } })
     })
 
     it('project exclude field', async function () {
-      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 0, arr: 0 })
+      const docs = await db.find({ title: 'first' }, 0, 10, undefined, { data: 0, arr: 0, number: 0 })
       expect(docs[0]).to.eql( { title: 'first', _id: docs[0]._id })
     })
 

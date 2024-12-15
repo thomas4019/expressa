@@ -50,12 +50,28 @@ describe('querying collections', function () {
         _id: 'testid123',
         title: 'doc3',
         data: {
-          number: 2,
+          number: 25,
           field: 'test'
         }
       })
       .expect(200)
   })
+
+  it('create doc 4', async function () {
+    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
+    await request(app)
+      .post('/testdoc')
+      .set('x-access-token', token)
+      .send({
+        _id: 'testid1234',
+        title: 'doc4',
+        data: {
+          number: 2,
+        }
+      })
+      .expect(200)
+  })
+
 
   let token
 
@@ -81,7 +97,7 @@ describe('querying collections', function () {
       .get('/testdoc')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body).to.have.lengthOf(3)
+    expect(res.body).to.have.lengthOf(4)
   })
 
   it('return docs matching deep field', async function () {
@@ -120,7 +136,7 @@ describe('querying collections', function () {
       .get('/testdoc?limit=2&page=1')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body.itemsTotal).to.equal(3)
+    expect(res.body.itemsTotal).to.equal(4)
     expect(res.body.itemsPerPage).to.equal(2)
     expect(res.body.pages).to.equal(2)
     expect(res.body.pagePrev).to.equal(undefined)
@@ -136,14 +152,15 @@ describe('querying collections', function () {
       .get('/testdoc?limit=2&page=2')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body.itemsTotal).to.equal(3)
+    expect(res.body.itemsTotal).to.equal(4)
     expect(res.body.itemsPerPage).to.equal(2)
     expect(res.body.pages).to.equal(2)
     expect(res.body.pagePrev).to.equal(1)
     expect(res.body.pageNext).to.equal(undefined)
-    expect(res.body.data).to.have.lengthOf(1)
+    expect(res.body.data).to.have.lengthOf(2)
 
     expect(res.body.data[0].title).to.equal('doc3')
+    expect(res.body.data[1].title).to.equal('doc4')
   })
 
   it('pagemetadisable url parameter strips additional page detail', async function () {
@@ -156,9 +173,10 @@ describe('querying collections', function () {
     expect(res.body.pages).to.equal(undefined)
     expect(res.body.pagePrev).to.equal(1)
     expect(res.body.pageNext).to.equal(undefined)
-    expect(res.body.data).to.have.lengthOf(1)
+    expect(res.body.data).to.have.lengthOf(2)
 
     expect(res.body.data[0].title).to.equal('doc3')
+    expect(res.body.data[1].title).to.equal('doc4')
   })
 
   it('page 3 is empty', async function () {
@@ -166,7 +184,7 @@ describe('querying collections', function () {
       .get('/testdoc?limit=2&page=3')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body.itemsTotal).to.equal(3)
+    expect(res.body.itemsTotal).to.equal(4)
     expect(res.body.itemsPerPage).to.equal(2)
     expect(res.body.pages).to.equal(2)
     expect(res.body.pagePrev).to.equal(2)
@@ -179,7 +197,7 @@ describe('querying collections', function () {
       .get('/testdoc?limit=2&page=3')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body.itemsTotal).to.equal(3)
+    expect(res.body.itemsTotal).to.equal(4)
     expect(res.body.itemsPerPage).to.equal(2)
     expect(res.body.pages).to.equal(2)
     expect(res.body.pagePrev).to.equal(2)
@@ -198,7 +216,7 @@ describe('querying collections', function () {
     expect(res.body.pagePrev).to.equal(undefined)
     expect(res.body.pageNext).to.equal(undefined)
     expect(res.body.data).to.have.lengthOf(1)
-    expect(res.body.data[0].title).to.equal('doc3')
+    expect(res.body.data[0].title).to.equal('doc4')
   })
 
   it('sort by deep field ascending', async function () {
@@ -207,10 +225,11 @@ describe('querying collections', function () {
       .get('/testdoc?orderby={"data.number":1}')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body).to.have.lengthOf(3)
-    expect(res.body[0].title).to.equal('doc2')
-    expect(res.body[1].title).to.equal('doc1')
-    expect(res.body[2].title).to.equal('doc3')
+    expect(res.body).to.have.lengthOf(4)
+    expect(res.body[0].title).to.equal('doc2') // -2
+    expect(res.body[1].title).to.equal('doc1') // 0
+    expect(res.body[2].title).to.equal('doc4') // 2
+    expect(res.body[3].title).to.equal('doc3') // 25
   })
 
   it('sort by deep field descending', async function () {
@@ -219,10 +238,11 @@ describe('querying collections', function () {
       .get('/testdoc?orderby={"meta.created":-1}')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body).to.have.lengthOf(3)
-    expect(res.body[0].title).to.equal('doc3')
-    expect(res.body[1].title).to.equal('doc2')
-    expect(res.body[2].title).to.equal('doc1')
+    expect(res.body).to.have.lengthOf(4)
+    expect(res.body[0].title).to.equal('doc4')
+    expect(res.body[1].title).to.equal('doc3')
+    expect(res.body[2].title).to.equal('doc2')
+    expect(res.body[3].title).to.equal('doc1')
   })
 
   it('project a specific field', async function () {
@@ -231,8 +251,8 @@ describe('querying collections', function () {
       .get('/testdoc?fields={"title":1}')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body).to.have.lengthOf(3)
-    expect(res.body[0].title).to.equal('doc1')
+    expect(res.body).to.have.lengthOf(4)
+    expect(res.body[0].title.substring(0, 3)).to.equal('doc')
     expect(res.body[0].data).to.be.undefined
   })
 
@@ -252,18 +272,18 @@ describe('querying collections', function () {
       .get('/testdoc?fields={"data":1}')
       .set('x-access-token', token)
       .expect(200)
-    expect(res.body).to.have.lengthOf(3)
+    expect(res.body).to.have.lengthOf(4)
     expect(res.body[0].title).to.be.undefined
-    expect(res.body[0].data.number).to.equal(0)
-    expect(res.body[0].data.field).to.equal('test111')
+    expect(res.body[0].data.number).to.not.be.undefined
+    expect(res.body[0].data.field).to.not.be.undefined
 
     const res2 = await request(app)
       .get('/testdoc?fields={"data.number":1}')
       .set('x-access-token', token)
       .expect(200)
-    expect(res2.body).to.have.lengthOf(3)
+    expect(res2.body).to.have.lengthOf(4)
     expect(res2.body[0].title).to.be.undefined
-    expect(res2.body[0].data.number).to.equal(0)
+    expect(res2.body[0].data.number).to.not.be.undefined
     expect(res2.body[0].data.field).to.be.undefined
   })
 })

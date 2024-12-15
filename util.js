@@ -191,7 +191,8 @@ exports.mongoToPostgresWhere = function(collection, query) {
 exports.mongoToPostgresOrderBy = function(collection, orderby) {
   const normalizedOrderBy = exports.normalizeOrderBy(orderby)
   return normalizedOrderBy.map((ordering) => {
-    return mongoToPostgres.convertDotNotation('data', ordering[0]) + (ordering[1] > 0 ? ' ASC' : ' DESC')
+    const field = mongoToPostgres.pathToText(['data'].concat(ordering[0].split('.')), false)
+    return field + (ordering[1] > 0 ? ' ASC' : ' DESC')
   }).join(', ')
 }
 

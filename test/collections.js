@@ -61,7 +61,7 @@ describe('basic collections', function () {
   })
 
   it('create without id', async function () {
-    const token = await testutils.getUserWithPermissions(api, 'testdoc: create')
+    const token = await testutils.getUserWithPermissions(api, ['testdoc: create', 'testdoc: delete'])
     const res = await request(app)
       .post('/testdoc')
       .set('x-access-token', token)
@@ -70,6 +70,14 @@ describe('basic collections', function () {
       })
       .expect(200)
     expect(res.body.status).to.equal('OK')
+
+    await request(app)
+      .delete('/testdoc/' + res.body.id)
+      .set('x-access-token', token)
+      .expect(200)
+      .expect({
+        status: 'OK'
+      })
   })
 
   it('create with a specific id', async function () {
