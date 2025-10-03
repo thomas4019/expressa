@@ -14,7 +14,8 @@ const webpackConfig = require('./webpack.prod.conf')
 const spinner = ora('building for production...')
 spinner.start()
 
-rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
+// Clean the entire dist directory to ensure no stale top-level hashed files linger
+rm(path.join(config.build.assetsRoot), err => {
   if (err) throw err
   webpack(webpackConfig, (err, stats) => {
     spinner.stop()

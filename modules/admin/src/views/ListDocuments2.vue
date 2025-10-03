@@ -187,6 +187,7 @@ export default {
     },
   },
   data: () => ({
+    activeCollectionName: '',
     page: 1,
     count: 0,
     data: [],
@@ -295,13 +296,16 @@ export default {
       this.update()
     },
     async update() {
+      // Determine active collection name without mutating prop
       if (this.$route.params.collectionName) {
-        this.collectionName = this.$route.params.collectionName
+        this.activeCollectionName = this.$route.params.collectionName
+      } else {
+        this.activeCollectionName = this.collectionName
       }
 
       // Fetch and Set schema info if name hasn't changed
-      if (!this.collection || this.collection._id !== this.collectionName) {
-        this.collection = (await request({ url: `/collection/${this.collectionName}` })).data
+      if (!this.collection || this.collection._id !== this.activeCollectionName) {
+        this.collection = (await request({ url: `/collection/${this.activeCollectionName}` })).data
         this.schema = this.collection.schema
       }
 
@@ -314,7 +318,7 @@ export default {
 
       // Fetch and Set table data
       const params = { ...this.allFilters }
-      const url = this.customParams ? `/${this.collectionName}/?${this.customParams}` : `/${this.collectionName}`
+      const url = this.customParams ? `/${this.activeCollectionName}/?${this.customParams}` : `/${this.activeCollectionName}`
       const info = (await request({ url, params })).data
       this.count = info.itemsTotal
       this.data = this.applyCustomColumnFilter(info.data)
@@ -340,9 +344,10 @@ export default {
     getSchemaProperty(obj, path) {
       const parts = path.split('.')
       let partObj = obj
-      for (const part of parts) {
-        if (partObj.properties && partObj.properties[part]) {
-          partObj = partObj.properties[part]
+      for (let index = 0; index < parts.length; index++) {
+        const key = parts[index]
+        if (partObj.properties && partObj.properties[key]) {
+          partObj = partObj.properties[key]
         } else {
           return
         }
@@ -372,7 +377,7 @@ export default {
       })
     },
     downloadCSV(data = this.data) {
-      const collection = this.collectionName
+      const collection = this.activeCollectionName || this.collectionName
       let text = this.selectedColumns.map((name) => '"' + name + '"').join(',') + '\n'
       if (data) {
         text += data.map((row) =>
@@ -394,7 +399,7 @@ export default {
           limit: 500,
         }
 
-        const response = (await request({ url: `/${this.collectionName}/${this.customParams}`, params })).data
+        const response = (await request({ url: `/${this.activeCollectionName || this.collectionName}/${this.customParams}`, params })).data
         rows = [...response.data, ...rows]
         page += 1
       }
