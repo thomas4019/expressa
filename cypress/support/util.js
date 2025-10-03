@@ -1,4 +1,4 @@
-exports.randomId = function(length) {
+export function randomId(length) {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 

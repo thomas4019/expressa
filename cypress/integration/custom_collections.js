@@ -13,9 +13,11 @@ describe('Custom Collections', function() {
     cy.visit('/')
     cy.get('.hamburger-container').click();
     cy.wait(100)
-    cy.get('span').contains('Collection').click();
+    cy.get('span').contains('Data').click();
+    cy.wait(1000)
+    cy.get('.is-opened span').contains('Collection').click();
 
-    cy.get('.btn-primary').click();
+    cy.get('.btn-primary').contains('Add').click();
     let id = `coll-${randomId()}`;
     cy.fillValue('_id', id)
 

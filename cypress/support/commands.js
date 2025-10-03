@@ -24,6 +24,21 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
+Cypress.Commands.overwrite('server', () => {
+  // no-op polyfill for deprecated cy.server
+})
+
+Cypress.Commands.overwrite('route', (originalFn, arg1, arg2, arg3) => {
+  // polyfill cy.route to cy.intercept for Cypress >= 10
+  if (typeof arg2 === 'undefined' && typeof arg3 === 'undefined') {
+    return cy.intercept(arg1)
+  }
+  if (typeof arg3 === 'undefined') {
+    return cy.intercept(arg1, arg2)
+  }
+  return cy.intercept(arg1, arg2, arg3)
+})
+
 Cypress.Commands.add('randomId', (length) => {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
