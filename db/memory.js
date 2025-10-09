@@ -68,6 +68,19 @@ module.exports = function (settings, collection) {
         matchedCount: matches.length
       }
     },
+    updateWithQuerySingle: async function (id, update, options) {
+      if (!store[id]) {
+        return {
+          matchedCount: 0
+        }
+      }
+      const doc = { _id: id, ...store[id] }
+      util.mongoUpdate(doc, update)
+      store[id] = doc
+      return {
+        matchedCount: 1
+      }
+    },
     delete: async function (id) {
       if (store[id]) {
         delete store[id]

@@ -73,6 +73,13 @@ module.exports = function (settings, collection) {
         matchedCount: res.matchedCount
       }
     },
+    updateWithQuerySingle: async function (id, update, options) {
+      const db = await this.getClient()
+      const res = await db.collection(collection).updateOne({ _id: id }, update, options)
+      return {
+        matchedCount: res.matchedCount
+      }
+    },
     delete: async function (id) {
       const db = await this.getClient()
       const res = await db.collection(collection).deleteOne({
