@@ -56,7 +56,7 @@ exports.getUserWithPermissions = async function(api, permissions) {
     permissions: permissionsMap
   }
 
-  const roleRes = await service.post('/role')
+  await service.post('/role')
     .set('x-access-token', tokens.admin)
     .send(role)
     .expect(200)
@@ -69,7 +69,7 @@ exports.getUserWithPermissions = async function(api, permissions) {
     .send(user)
     .expect(200)
 
-  const updateRes = await service.post(`/users/${registerRes.body.id}/update`)
+  await service.post(`/users/${registerRes.body.id}/update`)
     .send({ $push: { roles: roleName } })
     .set('x-access-token', tokens.admin)
     .expect(200)
@@ -100,7 +100,7 @@ exports.getAccessKeyForUserWithPermissions = async function(api, permissions) {
     permissions: permissionsMap
   }
 
-  const roleRes = await service.post('/role')
+  await service.post('/role')
     .set('x-access-token', tokens.admin)
     .send(role)
     .expect(200)
@@ -113,7 +113,7 @@ exports.getAccessKeyForUserWithPermissions = async function(api, permissions) {
     .send(user)
     .expect(200)
 
-  const updateRes = await service.post(`/users/${registerRes.body.id}/update`)
+  await service.post(`/users/${registerRes.body.id}/update`)
     .send({ $push: { roles: roleName } })
     .set('x-access-token', tokens.admin)
     .expect(200)
