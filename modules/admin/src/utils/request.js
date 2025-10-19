@@ -8,15 +8,15 @@ const get = (o, p) =>
 
 const service = axios.create({
   // eslint-disable-next-line
-  baseURL: (typeof settings !== 'undefined' ? settings.apiurl : process.env.BASE_API),
-  timeout: 5000 // 请求超时时间
+  baseURL: (typeof settings !== 'undefined' ? window.settings.apiurl : process.env.BASE_API),
+  timeout: window.settings?.api_timeout_ms || 5000
 })
+window.axios = service
 
-// request拦截器
 service.interceptors.request.use(
   config => {
     if (store.getters.token) {
-      config.headers['x-access-token'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+      config.headers['x-access-token'] = getToken()
     }
     return config
   },
@@ -27,7 +27,6 @@ service.interceptors.request.use(
   }
 )
 
-// response 拦截器
 service.interceptors.response.use(
   response => {
     return response

@@ -7,7 +7,20 @@ const api = expressa.api({
 const express = require('express')
 const app = express()
 app.use('/api', api)
-app.use('/admin', expressa.admin({ apiurl: 'http://localhost:3001/api/' }))
+app.use('/admin', expressa.admin({
+  apiurl: 'http://localhost:3001/api/',
+  api_timeout_ms: 10000,
+}))
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+api.get('/slow_endpoint', async (req, res) => {
+  await sleep(7000)
+
+  res.send('Hello World!')
+})
 
 api.addListener('ready', function onStart() {
   app.listen(3001, function () {
