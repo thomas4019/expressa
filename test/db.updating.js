@@ -149,7 +149,7 @@ collectionNames.forEach(function (collection) {
     })
 
     it('updateWithQuerySingle - non-existing document', async function () {
-      const fakeId = 'non-existing-id-12345'
+      const fakeId = '7c6f4426-f99f-4764-bebc-3b61c6710488'
       const res = await db.updateWithQuerySingle(fakeId, { $set: { singleUpdate: 'should-not-exist' } })
       expect(res.matchedCount).to.equal(0)
     })
