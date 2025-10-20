@@ -104,6 +104,25 @@ module.exports = function (settings, collection) {
         matchedCount: promises.length
       }
     },
+    updateWithQuerySingle: async function (id, update, options) {
+      try {
+        const doc = await store.getAsync(id)
+        if (!doc) {
+          return {
+            matchedCount: 0
+          }
+        }
+        util.mongoUpdate(doc, update)
+        await store.saveAsync(id, doc)
+        return {
+          matchedCount: 1
+        }
+      } catch (err) {
+        return {
+          matchedCount: 0
+        }
+      }
+    },
     delete: async function (id) {
       await this.get(id) // to check if exists
       await store.delete(id)

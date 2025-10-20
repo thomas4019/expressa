@@ -82,6 +82,13 @@ module.exports = function (settings, collectionId, collection) {
         matchedCount: result.rowCount
       }
     },
+    updateWithQuerySingle: async function (id, update, options) {
+      const updateSql = util.mongoToPostgresUpdate(collectionId, update)
+      const result = await pool.query('UPDATE ' + collectionId + ' SET data=' + updateSql + ' WHERE id=$1', [id])
+      return {
+        matchedCount: result.rowCount
+      }
+    },
     delete: async function (id) {
       const result = await pool.query('DELETE FROM ' + collectionId + ' WHERE id=$1', [id])
       if (result.rowCount === 0) {
