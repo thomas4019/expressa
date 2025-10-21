@@ -55,14 +55,6 @@ export default {
         }
         this.$emit('input', this.editor.getValue())
       })
-
-      const makeEditJsonTextAreaExpandable = () => {
-        const textarea = document.querySelector('.je-modal .je-edit-json--textarea')
-        textarea.classList.remove('je-edit-json--textarea') // INFO: Had to remove this class to remove height and width property
-        textarea.classList.add('expandable-textarea')
-      }
-
-      makeEditJsonTextAreaExpandable()
     },
     onSave() {
       this.$emit('json-save', this.json)
@@ -151,11 +143,45 @@ if (JSONEditor) {
 </script>
 
 <style>
-  .expandable-textarea {
-    display: block;
-    min-height: 250px;
-    min-width: 250px;
+  /* Override JSONEditor's textarea styles to make it expandable */
+  /* Use high specificity to override inline styles */
+  .jsoneditor-vue .je-modal textarea.form-control.je-edit-json--textarea[id] {
     resize: both !important;
+    min-height: 250px !important;
+    min-width: 250px !important;
+    /* Add padding to create a larger hit area for the resize handle */
+    padding-right: 20px !important;
+    padding-bottom: 20px !important;
+  }
+
+  /* Make the resize handle easier to grab with larger hit area and clear visibility */
+  .jsoneditor-vue .je-modal textarea.form-control.je-edit-json--textarea[id]::-webkit-resizer {
+    width: 20px !important;
+    height: 20px !important;
+    /* Position it in the corner of the larger hit area */
+    margin-right: -20px !important;
+    margin-bottom: -20px !important;
+    /* Use border to create visible resize handle */
+    border-right: 2px solid #999 !important;
+    border-bottom: 2px solid #999 !important;
+    background: transparent !important;
+  }
+
+  /* Alternative approach - add a visible corner indicator using ::after pseudo-element */
+  .jsoneditor-vue .je-modal textarea.form-control.je-edit-json--textarea[id] {
+    position: relative !important;
+  }
+
+  .jsoneditor-vue .je-modal textarea.form-control.je-edit-json--textarea[id]::after {
+    content: "⋰⋰⋰" !important;
+    position: absolute !important;
+    bottom: 2px !important;
+    right: 2px !important;
+    font-size: 8px !important;
+    line-height: 6px !important;
+    color: #999 !important;
+    pointer-events: none !important;
+    transform: rotate(45deg) !important;
   }
   .jsoneditor-vue img {
     border: 1px solid #ddd;
