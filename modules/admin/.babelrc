@@ -1,20 +1,9 @@
 {
   "sourceType": "module",
   "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "targets": {
-          "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
-        }
-      }
-    ]
   ],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-object-rest-spread",
-    "@babel/plugin-transform-runtime",
     "@vue/babel-plugin-transform-vue-jsx"
   ]
 }
