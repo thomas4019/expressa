@@ -215,7 +215,14 @@ module.exports.api = function (settings) {
     })
 
     router.use(bodyParser.json({
-      type: '*/*', // The wildcard type ensures it works even without the application/json header
+      type: (req) => {
+        const contentType = req.headers['content-type'] || ''
+        // Don't parse any multipart/* content - body-parser can't handle these
+        if (contentType.startsWith('multipart/')) {
+          return false
+        }
+        return true
+      },
       limit: router.settings.body_limit || '1mb',
     }))
 
