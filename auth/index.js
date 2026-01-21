@@ -16,6 +16,11 @@ exports.isValidPassword = function (password, hashedPassword) {
 
 exports.doLogin = handler.doLogin
 
+exports.getTokenError = function (req) {
+  if (!req.uerror) return {}
+  return { tokenError: req.uerror === 'jwt expired' ? 'expired token' : 'jwt error' }
+}
+
 exports.middleware = async function authMiddleware(req, res, next) {
   const key = req.query['access_key'] || req.headers['x-access-key']
   if (key) {

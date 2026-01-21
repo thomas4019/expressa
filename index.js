@@ -94,7 +94,7 @@ function ph (requestHandler) {
       req.returnedError = err
       res.status(err.status).send({
         error: err.result || err.message || err,
-        tokenError: req.uerror ?  (req.uerror === 'jwt expired' ? 'expired token' : 'jwt error') : undefined
+        ...auth.getTokenError(req)
       })
     }
   }
@@ -235,6 +235,16 @@ module.exports.api = function (settings) {
       req.getSetting = router.getSetting
       req.requestId = randomstring.generate(12)
       res.header('X-Request-ID', req.requestId)
+
+      // Token error helpers for custom endpoints
+      req.getTokenError = () => auth.getTokenError(req)
+      res.sendApiError = function (status, message) {
+        return this.status(status).send({
+          error: message,
+          ...auth.getTokenError(req)
+        })
+      }
+
       next()
     })
 
