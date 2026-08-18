@@ -4,12 +4,24 @@ const bodyParser = require('body-parser')
 const debug = require('debug')('expressa')
 const randomstring = require('randomstring')
 
+// Storage adapters load lazily, so that requiring expressa does not pull in a
+// driver for a backend the app never uses. This is what lets 'mongodb' and 'pg'
+// be optional peer dependencies. Getters (rather than a Proxy) keep `in`,
+// spread and Object.keys behaving exactly as they did for the old plain object.
 const dbTypeNames = ['cached', 'file', 'memory', 'postgres', 'mongo']
-const dbTypes = dbTypeNames.reduce((obj, name) => {
-  obj[name] = require('./db/' + name)
-  return obj
-}, {})
-dbTypes['mongodb'] = dbTypes['mongo'] // alias
+const dbTypes = {}
+const loadedDbTypes = {}
+for (const name of [...dbTypeNames, 'mongodb']) {
+  const target = name === 'mongodb' ? 'mongo' : name // alias
+  Object.defineProperty(dbTypes, name, {
+    get: () => {
+      loadedDbTypes[target] = loadedDbTypes[target] || require('./db/' + target)
+      return loadedDbTypes[target]
+    },
+    enumerable: true,
+    configurable: true
+  })
+}
 const auth = require('./auth')
 const util = require('./util')
 
