@@ -10,7 +10,7 @@ Expressa makes it easy to create basic APIs by using [JSON schema](http://json-s
 * re-use collection schema's in your frontend to generate forms
 * easily extendable so you can add complex features as well
 * define collections as [JSON schema](http://json-schema.org) instead of custom code
-* per-collection database storage: *MongoDB*, *PostgreSQL*, or *JSON-files* (useful for version control)
+* per-collection database storage: *MongoDB*, *PostgreSQL*, or *JSON-files* (useful for version control). JSON-file and in-memory storage work out of the box; MongoDB and PostgreSQL each need their driver installed alongside expressa (see [Getting Started](#getting-started))
 
 > Best of all: it's just middleware, not a framework 
 
@@ -27,6 +27,22 @@ It's very easy to install expressa in your project directory:
     cd myapp
     npm init
     npm install expressa express
+
+Expressa requires Node.js 20 or newer.
+
+### Storage drivers
+
+Expressa's core is storage-agnostic, so you install the driver for the backend you
+actually use. JSON-file storage (the default) and in-memory storage need nothing
+extra. For the database backends, add the matching driver:
+
+    npm install pg         # for 'postgres' storage
+    npm install mongodb    # for 'mongo' storage
+
+Both are declared as optional peer dependencies, so they are not installed
+automatically and you never carry a driver for a database you don't use. If a
+collection is configured for a backend whose driver is missing, expressa throws
+an error telling you which package to install.
 
 Create a file `app.js` with the following code (or just copy the middle 3 lines into your existing express app)
 
