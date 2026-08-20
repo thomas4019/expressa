@@ -36,4 +36,10 @@ exports.settingSchema = {
     description: 'The name of the folder where to put collections stored in the file system.',
     default: 'data'
   },
+  allow_where_in_api: {
+    type: 'boolean',
+    description: 'Whether to allow the $where and $function operators in the query parameter of REST requests. These are executed as JavaScript, so enabling this lets any client that can reach the API run code on the server. Off by default; only enable it if every caller is trusted.',
+    format: 'checkbox',
+    default: false,
+  },
 }
