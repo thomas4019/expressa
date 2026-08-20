@@ -4,6 +4,39 @@ const MongoQS = require('mongo-querystring')
 const util = require('../util')
 const queryStringParser = new MongoQS({})
 
+// Operators that the query engine compiles into executable JavaScript. Trusted
+// server-side callers of db.<collection>.find() may legitimately use them, but
+// they must never be accepted from an HTTP request, where they amount to
+// arbitrary code execution. See GHSA-vx6m-5p2v-fcvg.
+const CODE_EXECUTION_OPERATORS = ['$where', '$function']
+
+// Walks the whole query rather than only its top level, so an operator nested
+// inside $and/$or/$nor/$elemMatch is found too. Iterative on purpose: a
+// deeply nested query from an untrusted client should not be able to exhaust
+// the stack. Returns the offending operator, or undefined if there is none.
+function findCodeExecutionOperator (query) {
+  const pending = [query]
+  while (pending.length > 0) {
+    const value = pending.pop()
+    if (value === null || typeof value !== 'object') {
+      continue
+    }
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        pending.push(entry)
+      }
+      continue
+    }
+    for (const key of Object.keys(value)) {
+      if (CODE_EXECUTION_OPERATORS.includes(key)) {
+        return key
+      }
+      pending.push(value[key])
+    }
+  }
+  return undefined
+}
+
 function assertValidCollection(req) {
   if (!req.db[req.params.collection]) {
     throw new util.ApiError(404, 'unknown collection')
@@ -76,6 +109,12 @@ exports.get = async function (req) {
   let data, query
   if (req.query.query) {
     query = JSON.parse(req.query.query)
+    if (!req.getSetting('allow_where_in_api')) {
+      const operator = findCodeExecutionOperator(query)
+      if (operator) {
+        throw new util.ApiError(400, `${operator} is not allowed in the query parameter`)
+      }
+    }
   }
   else {
     const { skip, offset, limit, page, pageitems, pagemetadisable, orderby, ...params } = req.query // eslint-disable-line no-unused-vars
