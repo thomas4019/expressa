@@ -4,11 +4,13 @@ const MongoQS = require('mongo-querystring')
 const util = require('../util')
 const queryStringParser = new MongoQS({})
 
-// Operators that the query engine compiles into executable JavaScript. Trusted
-// server-side callers of db.<collection>.find() may legitimately use them, but
-// they must never be accepted from an HTTP request, where they amount to
-// arbitrary code execution. See GHSA-vx6m-5p2v-fcvg.
-const CODE_EXECUTION_OPERATORS = ['$where', '$function']
+// Operators that must not be accepted from an HTTP request. $where and
+// $function compile into executable JavaScript. $expr is an aggregation
+// expression that can reference any document field (including password)
+// and is too powerful for untrusted query strings. Trusted server-side
+// callers of db.<collection>.find() may still use them.
+// See GHSA-vx6m-5p2v-fcvg.
+const CODE_EXECUTION_OPERATORS = ['$where', '$function', '$expr']
 
 // Walks the whole query rather than only its top level, so an operator nested
 // inside $and/$or/$nor/$elemMatch is found too. Iterative on purpose: a
@@ -35,6 +37,59 @@ function findCodeExecutionOperator (query) {
     }
   }
   return undefined
+}
+
+function isPasswordFieldName (name) {
+  return name === 'password' || name.startsWith('password.')
+}
+
+// Password hashes are stripped from documents unless the caller has
+// "<collection>: view hashed passwords". Filtering or sorting on password
+// would still let them recover the hash (or whether it matches a guess).
+function referencesPasswordField (query) {
+  const pending = [query]
+  while (pending.length > 0) {
+    const value = pending.pop()
+    if (value === null || typeof value === 'undefined') {
+      continue
+    }
+    if (typeof value === 'string') {
+      // Mongo field paths in $expr / aggregation-style operators
+      if (value === '$password' || value.startsWith('$password.')) {
+        return true
+      }
+      continue
+    }
+    if (typeof value !== 'object') {
+      continue
+    }
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        pending.push(entry)
+      }
+      continue
+    }
+    for (const key of Object.keys(value)) {
+      if (isPasswordFieldName(key)) {
+        return true
+      }
+      pending.push(value[key])
+    }
+  }
+  return false
+}
+
+function orderbyReferencesPassword (orderby) {
+  if (!orderby) {
+    return false
+  }
+  for (const ordering of orderby) {
+    const field = Array.isArray(ordering) ? ordering[0] : ordering
+    if (typeof field === 'string' && isPasswordFieldName(field)) {
+      return true
+    }
+  }
+  return false
 }
 
 function assertValidCollection(req) {
@@ -132,6 +187,13 @@ exports.get = async function (req) {
       query['meta.owner'] = req.uid
       // if fields is null then all fields are requested
       if (fields) fields['meta.owner'] = 1
+    }
+  }
+
+  const collectionMeta = await req.db.collection.get(req.params.collection)
+  if (collectionMeta.enableLogin && !req.hasPermission(`${req.params.collection}: view hashed passwords`)) {
+    if (referencesPasswordField(query) || orderbyReferencesPassword(req.query.orderby)) {
+      throw new util.ApiError(400, 'password is a protected field')
     }
   }
 
