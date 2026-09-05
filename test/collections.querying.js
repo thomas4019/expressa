@@ -286,9 +286,10 @@ describe('querying collections', function () {
     expect(res2.body[0].data.field).to.be.undefined
   })
   describe('code execution operators', function () {
-    // The query parameter is parsed as JSON and handed to the query engine,
-    // which compiles $where and $function into executable JavaScript. They are
-    // rejected before the query runs. See GHSA-vx6m-5p2v-fcvg.
+    // The query parameter is parsed as JSON and handed to the query engine.
+    // $where and $function compile into executable JavaScript; $expr can
+    // reference any field. They are rejected before the query runs.
+    // See GHSA-vx6m-5p2v-fcvg.
     let viewToken
 
     before(async function () {
@@ -306,6 +307,21 @@ describe('querying collections', function () {
     it('rejects $function at the top level', async function () {
       await request(app)
         .get('/testdoc?query={"$function":{"body":"function () { return true }","args":[],"lang":"js"}}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+    })
+
+    it('rejects $expr at the top level', async function () {
+      const res = await request(app)
+        .get('/testdoc?query={"$expr":{"$eq":["$title","doc1"]}}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+      expect(res.body.error).to.contain('$expr')
+    })
+
+    it('rejects $expr nested inside $or', async function () {
+      await request(app)
+        .get('/testdoc?query={"$or":[{"title":"doc1"},{"$expr":{"$gt":["$data.number",0]}}]}')
         .set('x-access-token', viewToken)
         .expect(400)
     })

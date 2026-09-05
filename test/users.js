@@ -129,6 +129,60 @@ describe('user functionality', function () {
     expect(res.body.password).to.not.be.undefined
   })
 
+  it('cannot filter users by password without hashed password permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view'])
+    const res = await request(app)
+      .get('/users?query=' + encodeURIComponent(JSON.stringify({ password: { $regex: '^\\$2' } })))
+      .set('x-access-token', token)
+      .expect(400)
+    expect(res.body.error).to.contain('password')
+  })
+
+  it('cannot filter users by password via querystring operators', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view'])
+    // mongo-querystring treats a leading ^ as $regex
+    await request(app)
+      .get('/users?password=^$2')
+      .set('x-access-token', token)
+      .expect(400)
+  })
+
+  it('cannot filter users by nested password in $or', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view'])
+    await request(app)
+      .get('/users?query=' + encodeURIComponent(JSON.stringify({ $or: [{ email: 'nobody@example.com' }, { password: { $gt: '' } }] })))
+      .set('x-access-token', token)
+      .expect(400)
+  })
+
+  it('cannot sort users by password without hashed password permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view'])
+    await request(app)
+      .get('/users?orderby=' + encodeURIComponent(JSON.stringify({ password: 1 })))
+      .set('x-access-token', token)
+      .expect(400)
+  })
+
+  it('still allows other mongo operators on non-password fields', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view'])
+    const res = await request(app)
+      .get('/users?query=' + encodeURIComponent(JSON.stringify({ email: { $ne: 'nobody@example.com' } })))
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body.length).to.be.greaterThan(0)
+    expect(res.body[0].password).to.be.undefined
+  })
+
+  it('can filter users by password with hashed password permission', async function () {
+    const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: view hashed passwords'])
+    const res = await request(app)
+      .get('/users?query=' + encodeURIComponent(JSON.stringify({ password: { $regex: '^\\$2' } })))
+      .set('x-access-token', token)
+      .expect(200)
+    expect(res.body.length).to.be.greaterThan(0)
+    expect(res.body[0].password).to.be.a('string')
+  })
+
   it('cannot change role by default', async function () {
     const token = await testutils.getUserWithPermissions(api, ['users: view', 'users: edit'])
     delete user.collection
