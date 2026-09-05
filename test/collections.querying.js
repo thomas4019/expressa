@@ -285,4 +285,88 @@ describe('querying collections', function () {
     expect(res2.body[0].data.number).to.not.be.undefined
     expect(res2.body[0].data.field).to.be.undefined
   })
+  describe('code execution operators', function () {
+    // The query parameter is parsed as JSON and handed to the query engine,
+    // which compiles $where and $function into executable JavaScript. They are
+    // rejected before the query runs. See GHSA-vx6m-5p2v-fcvg.
+    let viewToken
+
+    before(async function () {
+      viewToken = await testutils.getUserWithPermissions(api, 'testdoc: view')
+    })
+
+    it('rejects $where at the top level', async function () {
+      const res = await request(app)
+        .get('/testdoc?query={"$where":"1 === 1"}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+      expect(res.body.error).to.contain('$where')
+    })
+
+    it('rejects $function at the top level', async function () {
+      await request(app)
+        .get('/testdoc?query={"$function":{"body":"function () { return true }","args":[],"lang":"js"}}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+    })
+
+    it('rejects $where nested inside $or', async function () {
+      await request(app)
+        .get('/testdoc?query={"$or":[{"title":"doc1"},{"$where":"1 === 1"}]}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+    })
+
+    it('rejects $where nested inside $and', async function () {
+      await request(app)
+        .get('/testdoc?query={"$and":[{"$where":"1 === 1"}]}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+    })
+
+    it('rejects $where nested inside $elemMatch', async function () {
+      await request(app)
+        .get('/testdoc?query={"arr":{"$elemMatch":{"$where":"1 === 1"}}}')
+        .set('x-access-token', viewToken)
+        .expect(400)
+    })
+
+    it('rejects $where before permissions are checked', async function () {
+      // The query runs inside find(), before the per-document permission
+      // listener fires, so an unauthorized request must be rejected on the
+      // operator rather than only on the eventual 401.
+      await request(app)
+        .get('/testdoc?query={"$where":"1 === 1"}')
+        .expect(400)
+    })
+
+    it('still allows the ordinary operators', async function () {
+      const res = await request(app)
+        .get('/testdoc?query={"$or":[{"data.number":{"$in":[25,2]}},{"title":{"$regex":"^doc1$"}}]}')
+        .set('x-access-token', viewToken)
+        .expect(200)
+      expect(res.body).to.have.lengthOf(3)
+    })
+
+    it('still allows a field whose value merely contains the operator name', async function () {
+      const res = await request(app)
+        .get('/testdoc?query={"title":"$where"}')
+        .set('x-access-token', viewToken)
+        .expect(200)
+      expect(res.body).to.have.lengthOf(0)
+    })
+
+    it('allows $where when allow_where_in_api is enabled', async function () {
+      api.settings.allow_where_in_api = true
+      try {
+        const res = await request(app)
+          .get('/testdoc?query={"$where":"this.title === \'doc1\'"}')
+          .set('x-access-token', viewToken)
+          .expect(200)
+        expect(res.body).to.have.lengthOf(1)
+      } finally {
+        delete api.settings.allow_where_in_api
+      }
+    })
+  })
 })
