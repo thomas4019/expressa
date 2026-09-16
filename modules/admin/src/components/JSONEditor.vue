@@ -63,6 +63,10 @@ export default {
 }
 
 if (JSONEditor) {
+  // json-editor >=2.16 strips HTML from string values unless DOMPurify is loaded.
+  // The admin edits stored data verbatim and only writes it to input values, never innerHTML.
+  JSONEditor.AbstractEditor.prototype.purify = value => value
+
   JSONEditor.defaults.resolvers.unshift(function(schema) {
     if (schema.type === 'object' && schema.format === 'schema') {
       return 'schema'
