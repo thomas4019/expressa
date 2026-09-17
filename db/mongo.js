@@ -1,4 +1,12 @@
-const mongo = require('mongodb')
+// 'mongodb' is an optional peer dependency - it is only needed by apps that
+// actually use the 'mongo' storage type. This module is required lazily (see
+// index.js), so this throws only when a collection asks for mongo storage.
+let mongo
+try {
+  mongo = require('mongodb')
+} catch (err) {
+  throw new Error('expressa: the \'mongo\' storage type requires the \'mongodb\' package. Install it with: npm install mongodb')
+}
 const MongoClient = mongo.MongoClient
 const util = require('../util')
 

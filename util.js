@@ -1,7 +1,9 @@
 const {v4} = require('uuid')
 const debug = require('debug')('expressa')
 const crypto = require('crypto')
-const pg = require('pg')
+// 'pg' is an optional peer dependency and is required lazily inside
+// getPgPool below - see the note there.
+let pg
 const pgPools = {}
 const dot = require('dot-object')
 const mongoQuery = require('mongo-query')
@@ -217,6 +219,11 @@ exports.mongoUpdate = function(doc, update) {
   return mongoQuery(doc, {}, update)
 }
 
+// Kept as an eager require, deliberately. This must NOT be converted into a
+// lazy getter: index.js builds router.util as `{ get pgpool() {...}, ...util }`
+// and a spread invokes getters at spread time, so the laziness would be
+// silently defeated. mongo-query-to-postgres-jsonb is small, pure JS and has no
+// advisories, so there is nothing to gain by making it optional.
 exports.mongoToPostgres = mongoToPostgres
 
 // paging requires orderby to include a field that is known to be unique and constant
@@ -401,7 +408,17 @@ exports.friendlyDuration = function friendlyDuration (seconds) {
   return Math.round(seconds) + ' seconds'
 }
 
+// 'pg' is required here rather than at module scope so that requiring expressa
+// does not load the postgres driver for apps that do not use postgres storage.
+// This is the only place in the codebase that touches 'pg'.
 exports.getPgPool = function getPgPool(connectionString) {
+  if (!pg) {
+    try {
+      pg = require('pg')
+    } catch (err) {
+      throw new Error('expressa: the \'postgres\' storage type requires the \'pg\' package. Install it with: npm install pg')
+    }
+  }
   if (!pgPools[connectionString]) {
     pgPools[connectionString] = new pg.Pool({ connectionString: connectionString })
   }
