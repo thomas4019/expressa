@@ -1,3 +1,4 @@
+const path = require('path')
 const Store = require('jfs')
 const debug = require('debug')('expressa')
 const { promisify } = require('util')
@@ -8,10 +9,22 @@ Store.prototype.saveAsync = promisify(Store.prototype.save)
 const util = require('../util')
 
 module.exports = function (settings, collection) {
-  const store = new Store((settings.file_storage_path || 'data') + '/' + collection, {
+  const baseDir = (settings.file_storage_path || 'data') + '/' + collection
+  const store = new Store(baseDir, {
     pretty: true,
     saveId: '_id'
   })
+
+  // Defense in depth against path traversal: confine every id to baseDir so
+  // the adapter stays safe even if a caller skips the controller's check.
+  const resolvedBase = path.resolve(baseDir)
+  function assertWithinCollection (id) {
+    const resolved = path.resolve(resolvedBase, id + '.json')
+    if (resolved !== path.join(resolvedBase, id + '.json') ||
+        (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep))) {
+      throw new util.ApiError(400, 'invalid document id')
+    }
+  }
 
   return {
     init: function () {},
@@ -48,6 +61,7 @@ module.exports = function (settings, collection) {
       return (await this.find(...params)).length
     },
     get: async function (id, fields) {
+      assertWithinCollection(id)
       try {
         let data = await store.getAsync(id)
         if (data) {
@@ -74,6 +88,7 @@ module.exports = function (settings, collection) {
       data = util.sortObjectKeys(data)
       util.addIdIfMissing(data)
       const id = data._id
+      assertWithinCollection(id)
       const existing = await this.exists(id)
       if (existing) {
         throw new util.ApiError(409, 'document already exists')
@@ -83,9 +98,13 @@ module.exports = function (settings, collection) {
     },
     update: async function (id, data) {
       data._id = data._id || id
+      assertWithinCollection(data._id)
       data = util.sortObjectKeys(data)
       await store.saveAsync(data._id, data)
       if (data._id !== id) {
+        if (id != null) {
+          assertWithinCollection(id)
+        }
         await store.delete(id)
       }
       return data
@@ -105,6 +124,7 @@ module.exports = function (settings, collection) {
       }
     },
     updateWithQuerySingle: async function (id, update, options) {
+      assertWithinCollection(id)
       try {
         const doc = await store.getAsync(id)
         if (!doc) {
@@ -124,6 +144,7 @@ module.exports = function (settings, collection) {
       }
     },
     delete: async function (id) {
+      assertWithinCollection(id)
       await this.get(id) // to check if exists
       await store.delete(id)
     }

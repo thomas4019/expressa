@@ -98,6 +98,22 @@ function assertValidCollection(req) {
   }
 }
 
+// Document ids become filesystem paths in the file store, so an id with a
+// path separator or '..' could escape the collection directory. Reject those
+// before they reach any storage adapter.
+function assertSafeDocumentId (id) {
+  if (typeof id !== 'string' ||
+      id.length === 0 ||
+      id.includes('/') ||
+      id.includes('\\') ||
+      id.includes('\0') ||
+      id.split(/[\\/]/).includes('..') ||
+      id === '..' ||
+      id === '.') {
+    throw new util.ApiError(400, 'invalid document id')
+  }
+}
+
 async function validateDocumentOwner(req, doc) {
   if (!doc.meta.owner_collection) {
     throw new util.ApiError(417, 'no owner_collection for owner found')
@@ -258,6 +274,7 @@ exports.insert = async function (req) {
 
 exports.getById = async function (req) {
   assertValidCollection(req)
+  assertSafeDocumentId(req.params.id)
   const fields = req.query.fields ? JSON.parse(req.query.fields) : null
   const data = await req.db[req.params.collection].get(req.params.id, fields)
   await util.notify('get', req, req.params.collection, data)
@@ -267,6 +284,7 @@ exports.getById = async function (req) {
 
 exports.replaceById = async function (req) {
   assertValidCollection(req)
+  assertSafeDocumentId(req.params.id)
   req.customResponseData = req.customResponseData || {}
   const data = req.body
   let oldDoc = {}
@@ -308,6 +326,7 @@ exports.replaceById = async function (req) {
 
 exports.updateById = async function (req) {
   assertValidCollection(req)
+  assertSafeDocumentId(req.params.id)
   req.customResponseData = req.customResponseData || {}
   const modifier = req.body
 
@@ -348,6 +367,7 @@ exports.updateById = async function (req) {
 
 exports.deleteById = async function (req) {
   assertValidCollection(req)
+  assertSafeDocumentId(req.params.id)
   req.customResponseData = req.customResponseData || {}
   const doc = await req.db[req.params.collection].get(req.params.id)
   await util.notify('delete', req, req.params.collection, doc)
