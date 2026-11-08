@@ -46,6 +46,11 @@ exports.register = function (req, collection) {
 }
 
 exports.getMe = function (req, collection) {
+  // Unauthenticated (no/invalid/expired token): req.uid is undefined, so
+  // return "not found" rather than letting it fail getById's id validation.
+  if (!req.uid) {
+    throw new util.ApiError(404, 'document not found')
+  }
   req.params.collection = collection
   req.params.id = req.uid
   return collectionsApi.getById(req)
