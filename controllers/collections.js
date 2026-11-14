@@ -1,5 +1,6 @@
 const debug = require('debug')('expressa')
 const MongoQS = require('mongo-querystring')
+const safeRegex = require('safe-regex')
 
 const util = require('../util')
 const queryStringParser = new MongoQS({})
@@ -34,6 +35,43 @@ function findCodeExecutionOperator (query) {
         return key
       }
       pending.push(value[key])
+    }
+  }
+  return undefined
+}
+
+// A user-supplied $regex (or RegExp) value is evaluated by the query engine
+// against stored documents. A catastrophic-backtracking pattern can block the
+// event loop for a long time (ReDoS), so reject patterns that safe-regex flags
+// as unsafe before the query runs. Walks the whole query so a $regex nested in
+// $and/$or/$elemMatch is checked too; iterative to avoid stack exhaustion.
+function findUnsafeRegex (query) {
+  const pending = [query]
+  while (pending.length > 0) {
+    const value = pending.pop()
+    if (value === null || typeof value !== 'object') {
+      continue
+    }
+    if (value instanceof RegExp) {
+      if (!safeRegex(value)) {
+        return value.source
+      }
+      continue
+    }
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        pending.push(entry)
+      }
+      continue
+    }
+    for (const key of Object.keys(value)) {
+      const child = value[key]
+      if (key === '$regex' && (typeof child === 'string' || child instanceof RegExp)) {
+        if (!safeRegex(child)) {
+          return child instanceof RegExp ? child.source : child
+        }
+      }
+      pending.push(child)
     }
   }
   return undefined
@@ -191,6 +229,10 @@ exports.get = async function (req) {
     const { skip, offset, limit, page, pageitems, pagemetadisable, orderby, ...params } = req.query // eslint-disable-line no-unused-vars
     delete params.fields
     query = queryStringParser.parse(params)
+  }
+  const unsafeRegex = findUnsafeRegex(query)
+  if (unsafeRegex) {
+    throw new util.ApiError(400, 'unsafe regular expression in query')
   }
   if (req.query.orderby) {
     req.query.orderby = JSON.parse(req.query.orderby)
