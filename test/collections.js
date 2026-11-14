@@ -60,6 +60,20 @@ describe('basic collections', function () {
     expect(res.body.status).to.equal('OK')
   })
 
+  it('rejects a collection id that is not a safe identifier', async function () {
+    // A collection id becomes a SQL table name and a directory name, so unsafe
+    // characters (quotes, path separators, etc.) must be rejected.
+    const token = await testutils.getUserWithPermissions(api, 'collection: create')
+    for (const badId of ['bad-name', '../escape', 'drop;table', 'a b', '1leading']) {
+      const res = await request(app)
+        .post('/collection')
+        .set('x-access-token', token)
+        .send({ _id: badId, storage: 'memory', documentsHaveOwners: false, schema: { type: 'object' } })
+        .expect(400)
+      expect(res.body.error).to.contain('invalid collection id')
+    }
+  })
+
   it('create without id', async function () {
     const token = await testutils.getUserWithPermissions(api, ['testdoc: create', 'testdoc: delete'])
     const res = await request(app)
