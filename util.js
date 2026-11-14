@@ -295,12 +295,32 @@ exports.shouldLogRequest = function (req, res) {
   return severityIndex <= severityLoggingIndex
 }
 
+// decodeURI throws URIError on a malformed percent-escape (e.g. '%E0%A4%A').
+// The request log must not fail on an attacker-controlled URL, so fall back to
+// the raw value when it cannot be decoded.
+function safeDecodeURI(value) {
+  if (typeof value !== 'string') {
+    return value
+  }
+  try {
+    return decodeURI(value)
+  } catch (err) {
+    return value
+  }
+}
+
+// Postgres rejects \u0000 in jsonb values, and a null byte has no place in a
+// log entry, so remove it from strings written to the log.
+function stripNullBytes(value) {
+  return typeof value === 'string' ? value.split('\u0000').join('') : value
+}
+
 function filterHeaders(req) {
   const headers = req.headers || {}
   return {
-    'user-agent': headers['user-agent'],
-    origin: headers['origin'],
-    referer: headers['referer'],
+    'user-agent': stripNullBytes(headers['user-agent']),
+    origin: stripNullBytes(headers['origin']),
+    referer: stripNullBytes(headers['referer']),
   }
 }
 
@@ -310,9 +330,9 @@ exports.createLogEntry = function (req, res) {
     severity: severity,
     user: req.uid,
     user_collection: req.ucollection,
-    url: decodeURI(req.originalUrl || req.url),
+    url: stripNullBytes(safeDecodeURI(req.originalUrl || req.url)),
     method: req.method,
-    referer: req.headers['referer'],
+    referer: stripNullBytes(req.headers['referer']),
     req: {
       ip: req.ip,
       headers: filterHeaders(req),
