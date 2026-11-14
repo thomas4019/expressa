@@ -15,14 +15,22 @@ module.exports = function logRequests(req, res, next) {
       return res.send(...params) // just call as normal with data
     }
     onFinished(res, async function (err) {
-      if (err) {
-        console.error('error found while logging.')
-        console.error(err)
-        return
-      }
-      if (util.shouldLogRequest(req, res)) {
-        const entry = util.createLogEntry(req, res)
-        await req.db.requestlog.create(entry)
+      // This callback runs detached after the response finishes, so anything
+      // thrown or rejected here is an unhandled rejection that crashes the
+      // process. A failed log write must never take the server down.
+      try {
+        if (err) {
+          console.error('error found while logging.')
+          console.error(err)
+          return
+        }
+        if (util.shouldLogRequest(req, res)) {
+          const entry = util.createLogEntry(req, res)
+          await req.db.requestlog.create(entry)
+        }
+      } catch (logErr) {
+        console.error('error while writing request log entry')
+        console.error(logErr)
       }
     })
   }
