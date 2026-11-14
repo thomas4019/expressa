@@ -385,4 +385,38 @@ describe('querying collections', function () {
       }
     })
   })
+
+  describe('regular expression denial of service', function () {
+    // A user-supplied $regex is evaluated against stored documents. A
+    // catastrophic-backtracking pattern can block the event loop (ReDoS), so
+    // unsafe patterns are rejected before the query runs.
+    let viewToken
+
+    before(async function () {
+      viewToken = await testutils.getUserWithPermissions(api, 'testdoc: view')
+    })
+
+    it('rejects an unsafe $regex pattern', async function () {
+      const res = await request(app)
+        .get('/testdoc?query=' + encodeURIComponent('{"title":{"$regex":"^(a+)+$"}}'))
+        .set('x-access-token', viewToken)
+        .expect(400)
+      expect(res.body.error).to.contain('unsafe regular expression')
+    })
+
+    it('rejects an unsafe $regex nested inside $or', async function () {
+      await request(app)
+        .get('/testdoc?query=' + encodeURIComponent('{"$or":[{"title":"doc1"},{"title":{"$regex":"(x+)+y"}}]}'))
+        .set('x-access-token', viewToken)
+        .expect(400)
+    })
+
+    it('still allows a safe $regex pattern', async function () {
+      const res = await request(app)
+        .get('/testdoc?query=' + encodeURIComponent('{"title":{"$regex":"^doc1$"}}'))
+        .set('x-access-token', viewToken)
+        .expect(200)
+      expect(res.body).to.have.lengthOf(1)
+    })
+  })
 })
