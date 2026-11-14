@@ -38,13 +38,15 @@ describe('user functionality', function () {
   })
 
   it('rejects unknown email', async function () {
+    // Same status and message as a wrong password, so the response does not
+    // reveal whether the email is registered.
     await request(app)
       .post('/users/login')
       .send(invalidEmailUser)
       .expect({
-        error: 'No users found with this email.'
+        error: 'Invalid email or password'
       })
-      .expect(400)
+      .expect(401)
   })
 
   it('rejects invalid password', async function () {
@@ -52,7 +54,7 @@ describe('user functionality', function () {
       .post('/users/login')
       .send(badPasswordUser)
       .expect({
-        error: 'Incorrect password'
+        error: 'Invalid email or password'
       })
       .expect(401)
   })
