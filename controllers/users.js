@@ -1,7 +1,13 @@
+const crypto = require('crypto')
 const auth = require('../auth')
 const util = require('../util')
 const collectionsApi = require('./collections')
 const permissions = require('../middleware/permissions')
+
+// A valid bcrypt hash of a random value. When no user matches the email we
+// still compare the supplied password against this, so the response takes the
+// same time whether or not the email is registered (no timing oracle).
+const DUMMY_PASSWORD_HASH = auth.createHash(crypto.randomBytes(32).toString('hex'))
 
 exports.login = async (req, collection) => {
   const password = req.body.password
@@ -12,16 +18,17 @@ exports.login = async (req, collection) => {
 
   req.body.email = req.body.email.toLowerCase()
 
-  // check if user exists
   const result = await req.db[collection].find({
     email: req.body.email
   })
-  if (result.length === 0) {
-    throw new util.ApiError(400, 'No ' + collection + ' found with this email.')
-  }
   const user = result[0]
-  if (!auth.isValidPassword(password, user.password)) {
-    throw new util.ApiError(401, 'Incorrect password')
+  // Always run one password comparison, and return the same error for an
+  // unknown email and a wrong password, so the endpoint does not reveal which
+  // emails are registered (via the message or the response timing).
+  const candidate = typeof password === 'string' ? password : ''
+  const passwordMatches = auth.isValidPassword(candidate, user ? user.password : DUMMY_PASSWORD_HASH)
+  if (!user || !passwordMatches) {
+    throw new util.ApiError(401, 'Invalid email or password')
   }
   const jwt_options = req.settings.jwt_expires_in ? { expiresIn: req.settings.jwt_expires_in } : {}
   const payload = auth.doLogin({
