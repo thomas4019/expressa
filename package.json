@@ -1,6 +1,6 @@
 {
   "name": "expressa",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "API framework using JSON schemas",
   "main": "index.js",
   "repository": "https://github.com/thomas4019/expressa",
@@ -66,7 +66,9 @@
     "testserver-watch": "rimraf testdata && nodemon test/testserver.js",
     "cypress": "cypress open",
     "testdbs": "./scripts/run_db_tests.sh",
-    "testcypress": "./scripts/run_cypress_tests.sh"
+    "testcypress": "./scripts/run_cypress_tests.sh",
+    "build:admin": "npm --prefix modules/admin ci && npm --prefix modules/admin run build",
+    "prepack": "npm run build:admin"
   },
   "license": "MIT"
 }

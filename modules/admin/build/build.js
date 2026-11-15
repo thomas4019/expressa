@@ -42,5 +42,8 @@ rm(path.join(config.build.assetsRoot), err => {
           "  Opening index.html over file:// won't work.\n"
       )
     )
+    // A worker thread stays open after the build, which would hang
+    // `npm pack` (prepack runs this build), so exit once the output is written.
+    process.exit(0)
   })
 })
